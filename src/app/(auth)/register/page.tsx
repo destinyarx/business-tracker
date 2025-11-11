@@ -2,7 +2,6 @@ import Image from "next/image";
 
 import {
   ClerkProvider,
-  SignIn,
   SignUp
 } from '@clerk/nextjs'
 
@@ -13,9 +12,6 @@ export default function Home() {
         <div className="flex justify-center items-center h-screen">
             <SignUp/>
         </div>
-        {/* <div className="flex justify-center items-center h-screen">
-            <SignIn/>
-        </div> */}
       </ClerkProvider>
     </div>
   );

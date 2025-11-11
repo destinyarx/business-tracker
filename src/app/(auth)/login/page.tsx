@@ -3,7 +3,6 @@ import Image from "next/image";
 import {
   ClerkProvider,
   SignIn,
-  SignUp
 } from '@clerk/nextjs'
 
 export default function Home() {
@@ -11,11 +10,8 @@ export default function Home() {
     <div className="w-full max-w-full min-h-screen bg-gradient-to-br from-teal-100 via-teal-50 to-teal-200">
       <ClerkProvider>
         <div className="flex justify-center items-center h-screen">
-            <SignUp/>
-        </div>
-        {/* <div className="flex justify-center items-center h-screen">
             <SignIn/>
-        </div> */}
+        </div>
       </ClerkProvider>
     </div>
   );
