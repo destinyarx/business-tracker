@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function ComingSoonPage() {
   return (
-    <div className="w-full max-w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 via-zinc-50 to-teal-100 text-gray-800 -mt-10">
+    <div className="w-full max-w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 via-gray-50 to-teal-100 text-gray-800 -mt-10">
       <div className="text-center p-8 rounded-2xl shadow-lg bg-white/80 backdrop-blur-md border border-gray-200 max-w-lg">
           <div className="flex justify-center mb-6">
               {/* Business icon */}
@@ -28,7 +28,7 @@ export default function ComingSoonPage() {
               This Feature is Coming Soon 🚀
           </h1>
   
-          <p className="text-gray-600 text-relaxed justify-center mb-10">
+          <p className="text-gray-600 mb-6">
               We're working hard to bring this feature to you.  
               Stay tuned — it's designed to help you manage your business smarter
               and track success effortlessly.
