@@ -47,7 +47,7 @@ export default async function RootLayout({
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           
           {/* Fixed Header */}
-          <header className="fixed top-0 left-0 w-full bg-white shadow-sm z-50 h-16 flex items-center px-4">
+          <header className="fixed top-0 left-0 w-full shadow-sm z-50 h-16 flex items-center bg-gradient-to-br from-teal-400 via-teal-200 to-teal-100 px-4">
             <SignedOut>
               <div className="flex justify-between w-full">
                 <div className="text-2xl font-semibold">Business Tracker</div>
