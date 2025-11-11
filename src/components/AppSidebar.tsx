@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { Calendar, Home, Inbox, CircleUserRound, CircleDollarSign, SquareChartGantt, ShoppingBasket, BadgeDollarSign, Wrench, Settings } from "lucide-react"
+import { CalendarDays, ChartNoAxesCombined, Receipt, CircleUserRound, SquareChartGantt, ShoppingBasket, BadgeDollarSign, Wrench, Settings, Bot } from "lucide-react"
 import { useSidebar, SidebarTrigger } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
 import { useSidebarStore } from "@/stores/sidebarStore"
@@ -18,16 +18,16 @@ import {
 } from "@/components/ui/sidebar"
 
 const items = [
-  { title: "Dashboard", url: "/dashboard", icon: Home },
+  { title: "Dashboard", url: "/dashboard", icon: ChartNoAxesCombined },
   { title: "Sales", url: "/sales", icon: BadgeDollarSign },
   { title: "Products", url: "/products", icon: ShoppingBasket },
   { title: "Services", url: "/products", icon: Wrench },
   { title: "Inventory", url: "/inventory", icon: SquareChartGantt },
-  { title: "Expenses", url: "/expenses", icon: CircleDollarSign },
-  { title: "Schedule", url: "/schedules", icon: Calendar },
+  { title: "Expenses", url: "/expenses", icon: Receipt },
+  { title: "Schedule", url: "/schedules", icon: CalendarDays },
   { title: "Customers", url: "/customers", icon: CircleUserRound },
   { title: "Settings", url: "/settings", icon: Settings },
-  // { title: "Customer Service", url: "#", icon: Settings },
+  { title: "NegosyoAI", url: "/negosyo-ai", icon: Bot },
 ]
 
 export function AppSidebar() {

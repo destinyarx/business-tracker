@@ -2,7 +2,7 @@
 
 export default function Index() {
     return (
-      <div className="w-full max-w-full h-[88vh] bg-gray-50 p-4">
+      <div className="w-full max-w-full h-[98vh] bg-gray-50 p-4">
         <div className="grid grid-cols-6 grid-rows-5 gap-4 h-full border border-red p-4">
           {/* Header */}
           <div className="col-span-6 bg-white shadow-md flex items-center justify-center rounded-md">
@@ -12,6 +12,10 @@ export default function Index() {
           {/* Left Sidebar */}
           <div className="row-span-3 row-start-2 bg-white shadow-md flex items-center justify-center rounded-md">
             <span className="text-gray-700 font-semibold">2 - Sidebar Left</span>
+
+            <div className="h-96">
+              This is the sidebar left
+            </div>
           </div>
   
           {/* Right Sidebar */}
