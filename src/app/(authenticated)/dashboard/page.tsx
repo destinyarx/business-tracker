@@ -12,7 +12,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchToken = async () => {
-      const t = await getToken();
+      const t = await getToken({ template: "supabase" });
+      console.log(t)
       setToken(t);
     };
     fetchToken();
@@ -21,7 +22,7 @@ export default function Dashboard() {
   if (!user) return <p>Loading...</p>;
 
   return (
-    <div>
+    <div className="w-full max-w-full">
       <h1>DASHBOARD</h1>
       <p><strong>User ID:</strong> {user.id}</p>
       <p><strong>Email:</strong> {user.primaryEmailAddress?.emailAddress}</p>
@@ -30,9 +31,10 @@ export default function Dashboard() {
       <hr className="my-4" />
 
       <p><strong>JWT Token:</strong></p>
-      <pre className="bg-gray-100 p-2 rounded">
+
+      {/* <div className="max-w-full bg-gray-100 p-2 rounded">
         {token ? token : "Fetching token..."}
-      </pre>
+      </div> */}
     </div>
   );
 }

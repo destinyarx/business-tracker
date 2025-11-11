@@ -2,10 +2,10 @@
 
 import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/nextjs";
 
-export default function Dashboard() {
+export default function index() {
   return (
     <>
-        <h1>Welcome to your dashboard</h1>
+        <h1>Customer Page</h1>
     </>
   );
 }
