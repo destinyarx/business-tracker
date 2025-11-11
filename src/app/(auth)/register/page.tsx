@@ -10,7 +10,7 @@ export default function Home() {
     <div className="w-full max-w-full min-h-screen bg-gradient-to-br from-teal-100 via-teal-50 to-teal-200">
       <ClerkProvider>
         <div className="flex justify-center items-center h-screen">
-            <SignUp/>
+            <SignUp routing="hash"/>
         </div>
       </ClerkProvider>
     </div>
