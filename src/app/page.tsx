@@ -1,6 +1,7 @@
-import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/components/ui/button"
+import Image from 'next/image';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button'
+import FeatureCard from '@/components/FeatureCard'
 
 
 import {
@@ -12,23 +13,64 @@ import {
 } from '@clerk/nextjs'
 
 export default function Home() {
+  const features = [
+    {
+      title: "Sales & Revenue Tracking",
+      description:
+        "Monitor your sales performance and revenue growth with comprehensive real-time analytics. Track sales on a daily, weekly, and monthly basis, identify emerging trends, and obtain the insights necessary to make informed, strategic business decisions.",
+      icon: "📈",
+    },
+    {
+      title: "Customer Management",
+      description:
+        "Centralize all customer information in one secure platform. Access contact details, purchase history, and interaction records to strengthen relationships, deliver tailored service, and consistently enhance customer satisfaction.",
+      icon: "👥",
+    },
+    {
+      title: "Inventory Management",
+      description:
+        "Optimize inventory management with a comprehensive overview of product availability. Monitor inventory movement, prevent shortages or overstock, and support uninterrupted, profitable business operations.",
+      icon: "📦",
+    },
+    {
+      title: "Expense Tracking & Reporting",
+      description:
+        "Accurately record and categorize expenses with ease. Generate detailed reports to analyze cash flow, identify spending patterns, and support informed financial decisions for sustained business stability.",
+      icon: "💰",
+    },
+    {
+      title: "NegosyoAI Insights",
+      description:
+        "Harness the capabilities of NegosyoAI to analyze your business data. Access actionable insights, identify key trends, forecast performance, and make data-driven decisions that drive growth and operational efficiency.",
+      icon: "🤖",
+    },
+    {
+      title: "Scheduler & Automated Receipts",
+      description:
+        "Coordinate tasks, set reminders, and streamline operations with an integrated scheduling solution. Automatically generate receipts or PDF reports and deliver them to customers via email, enhancing efficiency and projecting a professional business image.",
+      icon: "📅",
+    },
+  ];
+
   return (
     <div className="w-full max-w-full min-h-screen bg-gradient-to-br from-teal-100 via-teal-50 to-teal-200 px-10 pt-3 pb-5">
-      {/* Navbar on top */}
       <div className="flex flex-row justify-between items-center">
         <div className="bg-zinc-50 border-1 border-teal-600 rounded-lg py-1">
-          <Image
-            src="/logo-with-title.png"
-            alt="logo"
-            width={200}
-            height={200}
-          />
+          <Link href="/">
+            <Image
+              src="/logo-with-title.png"
+              alt="logo"
+              width={200}
+              height={200}
+            />
+          </Link>
         </div>
 
         <div className="flex flex-row gap-8 text-gray-500 text-[1rem] font-semibold">
           <div className="hover:text-gray-800">Features</div>
           <div className="hover:text-gray-800">Services</div>
           <div className=" hover:text-gray-800">Pricing</div>
+          <div className=" hover:text-gray-800">About</div>
           <div className="hover:text-gray-800">FAQ</div>
         </div>
 
@@ -81,49 +123,21 @@ export default function Home() {
 
       
       <section className="bg-gray-50 py-16 border rounded-xl mb-5">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-semibold text-gray-600">Core Features</h2>
-          <p className="text-gray-400 text-sm italic mb-8">
+        <div className="max-w-6xl mx-auto px-6 text-center mb-7">
+          <h2 className="text-4xl font-semibold text-teal-600 -mt-10">Core Features</h2>
+          <p className="text-gray-400 text-[1rem] font-light italic">
             Everything you need to manage your business efficiently in one place.
           </p>
+        </div>
 
-          <div className="flex flex-col md:flex-row gap-8 justify-center">
-            <div className="flex-1 bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300 border-t-4 border-teal-500">
-              <div className="flex flex-row items-center justify-center gap-2">
-                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-teal-100 mb-4 text-teal-600">
-                  📈
-                </div>
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">Sales Tracking</h3>
-              </div>
-              <p className="text-gray-600">
-                Monitor your sales growth and revenue with real-time analytics.
-              </p>
-            </div>
-
-            <div className="flex-1 bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300 border-t-4 border-teal-500">
-              <div className="flex flex-row items-center justify-center gap-2">
-                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-teal-100 mb-4 text-teal-600">
-                  👥
-                </div>
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">Customer Management</h3>
-              </div>
-              <p className="text-gray-600">
-                Keep track of your clients, contacts, and interactions in one place.
-              </p>
-            </div>
-
-            <div className="flex-1 bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300 border-t-4 border-teal-500">
-              <div className="flex flex-row items-center justify-center gap-2">
-                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-teal-100 mb-4 text-teal-600">
-                  📦
-                </div>
-                <h3 className="text-xl font-semibold text-gray-700 mb-2">Inventory & Expenses</h3>
-              </div>
-              <p className="text-gray-600">
-                Manage your inventory and expenses seamlessly for better business decisions.
-              </p>
-            </div>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mx-15">
+          {features.map((item, index) => (
+            <FeatureCard 
+              title={item.title} 
+              icon={item.icon} 
+              description={item.description}
+            />
+          ))}
         </div>
       </section>
     </div>
