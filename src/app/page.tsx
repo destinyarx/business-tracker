@@ -53,8 +53,8 @@ export default function Home() {
   ];
 
   return (
-    <div className="w-full max-w-full min-h-screen bg-gradient-to-br from-teal-100 via-teal-50 to-teal-200 px-10 pt-3 pb-5">
-      <div className="flex flex-row justify-between items-center">
+    <div className="w-screen max-w-screen min-h-screen bg-gradient-to-br from-teal-100 via-teal-50 to-teal-200 pt-3 pb-5">
+      <div className="flex flex-row justify-between items-center px-15">
         <div className="bg-zinc-50 border-1 border-teal-600 rounded-lg py-1">
           <Link href="/">
             <Image
@@ -84,7 +84,7 @@ export default function Home() {
               </Link>
 
               <Link href="/register">
-                <Button variant="outline" size="sm" className="font-medium text-white bg-sky-500 hover:bg-sky-200">
+                <Button variant="outline" size="sm" className="font-medium text-white bg-amber-500 hover:bg-amber-200">
                   Register
                 </Button>
               </Link>
@@ -97,32 +97,46 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex flex-row justify-between items-center h-[75vh] px-15 py-10">
+      <hr className="w-full h-[1.3px] bg-gray-300 border-0 rounded-full mt-2 mx-5" />
+
+      <div className="flex flex-row justify-between items-center h-[90vh] px-15 py-10">
         <div className="flex flex-col">
           <div className="text-6xl text-gray-800 font-semibold justify-center">
             Your All-in-One <br/>
             Business Companion
           </div>
 
-          <div className="text-[1.1rem] font-light text-gray-400 italic leading-tight mt-5">
+          <div className="text-[1.1rem] font-light text-gray-400 italic leading-tight mt-3  ">
             Easily track your customers, sales, inventory, and expenses <br/>
             with <strong>NegosyoTracker</strong> built for small business success.
           </div>
 
-          <div className="flex flex-row gap-2 mt-7">
-            <Button variant="outline" size="lg" className="rounded-full font-medium text-md bg-gradient-to-br from-teal-400 via-teal-300 to-teal-500 text-white hover:opacity-40">
-              Get Started
-            </Button>
+          <div className="flex flex-row gap-2 mt-10">
+            <Link href="/register">
+              <Button variant="outline" size="lg" className="rounded-full font-medium text-md bg-gradient-to-br from-teal-400 via-teal-300 to-teal-500 text-white hover:opacity-40">
+                Get Started
+              </Button>
+            </Link>
 
             <Button variant="outline" size="lg" className="rounded-full font-medium text-white text-md bg-slate-500 hover:opacity-40">
               Learn More
             </Button>
           </div>
         </div>
+
+        <div className="ml-10">
+            <Image
+              src="/landing.jpg"
+              alt="logo"
+              width={600}
+              height={300}
+              className="rounded-[2vw]"
+            />
+        </div>
       </div>
 
       
-      <section className="bg-gray-50 py-16 border rounded-xl mb-5">
+      <section className="bg-gray-50 py-16 border rounded-xl mb-5 mx-16">
         <div className="max-w-6xl mx-auto px-6 text-center mb-7">
           <h2 className="text-4xl font-semibold text-teal-600 -mt-10">Core Features</h2>
           <p className="text-gray-400 text-[1rem] font-light italic">
@@ -130,7 +144,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mx-15">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mx-10">
           {features.map((item, index) => (
             <FeatureCard 
               title={item.title} 

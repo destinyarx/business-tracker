@@ -52,7 +52,7 @@ export default async function RootLayout({
   
           {/* Sidebar + Main layout */}
           <SidebarProvider>
-            <div className="flex flex-row w-screen pt-13">
+            <div className="flex flex-row w-screen max-w-screen pt-13">
               <AppSidebar />
 
               <div className="w-full bg-gray-50 min-h-[calc(100vh-3rem)] p-4">

@@ -13,7 +13,7 @@ interface CardProps {
           </div>
           <h3 className="text-[1.2rem] font-semibold text-slate-500 mb-2">{title}</h3>
         </div>
-        <p className="text-slate-500 leading-relaxed text-justify font-light mx-5">
+        <p className="text-slate-500 leading-relaxed indent-4 text-justify font-light mx-5">
             {description}
         </p>
       </div>
