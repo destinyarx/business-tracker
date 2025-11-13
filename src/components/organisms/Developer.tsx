@@ -20,9 +20,9 @@ export default function DeveloperSection() {
         <div className="flex-1">
           <h2 className="text-4xl font-bold text-teal-600 mb-4">About the Developer</h2>
           <p className="text-gray-700 mb-4 leading-relaxed indent-5">
-            Hi! I’m 
+            Hi! I’m
             <Link href="https://www.linkedin.com/in/iamgiljeremy/">
-                <span className="font-semibold text-slate-800">Gil Jeremy Ditablan</span>, 
+                <span className="font-semibold text-slate-800">&nbsp;Gil Jeremy Ditablan</span>,&nbsp;
             </Link>
             a full-stack developer who loves building web applications and continually improving my craft. I’m dedicated to creating helpful, user-friendly solutions that make a difference for businesses and communities.
           </p>
