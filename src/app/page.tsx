@@ -6,7 +6,9 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button'
 import FeatureCard from '@/components/molecules/FeatureCard'
 import Pricing from '@/components/organisms/Pricing'
-import FrequentQuestion from "@/components/organisms/FrequentQuestion";
+import FrequentQuestion from "@/components/organisms/FrequentQuestion"
+import About from '@/components/organisms/About'
+import DeveloperSection from '@/components/organisms/Developer'
 
 import {
   ClerkProvider,
@@ -19,6 +21,8 @@ export default function Home() {
   const featureRef = useRef<HTMLElement | null>(null)
   const pricingRef = useRef<HTMLElement | null>(null)
   const frequentQuestionRef = useRef<HTMLElement | null>(null)
+  const aboutSectionRef = useRef<HTMLElement | null>(null)
+  const developerRef = useRef<HTMLElement | null>(null)
 
   const scrollToSection = (elementRef: React.RefObject<HTMLElement | null>) => {
     elementRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -86,8 +90,12 @@ export default function Home() {
             Pricing
           </div>
 
-          <div onClick={() => scrollToSection(featureRef)} className=" hover:text-gray-800">
+          <div onClick={() => scrollToSection(aboutSectionRef)} className=" hover:text-gray-800">
             About
+          </div>
+
+          <div onClick={() => scrollToSection(developerRef)} className=" hover:text-gray-800">
+            Developer
           </div>
 
           <div onClick={() => scrollToSection(frequentQuestionRef)} className="hover:text-gray-800">
@@ -189,9 +197,23 @@ export default function Home() {
 
       <section 
         ref={frequentQuestionRef} 
-        className="bg-gray-100 py-10 border rounded-xl mx-16"
+        className="bg-gray-100 py-10 border rounded-xl mx-16 mb-10"
       >
         <FrequentQuestion />
+      </section>
+
+      <section 
+        ref={aboutSectionRef} 
+        className="bg-gray-100 py-10 border rounded-xl mx-16 mb-10"
+      >
+        <About />
+      </section>
+
+      <section 
+        ref={developerRef} 
+        className="bg-gray-100 py-10 border rounded-xl mx-16"
+      >
+        <DeveloperSection />
       </section>
     </div>
 
