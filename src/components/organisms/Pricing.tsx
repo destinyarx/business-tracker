@@ -32,7 +32,7 @@ export default function Pricing() {
                                 <p className="font-light text-gray-400 text-xs ml-1">/month</p>
                             </div>
 
-                            <Button variant="outline" size="sm" className="rounded-full bg-teal-400">
+                            <Button variant="outline" size="sm" className="rounded-full  text-white bg-slate-800">
                                 Register Now
                             </Button>
                         </div>
