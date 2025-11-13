@@ -1,7 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button'
-import FeatureCard from '@/components/FeatureCard'
+import FeatureCard from '@/components/molecules/FeatureCard'
+import Pricing from '@/components/organisms/Pricing'
 
 
 import {
@@ -114,7 +115,7 @@ export default function Home() {
           <div className="flex flex-row gap-2 mt-10">
             <Link href="/register">
               <Button variant="outline" size="lg" className="rounded-full font-medium text-md bg-gradient-to-br from-teal-400 via-teal-300 to-teal-500 text-white hover:opacity-40">
-                Get Started
+              Get Started
               </Button>
             </Link>
 
@@ -153,6 +154,10 @@ export default function Home() {
             />
           ))}
         </div>
+      </section>
+
+      <section className="bg-gray-100 py-16 border rounded-xl mb-5 mx-16">
+        <Pricing/>
       </section>
     </div>
   );

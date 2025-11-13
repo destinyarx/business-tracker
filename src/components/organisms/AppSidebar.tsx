@@ -20,8 +20,9 @@ import {
 
 const items = [
   { title: "Dashboard", url: "/dashboard", icon: ChartNoAxesCombined },
-  { title: "Sales", url: "/sales", icon: BadgeDollarSign },
   { title: "Products", url: "/products", icon: ShoppingBasket },
+  { title: "Orders", url: "/orders", icon: BadgeDollarSign },
+  { title: "Sales", url: "/sales", icon: BadgeDollarSign },
   { title: "Services", url: "/services", icon: Wrench },
   { title: "Inventory", url: "/inventory", icon: SquareChartGantt },
   { title: "Expenses", url: "/expenses", icon: Receipt },

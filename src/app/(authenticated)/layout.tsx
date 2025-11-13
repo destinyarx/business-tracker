@@ -1,7 +1,7 @@
 import { cookies } from "next/headers"
 import type { Metadata } from 'next'
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from '@/components/AppSidebar'
+import { AppSidebar } from '@/components/organisms/AppSidebar'
 import {
   ClerkProvider,
   SignInButton,

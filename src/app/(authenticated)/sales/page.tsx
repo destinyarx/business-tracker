@@ -30,7 +30,7 @@ export default function ComingSoonPage() {
   
           <p className="text-gray-600 text-relaxed justify-center mb-10">
               We're working hard to bring this feature to you.  
-              Stay tuned — it's designed to help you manage your business smarter
+              Stay tuned <br/> it's designed to help you manage your business smarter
               and track success effortlessly.
           </p>
   

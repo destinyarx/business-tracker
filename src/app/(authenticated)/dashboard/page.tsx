@@ -34,7 +34,6 @@ export default function Dashboard() {
 
       <div className="w-full max-w-full h-[95vh] bg-gray-50 p-4">
         <div className="grid grid-cols-6 grid-rows-5 gap-4 h-full border border-red p-4">
-          {/* Header */}
           <div className="col-span-6 bg-white shadow-md flex items-center justify-center rounded-md">
             <span className="text-gray-700 font-semibold">1 - Header</span>
           </div>
