@@ -12,14 +12,13 @@ import {
   SignedIn,
   SignedOut,
   UserButton,
-  SignUpButton
 } from '@clerk/nextjs'
 
 export default function Home() {
-  const featureRef = useRef(null)
-  const pricingRef = useRef(null)
+  const featureRef = useRef<HTMLElement | null>(null)
+  const pricingRef = useRef<HTMLElement | null>(null)
 
-  const scrollToSection = <T extends HTMLElement>(elementRef: RefObject<T>) => {
+  const scrollToSection = (elementRef: React.RefObject<HTMLElement | null>) => {
     elementRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
