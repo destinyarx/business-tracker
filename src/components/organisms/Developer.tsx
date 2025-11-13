@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function DeveloperSection() {
   return (
@@ -19,7 +20,11 @@ export default function DeveloperSection() {
         <div className="flex-1">
           <h2 className="text-4xl font-bold text-teal-600 mb-4">About the Developer</h2>
           <p className="text-gray-700 mb-4 leading-relaxed indent-5">
-            Hi! I’m <span className="font-semibold text-slate-800">Gil Jeremy Ditablan</span>, a full-stack developer who loves building web applications and continually improving my craft. I’m dedicated to creating helpful, user-friendly solutions that make a difference for businesses and communities.
+            Hi! I’m 
+            <Link href="https://www.linkedin.com/in/iamgiljeremy/">
+                <span className="font-semibold text-slate-800">Gil Jeremy Ditablan</span>, 
+            </Link>
+            a full-stack developer who loves building web applications and continually improving my craft. I’m dedicated to creating helpful, user-friendly solutions that make a difference for businesses and communities.
           </p>
           <p className="text-gray-700 mb-4 leading-relaxed indent-5">
             I developed <span className="font-semibold text-teal-600">NegosyoTracker</span> to help entrepreneurs, small business owners, and local businesses efficiently manage their daily operations through a cloud-based platform.
