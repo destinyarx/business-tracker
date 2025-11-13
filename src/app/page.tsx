@@ -1,9 +1,11 @@
+"use client"
+
+import { useRef, RefObject } from "react";
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button'
 import FeatureCard from '@/components/molecules/FeatureCard'
 import Pricing from '@/components/organisms/Pricing'
-
 
 import {
   ClerkProvider,
@@ -14,6 +16,13 @@ import {
 } from '@clerk/nextjs'
 
 export default function Home() {
+  const featureRef = useRef(null)
+  const pricingRef = useRef(null)
+
+  const scrollToSection = <T extends HTMLElement>(elementRef: RefObject<T>) => {
+    elementRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   const features = [
     {
       title: "Sales & Revenue Tracking",
@@ -68,9 +77,14 @@ export default function Home() {
         </div>
 
         <div className="flex flex-row gap-8 text-gray-500 text-[1rem] font-semibold">
-          <div className="hover:text-gray-800">Features</div>
-          <div className="hover:text-gray-800">Services</div>
-          <div className=" hover:text-gray-800">Pricing</div>
+          <div onClick={() => scrollToSection(featureRef)} className="hover:text-gray-800">
+            Features
+          </div>
+
+          <div onClick={() => scrollToSection(pricingRef)} className=" hover:text-gray-800">
+            Pricing
+          </div>
+
           <div className=" hover:text-gray-800">About</div>
           <div className="hover:text-gray-800">FAQ</div>
         </div>
@@ -137,7 +151,10 @@ export default function Home() {
       </div>
 
       
-      <section className="bg-gray-50 py-16 border rounded-xl mb-5 mx-16">
+      <section 
+        ref={featureRef} 
+        className="bg-gray-50 py-16 border rounded-xl mb-5 mx-16"
+      >
         <div className="max-w-6xl mx-auto px-6 text-center mb-7">
           <h2 className="text-4xl font-semibold text-teal-600 -mt-10">Core Features</h2>
           <p className="text-gray-400 text-[1rem] font-light italic">
@@ -157,8 +174,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-gray-100 py-16 border rounded-xl mb-5 mx-16">
-        <Pricing/>
+      <section 
+        ref={pricingRef} 
+        className="bg-gray-100 py-16 border rounded-xl mb-5 mx-16"
+      >
+        <Pricing />
       </section>
     </div>
   );
