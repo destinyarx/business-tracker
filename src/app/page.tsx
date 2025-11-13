@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button'
 import FeatureCard from '@/components/molecules/FeatureCard'
 import Pricing from '@/components/organisms/Pricing'
+import FrequentQuestion from "@/components/organisms/FrequentQuestion";
 
 import {
   ClerkProvider,
@@ -17,6 +18,7 @@ import {
 export default function Home() {
   const featureRef = useRef<HTMLElement | null>(null)
   const pricingRef = useRef<HTMLElement | null>(null)
+  const frequentQuestionRef = useRef<HTMLElement | null>(null)
 
   const scrollToSection = (elementRef: React.RefObject<HTMLElement | null>) => {
     elementRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -84,8 +86,13 @@ export default function Home() {
             Pricing
           </div>
 
-          <div className=" hover:text-gray-800">About</div>
-          <div className="hover:text-gray-800">FAQ</div>
+          <div onClick={() => scrollToSection(featureRef)} className=" hover:text-gray-800">
+            About
+          </div>
+
+          <div onClick={() => scrollToSection(frequentQuestionRef)} className="hover:text-gray-800">
+            FAQ
+          </div>
         </div>
 
         <div className="flex flex-row gap-2 -mt-3">
@@ -138,7 +145,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="ml-10">
+        <div className="mr-10">
             <Image
               src="/landing.jpg"
               alt="logo"
@@ -175,10 +182,19 @@ export default function Home() {
 
       <section 
         ref={pricingRef} 
-        className="bg-gray-100 py-16 border rounded-xl mb-5 mx-16"
+        className="bg-gray-100 py-16 border rounded-xl mb-10 mx-16"
       >
         <Pricing />
       </section>
+
+      <section 
+        ref={frequentQuestionRef} 
+        className="bg-gray-100 py-10 border rounded-xl mx-16"
+      >
+        <FrequentQuestion />
+      </section>
     </div>
+
+
   );
 }
