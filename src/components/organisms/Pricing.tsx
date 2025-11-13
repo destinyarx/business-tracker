@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
-import { Badge, BadgeCheck } from "lucide-react"
+import { Badge, BadgeCheck } from 'lucide-react'
+import Link from 'next/link'
 
 
 export default function Pricing() {
@@ -32,9 +33,11 @@ export default function Pricing() {
                                 <p className="font-light text-gray-400 text-xs ml-1">/month</p>
                             </div>
 
-                            <Button variant="outline" size="sm" className="rounded-full  text-white bg-slate-800">
-                                Register Now
-                            </Button>
+                            <Link href="/register">
+                                <Button variant="outline" size="sm" className="rounded-full  text-white bg-slate-800">
+                                    Register Now
+                                </Button>
+                            </Link>
                         </div>
                     </div>
 
@@ -95,9 +98,11 @@ export default function Pricing() {
                                 <p className="font-light  text-xs ml-1">/month</p>
                             </div>
 
-                            <Button variant="outline" size="sm" className="rounded-full bg-zinc-50 text-black hover:opacity-60">
-                                Register Now
-                            </Button>
+                            <Link href="/register">
+                                <Button variant="outline" size="sm" className="rounded-full bg-zinc-50 text-black hover:opacity-60">
+                                    Register Now
+                                </Button>
+                            </Link>
                         </div>
                     </div>
 
