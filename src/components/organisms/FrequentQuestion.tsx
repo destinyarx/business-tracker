@@ -9,7 +9,7 @@ export default function FrequentQuestion() {
 
     const faqs = [
         {
-            question: "What is NegosyoAI and how does it help my business?",
+            question: "What is NegosyoTracker and how does it help my business?",
             answer: `NegosyoTracker is a simple all-in-one system built for small to medium business owners who can’t afford expensive software or subscriptions.
                 It helps you manage your sales, customers, inventory, and expenses — all in one place. 
                 The built-in NegosyoAI analyzes your data to show sales trends, best-selling products, and forecasts, helping you make smart, data-driven decisions.`,
