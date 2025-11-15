@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { CalendarDays, ChartNoAxesCombined, Receipt, CircleUserRound, SquareChartGantt, ShoppingBasket, BadgeDollarSign, Wrench, Settings, Bot } from "lucide-react"
+import { CalendarDays, ShoppingCart, ChartNoAxesCombined, Receipt, CircleUserRound, SquareChartGantt, ShoppingBasket, BadgeDollarSign, Wrench, Settings, Bot } from "lucide-react"
 import { useSidebar, SidebarTrigger } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
 import { useSidebarStore } from "@/stores/sidebarStore"
@@ -21,7 +21,7 @@ import {
 const items = [
   { title: "Dashboard", url: "/dashboard", icon: ChartNoAxesCombined },
   { title: "Products", url: "/products", icon: ShoppingBasket },
-  { title: "Orders", url: "/orders", icon: BadgeDollarSign },
+  { title: "Orders", url: "/orders", icon: ShoppingCart },
   { title: "Sales", url: "/sales", icon: BadgeDollarSign },
   { title: "Services", url: "/services", icon: Wrench },
   { title: "Inventory", url: "/inventory", icon: SquareChartGantt },
