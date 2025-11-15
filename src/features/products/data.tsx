@@ -2,93 +2,93 @@ export const data = {
     "products": [
       {
         "id": 1,
-        "title": "Wireless Headphones",
-        "description": "High-quality over-ear wireless headphones with noise cancellation.",
-        "price": 99.99,
-        "stock": 25,
-        "image": "https://example.com/images/headphones.jpg",
-        "category": "Electronics"
+        "title": "Classic Pepperoni Pizza",
+        "description": "A delicious pepperoni pizza with melted cheese and crispy crust.",
+        "price": 12.99,
+        "stock": 15,
+        "image": "https://foodish-api.com/images/pizza/pizza1.jpg",
+        "category": "Meals"
       },
       {
         "id": 2,
-        "title": "Smartwatch Series 7",
-        "description": "Stay connected and track your fitness with the latest smartwatch.",
-        "price": 199.99,
-        "stock": 40,
-        "image": "https://example.com/images/smartwatch.jpg",
-        "category": "Electronics"
+        "title": "Cheese Burger",
+        "description": "Juicy beef patty with cheese, lettuce, and tomato.",
+        "price": 8.99,
+        "stock": 20,
+        "image": "https://foodish-api.com/images/burger/burger3.jpg",
+        "category": "Fast Food"
       },
       {
         "id": 3,
-        "title": "Gaming Mouse",
-        "description": "Ergonomic gaming mouse with customizable RGB lighting.",
-        "price": 49.99,
-        "stock": 60,
-        "image": "https://example.com/images/gaming-mouse.jpg",
-        "category": "Electronics"
+        "title": "Chocolate Dessert",
+        "description": "Rich chocolate dessert perfect for sweet lovers.",
+        "price": 5.49,
+        "stock": 30,
+        "image": "https://foodish-api.com/images/dessert/dessert1.jpg",
+        "category": "Desserts"
       },
       {
         "id": 4,
-        "title": "Leather Wallet",
-        "description": "Premium genuine leather wallet with multiple card slots.",
-        "price": 29.99,
-        "stock": 100,
-        "image": "https://example.com/images/wallet.jpg",
-        "category": "Accessories"
+        "title": "Creamy Pasta",
+        "description": "Italian-style pasta tossed in creamy white sauce.",
+        "price": 10.99,
+        "stock": 18,
+        "image": "https://foodish-api.com/images/pasta/pasta1.jpg",
+        "category": "Meals"
       },
       {
         "id": 5,
-        "title": "Running Shoes",
-        "description": "Lightweight running shoes designed for comfort and performance.",
-        "price": 79.99,
-        "stock": 50,
-        "image": "https://example.com/images/running-shoes.jpg",
-        "category": "Footwear"
+        "title": "Steamed Rice Bowl",
+        "description": "Freshly steamed rice served with assorted toppings.",
+        "price": 4.99,
+        "stock": 40,
+        "image": "https://foodish-api.com/images/rice/rice1.jpg",
+        "category": "Meals"
       },
       {
         "id": 6,
-        "title": "Sunglasses",
-        "description": "UV-protection sunglasses with a stylish frame design.",
-        "price": 39.99,
-        "stock": 80,
-        "image": "https://example.com/images/sunglasses.jpg",
-        "category": "Accessories"
+        "title": "Crispy Samosa",
+        "description": "Crispy and flavorful potato-filled samosa.",
+        "price": 2.99,
+        "stock": 50,
+        "image": "https://foodish-api.com/images/samosa/samosa3.jpg",
+        "category": "Snacks"
       },
       {
         "id": 7,
-        "title": "Bluetooth Speaker",
-        "description": "Portable Bluetooth speaker with deep bass and long battery life.",
-        "price": 59.99,
-        "stock": 35,
-        "image": "https://example.com/images/speaker.jpg",
-        "category": "Electronics"
+        "title": "Masala Dosa",
+        "description": "South Indian dosa served with chutney and sambar.",
+        "price": 6.99,
+        "stock": 12,
+        "image": "https://foodish-api.com/images/dosa/dosa1.jpg",
+        "category": "Meals"
       },
       {
         "id": 8,
-        "title": "Coffee Maker",
-        "description": "Automatic drip coffee maker with programmable timer.",
-        "price": 89.99,
-        "stock": 20,
-        "image": "https://example.com/images/coffee-maker.jpg",
-        "category": "Home Appliances"
+        "title": "Veggie Pizza",
+        "description": "Fresh vegetable toppings on a cheesy crust.",
+        "price": 11.99,
+        "stock": 14,
+        "image": "https://foodish-api.com/images/pizza/pizza10.jpg",
+        "category": "Meals"
       },
       {
         "id": 9,
-        "title": "Yoga Mat",
-        "description": "Non-slip yoga mat with cushioning for extra comfort.",
-        "price": 24.99,
-        "stock": 75,
-        "image": "https://example.com/images/yoga-mat.jpg",
-        "category": "Fitness"
+        "title": "Double Patty Burger",
+        "description": "Big satisfying burger with double beef patties.",
+        "price": 9.49,
+        "stock": 10,
+        "image": "https://foodish-api.com/images/burger/burger5.jpg",
+        "category": "Fast Food"
       },
       {
         "id": 10,
-        "title": "Backpack",
-        "description": "Durable backpack with multiple compartments and water-resistant fabric.",
-        "price": 59.99,
-        "stock": 45,
-        "image": "https://example.com/images/backpack.jpg",
-        "category": "Accessories"
+        "title": "Fruit Dessert Bowl",
+        "description": "Refreshing dessert with mixed fruits and cream.",
+        "price": 4.99,
+        "stock": 22,
+        "image": "https://foodish-api.com/images/dessert/dessert10.jpg",
+        "category": "Desserts"
       }
     ],
     hasPrev: false,

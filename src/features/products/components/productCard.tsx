@@ -17,10 +17,10 @@ interface ProductProps {
 
 export default function ProductCard({ product }: ProductProps ) {
     return (
-        <div className="w-full max-w-full bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+        <div className="w-full max-w-full bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
             <div className="relative w-full h-48"> {/* height fixed */}
                 <Image
-                    src='/burger.jpg'
+                    src={product.image}
                     alt={product.title}
                     fill
                     className="object-cover rounded-t-xl"
@@ -32,10 +32,12 @@ export default function ProductCard({ product }: ProductProps ) {
                     ₱{product.price}
                 </p>
 
-                <p className="text-[0.9rem] text-gray-600 font-semibold mb-2 ml-4">{product.title}</p>
+                <p className="text-[1rem] text-gray-600 font-semibold mb-2 ml-4">
+                    {product.title}
+                </p>
 
                 <div className="flex flex-row justify-between mr-7">
-                    <p className="text-gray-500 text-xs ml-4">Stock: {product.stock}</p>
+                    <p className="text-slate-700 text-xs font-semibold ml-4">Stock: {product.stock}</p>
 
                     <p className="border rounded-xl bg-slate-800 text-white text-[0.6rem] ml-4 px-2">
                         {product.category}
@@ -45,9 +47,9 @@ export default function ProductCard({ product }: ProductProps ) {
             </div>
 
             <div className="flex justify-center">
-                <Button variant="outline" size="sm" className="bg-amber-500 text-white text-xs rounded-full mb-2">
-                    Edit
-                </Button>
+                <div className="border rounded-xl bg-orange-400 text-white text-[0.7rem] shadow-md hover:opacity-60 mb-2 px-2 py-1">
+                    Update
+                </div>
             </div>
         </div>
     )
