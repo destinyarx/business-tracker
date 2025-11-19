@@ -1,13 +1,13 @@
 "use client"
 
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog"
+} from '@/components/ui/dialog'
 
 interface ModalProps {
   open: boolean
@@ -31,14 +31,17 @@ export function Modal({
       <DialogContent className={cn(className)}>
         {(title || description) && (
           <DialogHeader>
-            {title && <DialogTitle>{title}</DialogTitle>}
+            {title && (
+              <DialogTitle className="text-xl">{title}</DialogTitle>
+            )}
+
             {description && (
               <DialogDescription>{description}</DialogDescription>
             )}
           </DialogHeader>
         )}
 
-        <div className="mt-2">{children}</div>
+        <div className="mt-2 px-2">{children}</div>
       </DialogContent>
     </Dialog>
   )

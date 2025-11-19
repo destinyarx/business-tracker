@@ -34,36 +34,42 @@ export default function Home() {
       description:
         "Monitor your sales performance and revenue growth with comprehensive real-time analytics. Track sales on a daily, weekly, and monthly basis, identify emerging trends, and obtain the insights necessary to make informed, strategic business decisions.",
       icon: "📈",
+      showComingSoon: false
     },
     {
       title: "Customer Management",
       description:
         "Centralize all customer information in one secure platform. Access contact details, purchase history, and interaction records to strengthen relationships, deliver tailored service, and consistently enhance customer satisfaction.",
       icon: "👥",
+      showComingSoon: false
     },
     {
       title: "Inventory Management",
       description:
         "Optimize inventory management with a comprehensive overview of product availability. Monitor inventory movement, prevent shortages or overstock, and support uninterrupted, profitable business operations.",
       icon: "📦",
+      showComingSoon: false
     },
     {
       title: "Expense Tracking & Reporting",
       description:
         "Accurately record and categorize expenses with ease. Generate detailed reports to analyze cash flow, identify spending patterns, and support informed financial decisions for sustained business stability.",
       icon: "💰",
+      showComingSoon: false
     },
     {
       title: "NegosyoAI Insights",
       description:
         "Harness the capabilities of NegosyoAI to analyze your business data. Access actionable insights, identify key trends, forecast performance, and make data-driven decisions that drive growth and operational efficiency.",
       icon: "🤖",
+      showComingSoon: true
     },
     {
       title: "Scheduler & Automated Receipts",
       description:
         "Coordinate tasks, set reminders, and streamline operations with an integrated scheduling solution. Automatically generate receipts or PDF reports and deliver them to customers via email, enhancing efficiency and projecting a professional business image.",
       icon: "📅",
+      showComingSoon: true
     },
   ];
 
@@ -183,6 +189,7 @@ export default function Home() {
               title={item.title} 
               icon={item.icon} 
               description={item.description}
+              showComingSoon={item.showComingSoon}
             />
           ))}
         </div>
