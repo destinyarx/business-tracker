@@ -8,3 +8,9 @@ export interface Product {
     category: string
     image: string
 }
+
+export enum FormState {
+    ADD = 'ADD',
+    VIEW = 'VIEW',
+    EDIT = 'EDIT',
+}

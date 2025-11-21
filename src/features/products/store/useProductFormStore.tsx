@@ -1,9 +1,12 @@
 import { create } from 'zustand'
-import type { Product } from '@/features/products/products.types'
+import { Product, FormState } from '@/features/products/products.types'
+
+
+
 
 interface ProductFormState {
     showForm: boolean,
-    viewMode: boolean,
+    formState: FormState|null,
     product: Product|null,
     setShowForm: (isOpen: boolean) => void,
     openForm: () => void,
@@ -14,32 +17,32 @@ interface ProductFormState {
 
 export const useProductFormStore = create<ProductFormState>((set) => ({
     showForm: false,
-    viewMode: false,
     product: null,
+    formState: null,
     
     setShowForm: (isOpen: boolean) => set({ showForm: isOpen }),
 
     openForm: () => set({
         product: null, 
         showForm: true,
-        viewMode: false,
+        formState: FormState.ADD
     }),
 
     closeForm: () => set({
         product: null, 
         showForm: false,
-        viewMode: false,
+        formState: null
     }),
 
     viewForm: (product: Product) => set({
         product: product, 
         showForm: true,
-        viewMode: true,
+        formState: FormState.VIEW
     }),
 
     editForm: (product: Product) => set({
         product: product, 
         showForm: true,
-        viewMode: false,
+        formState: FormState.EDIT
     }),
 }))

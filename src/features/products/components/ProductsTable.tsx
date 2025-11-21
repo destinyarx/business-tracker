@@ -16,7 +16,7 @@ interface Props {
 }
 
 export default function ProductTable({ products }: Props) {
-    const { openForm, editForm } = useProductFormStore()
+    const { openForm } = useProductFormStore()
 
     const [searchQuery, setSearchQuery] = useState('')
     const [selectedCategory, setSelectedCategory] = useState('all')

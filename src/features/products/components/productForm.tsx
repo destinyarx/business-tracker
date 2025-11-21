@@ -13,6 +13,7 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@
 import { PRODUCT_CATEGORY } from '@/constants'
 import { useNotify } from '@/hooks/useNotification'
 import { useProductFormStore } from '@/features/products/store/useProductFormStore';
+import { FormState } from '@/features/products/products.types'
 
 interface Props {
   handleSuccess: () => void
@@ -37,7 +38,7 @@ const schema = z.object({
 type ProductFormValues = z.infer<typeof schema>
 
 export default function ProductForm({ handleSuccess }: Props) {
-  const { viewMode, product } = useProductFormStore()
+  const { formState, product } = useProductFormStore()
   const api = useApi()
   const notify = useNotify()
 
@@ -64,13 +65,31 @@ export default function ProductForm({ handleSuccess }: Props) {
   const amount = Number(form.watch('profit'))
   const percentage = Number(form.watch('profitPercentage'))
 
-  async function onSubmit(values: ProductFormValues) {
+  const addProduct = async(values: ProductFormValues) => {
     try {
       const request = api.post('/products', values)
       await notify.loading(request, 'Products successfully saved!', 'Processing...')
       handleSuccess()
     } catch (error) {
       console.log(error)
+    }
+  }
+
+  const updateProduct = async(values: ProductFormValues) => {
+    try {
+      const request = api.post('/products', values)
+      await notify.loading(request, 'Products successfully saved!', 'Processing...')
+      handleSuccess()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const onSubmit = (values: ProductFormValues) => {
+    if (formState === FormState.ADD) {
+      console.log('Add Product')
+    } else if (formState === FormState.EDIT) {
+      console.log('Update Product')
     }
   }
 
@@ -106,7 +125,7 @@ export default function ProductForm({ handleSuccess }: Props) {
 
         <Input 
           {...form.register('title')} 
-          readOnly={viewMode}
+          readOnly={formState === FormState.VIEW}
           placeholder='Enter product name' 
         />
 
@@ -122,7 +141,7 @@ export default function ProductForm({ handleSuccess }: Props) {
         <Textarea 
           {...form.register('description')} 
           rows={4} 
-          readOnly={viewMode}
+          readOnly={formState === FormState.VIEW}
           placeholder='Write product details...' 
         />
       </div>
@@ -132,7 +151,7 @@ export default function ProductForm({ handleSuccess }: Props) {
           <Label className='mb-1'>Category</Label>
           <Select 
             onValueChange={(val) => form.setValue('category', val)}
-            disabled={viewMode}
+            disabled={formState === FormState.VIEW}
           >
             <SelectTrigger className='w-full'>
               <SelectValue placeholder='Choose category' />
@@ -151,7 +170,7 @@ export default function ProductForm({ handleSuccess }: Props) {
           <Label className='mb-1'>Product Code / SKU</Label>
           <Input 
             {...form.register('sku')} 
-            readOnly={viewMode}
+            readOnly={formState === FormState.VIEW}
             placeholder='SKU code (optional)' 
           />
         </div>
@@ -160,7 +179,7 @@ export default function ProductForm({ handleSuccess }: Props) {
           <Label className='mb-1'>Supplier</Label>
           <Input 
             {...form.register('supplier')} 
-            readOnly={viewMode}
+            readOnly={formState === FormState.VIEW}
             placeholder='Supplier name (optional)' 
           />
         </div>
@@ -176,7 +195,7 @@ export default function ProductForm({ handleSuccess }: Props) {
             type='number' 
             step='0.01' 
             {...form.register('price')} 
-            readOnly={viewMode}
+            readOnly={formState === FormState.VIEW}
             placeholder='0.00' 
           />
 
@@ -191,7 +210,7 @@ export default function ProductForm({ handleSuccess }: Props) {
           <Label className='mb-1'>Stock / Qty</Label>
           <Input 
             {...form.register('stock')} 
-            readOnly={viewMode}
+            readOnly={formState === FormState.VIEW}
             type='number' 
             placeholder='0' 
           />
@@ -209,7 +228,7 @@ export default function ProductForm({ handleSuccess }: Props) {
             {...form.register('profitPercentage', {
               onChange: () => (lastEdited.current = 'percentage'),
             })}
-            readOnly={viewMode}
+            readOnly={formState === FormState.VIEW}
             disabled={!price}
             placeholder='0.00'
             type='number'
@@ -229,7 +248,7 @@ export default function ProductForm({ handleSuccess }: Props) {
             {...form.register('profit', {
               onChange: () => (lastEdited.current = 'amount'),
             })}
-            readOnly={viewMode}
+            readOnly={formState === FormState.VIEW}
             disabled={!price}
             placeholder='0.00'
             type='number'
@@ -244,11 +263,19 @@ export default function ProductForm({ handleSuccess }: Props) {
         </div>
       </div>
 
-      <div className='flex justify-end'>
-        <Button className='bg-teal-600 hover:bg-teal-700 text-white px-6'>
-          Save Product
-        </Button>
-      </div>
+      { formState !== FormState.VIEW && (
+        <div className='flex justify-end'>
+          {formState === FormState.EDIT ? (
+            <Button className='bg-teal-600 hover:bg-teal-700 text-white px-6'>
+              Update Product
+            </Button>
+          ) : (
+            <Button className='bg-teal-600 hover:bg-teal-700 text-white px-6'>
+              Save Product
+            </Button>
+          )}
+        </div>
+      )}
     </form>
   )
 }
