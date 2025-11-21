@@ -14,7 +14,7 @@ interface ToastSystem {
   success: (options: NotifyOptions) => void;
   error: (options: NotifyOptions) => void;
   info: (options: NotifyOptions) => void;
-  loading: <T>(promise: Promise<T>, message?: string) => Id;
+  loading: <T>(promise: Promise<T>, successMessage: string, loadingText?: string) => Id;
 }
 
 export const ToastProvider: React.FC = () => (
@@ -75,7 +75,7 @@ export const useNotify = (): ToastSystem => {
     );
   };
 
-  const loading = <T,>(promise: Promise<T>, message: string = 'Loading...'): Id => {
+  const loading = <T,>(promise: Promise<T>, successMessage: string,  loadingText: string = 'Loading...'): Id => {
     // Cast the promise parameter to unknown first, as TypeScript recommends
     const safePromise = promise as unknown as Promise<unknown>;
   
@@ -84,7 +84,7 @@ export const useNotify = (): ToastSystem => {
       pending: {
         render: (
           <div className="flex items-center space-x-2 p-3">
-            <span>{message}</span>
+            <span className="text-2xl">{loadingText}</span>
           </div>
         ),
         className: 'bg-gray-50 border-l-4 border-gray-300',
@@ -93,7 +93,7 @@ export const useNotify = (): ToastSystem => {
       success: {
         render: (
           <div className="flex items-center space-x-2 p-3">
-            <span>Success</span>
+            <span className="text-2xl">{successMessage}</span>
           </div>
         ),
         className: 'bg-green-50 border-l-4 border-green-500',
@@ -102,7 +102,7 @@ export const useNotify = (): ToastSystem => {
       error: {
         render: (
           <div className="flex items-center space-x-2 p-3">
-            <span>Error</span>
+            <span className="text-2xl">Unexpected Error Occured</span>
           </div>
         ),
         className: 'bg-red-50 border-l-4 border-red-500',
@@ -110,7 +110,7 @@ export const useNotify = (): ToastSystem => {
       },
     });
   
-    return toastId as unknown as Id; // ✅ cast the return, not the promise
+    return toastId as unknown as Id;
   };
 
   return { success, error, info, loading };

@@ -1,23 +1,55 @@
 "use client"
 
-import { useState } from 'react'
-import ProductTable from "@/features/products/components/ProductsDT";
+import { useState, useEffect } from 'react'
+import { useApi } from '@/lib/api'
+import type { Product } from '@/features/products/products.types'
+import ProductTable from "@/features/products/components/ProductsTable";
 import { Modal } from '@/components/molecules/Modal'
 import ProductForm from '@/features/products/components/productForm'
+import Loading from '@/components/organisms/Loading'
+import { useProductFormStore } from '@/features/products/store/useProductFormStore';
 
 export default function Products() {
-  const [showForm, setShowForm] = useState<boolean>(false)
+  const api = useApi()
+  const { showForm, closeForm, setShowForm } = useProductFormStore()
 
-  const handleCreate = () => {
-    setShowForm(true)
-    console.log('Parent created products')
+  const [isLoading, setIsLoading] = useState(false);
+  const [products, setProducts] = useState<Product[]>([])
+
+  const fetchProducts = async () => {
+    try {
+        setIsLoading(true)
+        const { data } = await api.get('/products')
+        setProducts(data.data)
+        console.log(data.data)
+    } catch (error) {
+        console.log(error)
+    } finally {
+        setIsLoading(false)
+    }
   }
+
+  const handleSuccess = () => {
+    closeForm()
+    fetchProducts()
+  }
+
+  useEffect(() => {
+      fetchProducts()
+  }, [])
 
   return (
     <div className="w-full max-w-full min-h-screen bg-gradient-to-br from-teal-50 via-gray-50 to-teal-100 text-gray-800">
         <div className="m-5">
-          <ProductTable onAddProduct={handleCreate}/>
+          {isLoading ? (
+            <Loading  message="Fetching products, please wait..." />
+          ) : (
+            <ProductTable products={products} />
+          )}
         </div>
+
+          
+        {!!showForm}
 
         <Modal 
           open={showForm} 
@@ -25,7 +57,7 @@ export default function Products() {
           title="Create Product"
           className="lg:max-w-4xl"
         >
-          <ProductForm />
+          <ProductForm handleSuccess={handleSuccess}/>
         </Modal>
     </div>
   );

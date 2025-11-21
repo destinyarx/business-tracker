@@ -1,54 +1,82 @@
 import Image from 'next/image'
+import { MoreVertical } from 'lucide-react'
+import { DropdownMenu,  DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-
-interface Product {
-    id: number
-    title: string,
-    description: string,
-    price: number,
-    stock: number,
-    image: string,
-    category: string
-}
+import { Product } from '@/features/products/products.types'
+import { useProductFormStore } from '@/features/products/store/useProductFormStore';
 
 interface ProductProps {
     product: Product
 }
 
 export default function ProductCard({ product }: ProductProps ) {
+    const { editForm, viewForm } = useProductFormStore()
+
+
     return (
         <div className="w-full max-w-full bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
-            <div className="relative w-full h-48"> {/* height fixed */}
-                <Image
-                    src={product.image}
-                    alt={product.title}
-                    fill
-                    className="object-cover rounded-t-xl"
-                />
-            </div>
+            <div className="flex flex-col justify-between h-full">
+                <div className="relative w-full h-48"> {/* height fixed */}
+                    <Image
+                        src={product.image ?? 'https://foodish-api.com/images/pasta/pasta1.jpg'}
+                        alt={product.title}
+                        sizes='(max-width: 640px) 100vw,
+                        (max-width: 1024px) 33vw,
+                        (max-width: 1280px) 25vw,
+                        20vw'
+                        fill
+                        className="object-cover rounded-t-xl"
+                    />
 
-            <div className="flex flex-col flex-1 mb-2">
-                <p className="inline-block bg-teal-500 text-white font-bold rounded-r-xl px-4 py-1 mr-20 mt-2 mb-2">
-                    ₱{product.price}
-                </p>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className='absolute top-2 right-2 z-20 bg-black/60 hover:bg-black/80 text-white rounded-full p-1'>
+                                <MoreVertical size={18} />
+                            </button>
+                        </DropdownMenuTrigger>
 
-                <p className="text-[1rem] text-gray-600 font-semibold mb-2 ml-4">
-                    {product.title}
-                </p>
-
-                <div className="flex flex-row justify-between mr-7">
-                    <p className="text-slate-700 text-xs font-semibold ml-4">Stock: {product.stock}</p>
-
-                    <p className="border rounded-xl bg-slate-800 text-white text-[0.6rem] ml-4 px-2">
-                        {product.category}
-                    </p>
+                        <DropdownMenuContent align='end' className='w-28 bg-white text-sm font-medium'>
+                            <DropdownMenuItem onClick={() => viewForm(product)}>
+                                View
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => editForm(product)}>
+                                Update
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => console.log('Delete', product.id)}>
+                                Delete
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
 
-            </div>
+                <div className="flex flex-col justify-between">
+                    <div className="flex flex-col flex-1 mb-2">
+                        <div className="flex flex-row justify-between items-center px-2 mt-1">
+                            <p className="text-gray-400 font-semibold text-[0.8rem] mt-1">
+                                {product.sku}
+                            </p>
 
-            <div className="flex justify-center">
-                <div className="border rounded-xl bg-orange-400 text-white text-[0.7rem] shadow-md hover:opacity-60 mb-2 px-2 py-1">
-                    Update
+                            <p className="border rounded-xl bg-slate-800 text-white text-[0.6rem] px-2">
+                                {product.category}
+                            </p>
+                        </div>
+
+                        <p className="text-[1.1rem] text-gray-600 font-semibold ml-2 -mt-1">
+                            {product.title}
+                        </p>
+
+                        <p className="min-h-2 text-[0.7rem] text-slate-500 font-light italic truncate ml-2">
+                            {product.description ?? null}
+                        </p>
+                    </div>
+
+                    <div className="flex flex-row justify-between items-center pr-2 mb-1">
+                        <p className="bg-teal-500 w-fit text-white font-bold rounded-r-xl px-4 py-1 mb-2">
+                            ₱{product.price}
+                        </p>
+
+                        <p className="bg-slate-600 text-[0.9rem] text-white rounded-xl font-semibold ml-4 px-2 py-1">Stock: {product.stock}</p>
+                    </div>
                 </div>
             </div>
         </div>
