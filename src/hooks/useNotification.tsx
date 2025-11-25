@@ -39,7 +39,7 @@ export const useNotify = (): ToastSystem => {
     loading: 'bg-gray-50 border-l-4 border-gray-300'
   };
 
-  const success = ({ message, title = 'Success', duration = 3000 }: NotifyOptions) => {
+  const success = ({ message, title = 'Success', duration = 2500 }: NotifyOptions) => {
     toast.success(
       <div className="flex items-center space-x-2 p-3">
         <div>
@@ -63,7 +63,7 @@ export const useNotify = (): ToastSystem => {
     );
   };
 
-  const info = ({ message, title = 'Info', duration = 3000 }: NotifyOptions) => {
+  const info = ({ message, title = 'Info', duration = 2500 }: NotifyOptions) => {
     toast.info(
       <div className="flex items-center space-x-2 p-3">
         <div>
@@ -97,7 +97,7 @@ export const useNotify = (): ToastSystem => {
           </div>
         ),
         className: 'bg-green-50 border-l-4 border-green-500',
-        autoClose: 3000,
+        autoClose: 2500,
       },
       error: {
         render: (

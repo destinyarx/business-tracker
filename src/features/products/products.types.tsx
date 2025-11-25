@@ -13,4 +13,5 @@ export enum FormState {
     ADD = 'ADD',
     VIEW = 'VIEW',
     EDIT = 'EDIT',
+    DELETE = 'DELETE',
 }

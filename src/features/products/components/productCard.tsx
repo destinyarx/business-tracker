@@ -1,7 +1,9 @@
 import Image from 'next/image'
+import { useApi } from '@/lib/api'
+import { useNotify } from '@/hooks/useNotification'
+import { cn } from '@/lib/utils'
 import { MoreVertical } from 'lucide-react'
 import { DropdownMenu,  DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
 import { Product } from '@/features/products/products.types'
 import { useProductFormStore } from '@/features/products/store/useProductFormStore';
 
@@ -10,13 +12,24 @@ interface ProductProps {
 }
 
 export default function ProductCard({ product }: ProductProps ) {
-    const { editForm, viewForm } = useProductFormStore()
+    const { editForm, viewForm, closeForm } = useProductFormStore()
+    const { loading } = useNotify()
+    const api = useApi()
 
+    const handleDelete = async (id: number) => {
+        try {
+            const request = api.delete(`/products/${id}`)
+            await loading(request, 'Products successfully deleted!', 'Processing...')
+            closeForm()
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     return (
         <div className="w-full max-w-full bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
             <div className="flex flex-col justify-between h-full">
-                <div className="relative w-full h-48"> {/* height fixed */}
+                <div className="relative w-full h-48">
                     <Image
                         src={product.image ?? 'https://foodish-api.com/images/pasta/pasta1.jpg'}
                         alt={product.title}
@@ -42,7 +55,7 @@ export default function ProductCard({ product }: ProductProps ) {
                             <DropdownMenuItem onClick={() => editForm(product)}>
                                 Update
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => console.log('Delete', product.id)}>
+                            <DropdownMenuItem onClick={() => handleDelete(product.id)}>
                                 Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -75,7 +88,13 @@ export default function ProductCard({ product }: ProductProps ) {
                             ₱{product.price}
                         </p>
 
-                        <p className="bg-slate-600 text-[0.9rem] text-white rounded-xl font-semibold ml-4 px-2 py-1">Stock: {product.stock}</p>
+                        <p  className={cn(
+                                "bg-slate-600 text-[0.9rem] text-white rounded-xl font-semibold ml-4 px-2 py-1",
+                                product.stock ? "bg-slate-600" : "bg-rose-600"
+                            )}
+                        >
+                            Stock: {product.stock}
+                        </p>
                     </div>
                 </div>
             </div>

@@ -12,22 +12,48 @@ export const useApi = () => {
   api.interceptors.request.use(async (config) => {
     const token = await getToken({ template: "supabase-jwt", skipCache: true })
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+    if (!token && !userId) {
+      // Throw an axios-style error
+      return Promise.reject({
+        message: 'Authentication token missing',
+        status: 401,
+        config
+      })
     }
+  
+    config.headers.Authorization = `Bearer ${token}`
 
-    if (userId && config.method === 'post') {
+    switch(config.method) {
+      case 'post': 
         config.data = {
-            ...(config.data || {}),
-            createdBy: userId,
+          ...(config.data || {}),
+          createdBy: userId,
         }
-    }
-
-    if (userId && config.method === 'get') {
+        break;
+      
+      case 'get': {
         config.params = {
           ...(config.params || {}),
           createdBy: userId,
         }
+        break;
+      }
+
+      case 'patch': {
+        config.data = {
+          ...(config.data || {}),
+          createdBy: userId
+        }
+        break;
+      }
+
+      case 'delete': {
+        config.params = {
+          ...(config.params || {}),
+          createdBy: userId
+        }
+        break;
+      }
     }
 
     return config

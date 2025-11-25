@@ -114,7 +114,7 @@ export default function Pricing() {
                         <div className="flex flex-row items-center gap-2">
                             <BadgeCheck className="!h-7 !w-7"/>
                             <p className="text-[0.7rem] text-gray-500">
-                                All Free Tier plan.
+                                All in Free Tier plan.
                             </p>
                         </div>
                         <div className="flex flex-row items-center gap-2">
@@ -127,6 +127,12 @@ export default function Pricing() {
                             <BadgeCheck className="!h-7 !w-7"/>
                             <p className="text-[0.7rem] text-gray-500">
                                 Automate reminders, PDF receipts, and customer emails for efficiency.
+                            </p>
+                        </div>
+                        <div className="flex flex-row items-center gap-2">
+                            <BadgeCheck className="!h-7 !w-7"/>
+                            <p className="text-[0.7rem] text-gray-500">
+                                Access to Queue Management Feature.
                             </p>
                         </div>
                     </div>

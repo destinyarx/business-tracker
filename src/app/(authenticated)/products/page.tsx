@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
+import { useAuth } from '@clerk/nextjs'
 import { useApi } from '@/lib/api'
 import type { Product } from '@/features/products/products.types'
 import ProductTable from "@/features/products/components/ProductsTable";
@@ -11,6 +12,7 @@ import { useProductFormStore } from '@/features/products/store/useProductFormSto
 
 export default function Products() {
   const api = useApi()
+  const { userId } = useAuth()
   const { showForm, closeForm, setShowForm } = useProductFormStore()
 
   const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +21,8 @@ export default function Products() {
   const fetchProducts = async () => {
     try {
         setIsLoading(true)
-        const { data } = await api.get('/products')
+        console.log(userId)
+        const { data } = await api.get(`/products`)
         setProducts(data.data)
         console.log(data.data)
     } catch (error) {
@@ -36,7 +39,7 @@ export default function Products() {
 
   useEffect(() => {
       fetchProducts()
-  }, [])
+  }, [userId])
 
   return (
     <div className="w-full max-w-full min-h-screen bg-gradient-to-br from-teal-50 via-gray-50 to-teal-100 text-gray-800">
@@ -47,9 +50,6 @@ export default function Products() {
             <ProductTable products={products} />
           )}
         </div>
-
-          
-        {!!showForm}
 
         <Modal 
           open={showForm} 

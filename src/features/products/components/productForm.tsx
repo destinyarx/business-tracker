@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -20,6 +20,7 @@ interface Props {
 }
 
 const schema = z.object({
+  id: z.preprocess((val) => Number(val), z.number().optional()),
   title: z.string().min(2, 'Title is required'),
   description: z.string().optional(),
   sku: z.string().optional(),
@@ -38,14 +39,15 @@ const schema = z.object({
 type ProductFormValues = z.infer<typeof schema>
 
 export default function ProductForm({ handleSuccess }: Props) {
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const { formState, product } = useProductFormStore()
   const api = useApi()
   const notify = useNotify()
 
-
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
+      id: 0,
       title: '',
       description: '',
       category: '',
@@ -61,6 +63,7 @@ export default function ProductForm({ handleSuccess }: Props) {
 
   const lastEdited = useRef<'amount' | 'percentage' | null>(null)
 
+  const id = Number(form.watch('id'))
   const price = Number(form.watch('price'))
   const amount = Number(form.watch('profit'))
   const percentage = Number(form.watch('profitPercentage'))
@@ -69,7 +72,6 @@ export default function ProductForm({ handleSuccess }: Props) {
     try {
       const request = api.post('/products', values)
       await notify.loading(request, 'Products successfully saved!', 'Processing...')
-      handleSuccess()
     } catch (error) {
       console.log(error)
     }
@@ -77,20 +79,26 @@ export default function ProductForm({ handleSuccess }: Props) {
 
   const updateProduct = async(values: ProductFormValues) => {
     try {
-      const request = api.post('/products', values)
-      await notify.loading(request, 'Products successfully saved!', 'Processing...')
-      handleSuccess()
+      const request = api.patch(`/products/${values.id}`, values)
+      await notify.loading(request, 'Products successfully updated!', 'Processing...')
     } catch (error) {
       console.log(error)
     }
   }
 
-  const onSubmit = (values: ProductFormValues) => {
+  const onSubmit = async (values: ProductFormValues) => {
+    setIsLoading(true)
+
     if (formState === FormState.ADD) {
-      console.log('Add Product')
+      await addProduct(values)
     } else if (formState === FormState.EDIT) {
-      console.log('Update Product')
+      await updateProduct(values)
+    } else if (formState === FormState.DELETE) {
+
     }
+
+    setIsLoading(false)
+    handleSuccess()
   }
 
   useEffect(() => {
@@ -266,11 +274,11 @@ export default function ProductForm({ handleSuccess }: Props) {
       { formState !== FormState.VIEW && (
         <div className='flex justify-end'>
           {formState === FormState.EDIT ? (
-            <Button className='bg-teal-600 hover:bg-teal-700 text-white px-6'>
+            <Button disabled={isLoading} className='bg-teal-600 hover:bg-teal-700 text-white px-6'>
               Update Product
             </Button>
           ) : (
-            <Button className='bg-teal-600 hover:bg-teal-700 text-white px-6'>
+            <Button disabled={isLoading} className='bg-teal-600 hover:bg-teal-700 text-white px-6'>
               Save Product
             </Button>
           )}
