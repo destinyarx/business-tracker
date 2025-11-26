@@ -54,6 +54,7 @@ export function AppSidebar() {
       <SidebarContent className="bg-teal-600">
         <SidebarGroup>
           {/* <SidebarGroupLabel>Application</SidebarGroupLabel> */}
+
           <SidebarGroupContent>
             <SidebarMenu>
               <div className="flex justify-end text-white mb-3">
@@ -63,7 +64,14 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url} className={cn('flex gap-3 items-center text-white overflow-visible mb-2', isActive(item.url) && 'border border-zinc-50 bg-zinc-50 font-semibold text-teal-800')}>
+                    <a 
+                      href={item.url}
+                      className={cn(
+                        'flex items-center gap-3 text-white mb-2 overflow-visible',
+                        isCollapsed ? 'h-12 w-12 justify-center p-0' : '',
+                        isActive(item.url) && 'bg-zinc-50 text-teal-800 font-semibold border border-zinc-50'
+                      )}
+                    >
                       <item.icon className="!w-7 !h-7" />
                       {!isCollapsed && <span>{item.title}</span>}
                     </a>
