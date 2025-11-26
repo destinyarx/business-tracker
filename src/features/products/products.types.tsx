@@ -1,12 +1,12 @@
 export interface Product {
-    id: number
+    id: number|undefined
     title: string
     sku: string
     description: string
     price: number
     stock: number
     category: string
-    image: string
+    image?: string
 }
 
 export enum FormState {

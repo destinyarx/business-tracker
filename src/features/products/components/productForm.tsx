@@ -9,16 +9,12 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'
 import { SearchableSelect } from '@/components/molecules/SearchableSelect'
 import { PRODUCT_CATEGORY } from '@/constants'
 import { useNotify } from '@/hooks/useNotification'
 import { useProductFormStore } from '@/features/products/store/useProductFormStore';
+import { useProducts } from '../hooks/useProducts'
 import { FormState } from '@/features/products/products.types'
-
-interface Props {
-  handleSuccess: () => void
-}
 
 const schema = z.object({
   id: z.preprocess((val) => Number(val), z.number().optional()),
@@ -39,11 +35,13 @@ const schema = z.object({
 
 type ProductFormValues = z.infer<typeof schema>
 
-export default function ProductForm({ handleSuccess }: Props) {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const { formState, product } = useProductFormStore()
+export default function ProductForm() {
   const api = useApi()
   const notify = useNotify()
+  const { formState, product, closeForm } = useProductFormStore()
+  const { createProduct, updateProduct } = useProducts()
+
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(schema),
@@ -69,37 +67,16 @@ export default function ProductForm({ handleSuccess }: Props) {
   const amount = Number(form.watch('profit'))
   const percentage = Number(form.watch('profitPercentage'))
 
-  const addProduct = async(values: ProductFormValues) => {
-    try {
-      const request = api.post('/products', values)
-      await notify.loading(request, 'Products successfully saved!', 'Processing...')
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const updateProduct = async(values: ProductFormValues) => {
-    try {
-      const request = api.patch(`/products/${values.id}`, values)
-      await notify.loading(request, 'Products successfully updated!', 'Processing...')
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   const onSubmit = async (values: ProductFormValues) => {
     setIsLoading(true)
 
     if (formState === FormState.ADD) {
-      await addProduct(values)
-    } else if (formState === FormState.EDIT) {
-      await updateProduct(values)
-    } else if (formState === FormState.DELETE) {
-
-    }
+      await createProduct.mutateAsync(values)
+    } else if (formState === FormState.EDIT && values.id) {
+      await updateProduct.mutateAsync({ id, values })
+    } 
 
     setIsLoading(false)
-    handleSuccess()
   }
 
   useEffect(() => {
@@ -159,33 +136,14 @@ export default function ProductForm({ handleSuccess }: Props) {
         <div>
           <Label className='mb-1'>Category</Label>
           <SearchableSelect 
-            label='Category'
-            items={PRODUCT_CATEGORY.map(c => ({ value: c.value, label: c.name }))}
             value={form.watch('category')}
+            items={PRODUCT_CATEGORY.map(c => ({ value: c.value, label: c.name }))}
             onChange={(val) => form.setValue('category', val)}
-            placeholder='Choose category'
             readOnly={formState === FormState.VIEW}
+            label='Category'
+            placeholder='Choose category'
           />
         </div>
-
-        {/* <div>
-          <Label className='mb-1'>Category</Label>
-          <Select 
-            onValueChange={(val) => form.setValue('category', val)}
-            disabled={formState === FormState.VIEW}
-          >
-            <SelectTrigger className='w-full'>
-              <SelectValue placeholder='Choose category' />
-            </SelectTrigger>
-            <SelectContent>
-              {PRODUCT_CATEGORY.map((product, index) => (
-                <SelectItem key={index} value={product.value}>
-                  {product.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div> */}
 
         <div>
           <Label className='mb-1'>Product Code / SKU</Label>

@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import { useApi } from '@/lib/api'
 import { useNotify } from '@/hooks/useNotification'
 import { cn } from '@/lib/utils'
 import { MoreVertical } from 'lucide-react'
@@ -14,12 +13,13 @@ interface ProductProps {
 export default function ProductCard({ product }: ProductProps ) {
     const { editForm, viewForm, closeForm } = useProductFormStore()
     const { loading } = useNotify()
-    const api = useApi()
 
-    const handleDelete = async (id: number) => {
+    const handleDelete = async (id: number|undefined) => {
+        if(!id) return
+        
         try {
-            const request = api.delete(`/products/${id}`)
-            await loading(request, 'Products successfully deleted!', 'Processing...')
+            // const request = api.delete(`/products/${id}`)
+            // await loading(request, 'Products successfully deleted!', 'Processing...')
             closeForm()
         } catch (error) {
             console.log(error)
@@ -33,10 +33,7 @@ export default function ProductCard({ product }: ProductProps ) {
                     <Image
                         src={product.image ?? 'https://foodish-api.com/images/pasta/pasta1.jpg'}
                         alt={product.title}
-                        sizes='(max-width: 640px) 100vw,
-                        (max-width: 1024px) 33vw,
-                        (max-width: 1280px) 25vw,
-                        20vw'
+                        sizes='(max-width: 640px) 100vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw'
                         fill
                         className="object-cover rounded-t-xl"
                     />
