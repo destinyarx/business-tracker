@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'
+import { SearchableSelect } from '@/components/molecules/SearchableSelect'
 import { PRODUCT_CATEGORY } from '@/constants'
 import { useNotify } from '@/hooks/useNotification'
 import { useProductFormStore } from '@/features/products/store/useProductFormStore';
@@ -157,6 +158,18 @@ export default function ProductForm({ handleSuccess }: Props) {
       <div className='grid grid-cols-3 gap-4'>
         <div>
           <Label className='mb-1'>Category</Label>
+          <SearchableSelect 
+            label='Category'
+            items={PRODUCT_CATEGORY.map(c => ({ value: c.value, label: c.name }))}
+            value={form.watch('category')}
+            onChange={(val) => form.setValue('category', val)}
+            placeholder='Choose category'
+            readOnly={formState === FormState.VIEW}
+          />
+        </div>
+
+        {/* <div>
+          <Label className='mb-1'>Category</Label>
           <Select 
             onValueChange={(val) => form.setValue('category', val)}
             disabled={formState === FormState.VIEW}
@@ -172,7 +185,7 @@ export default function ProductForm({ handleSuccess }: Props) {
               ))}
             </SelectContent>
           </Select>
-        </div>
+        </div> */}
 
         <div>
           <Label className='mb-1'>Product Code / SKU</Label>
