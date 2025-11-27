@@ -1,11 +1,26 @@
+// export interface Product {
+//     id?: number|undefined
+//     title: string
+//     sku?: string|undefined
+//     description?: string
+//     price: number
+//     stock: number
+//     category?: string
+//     image?: string
+// }
+
 export interface Product {
-    id: number|undefined
+    id?: number
     title: string
-    sku: string
-    description: string
+    description?: string
+    sku?: string
+    barcode?: string
+    supplier?: string
     price: number
     stock: number
-    category: string
+    profitPercentage?: number
+    profit?: number
+    category?: string
     image?: string
 }
 

@@ -17,7 +17,10 @@ import { useProducts } from '../hooks/useProducts'
 import { FormState } from '@/features/products/products.types'
 
 const schema = z.object({
-  id: z.preprocess((val) => Number(val), z.number().optional()),
+  id: z.preprocess(
+    (val) => val === '' || val === undefined || val === null ? undefined : Number(val),
+    z.number().optional()
+  ),
   title: z.string().min(2, 'Title is required'),
   description: z.string().optional(),
   sku: z.string().optional(),
@@ -44,7 +47,7 @@ export default function ProductForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const form = useForm<ProductFormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as any,
     defaultValues: {
       id: 0,
       title: '',

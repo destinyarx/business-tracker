@@ -2,18 +2,19 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { cn } from "@/lib/utils";
-import ProductCard from '@/features/products/components/productCard';
-import { data } from '@/features/products/data';
-import { LoaderPinwheel, Package, ChevronLeft, ChevronRight } from 'lucide-react';
+import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input';
 import { Plus, Search } from 'lucide-react'
 import { Product } from '@/features/products/products.types'
 import { useProductFormStore } from '@/features/products/store/useProductFormStore';
-
+import ProductCard from '@/features/products/components/productCard';
 interface Props {
     products: Product[],
 }
+
+type Checked = DropdownMenuCheckboxItemProps['checked']
 
 export default function ProductTable({ products }: Props) {
     const { openForm } = useProductFormStore()
@@ -24,14 +25,12 @@ export default function ProductTable({ products }: Props) {
 
     const filteredProducts = useMemo(() => {
         return products.filter((product) => {
-          const matchesSearch =
-            product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            product.sku.toLowerCase().includes(searchQuery.toLowerCase())
-    
-          const matchesCategory =
-            selectedCategory === 'all' || product.category === selectedCategory
-    
-          return matchesSearch && matchesCategory
+            const matchesSearch = 
+                [product.title, product.sku, product.category]
+                .filter(Boolean)
+                .some(field => (field ?? '').toLowerCase().includes(searchQuery.toLowerCase()))
+        
+          return matchesSearch
         })
     }, [products, searchQuery, selectedCategory])
 

@@ -1,25 +1,24 @@
 import Image from 'next/image'
-import { useNotify } from '@/hooks/useNotification'
 import { cn } from '@/lib/utils'
-import { MoreVertical } from 'lucide-react'
+import { MoreVertical, CircleAlert } from 'lucide-react'
 import { DropdownMenu,  DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Product } from '@/features/products/products.types'
 import { useProductFormStore } from '@/features/products/store/useProductFormStore';
+import { useProducts } from '@/features/products/hooks/useProducts'
 
 interface ProductProps {
     product: Product
 }
 
 export default function ProductCard({ product }: ProductProps ) {
+    const { deleteProduct } = useProducts()
     const { editForm, viewForm, closeForm } = useProductFormStore()
-    const { loading } = useNotify()
 
     const handleDelete = async (id: number|undefined) => {
         if(!id) return
         
         try {
-            // const request = api.delete(`/products/${id}`)
-            // await loading(request, 'Products successfully deleted!', 'Processing...')
+            const request = await deleteProduct.mutateAsync(id)
             closeForm()
         } catch (error) {
             console.log(error)
@@ -85,13 +84,14 @@ export default function ProductCard({ product }: ProductProps ) {
                             ₱{product.price}
                         </p>
 
-                        <p  className={cn(
-                                "bg-slate-600 text-[0.9rem] text-white rounded-xl font-semibold ml-4 px-2 py-1",
+                        <div  className={cn(
+                                "flex flex-row items-center gap-1 bg-slate-600 text-[0.8rem] text-white rounded-xl font-semibold ml-4 px-2 py-1",
                                 product.stock ? "bg-slate-600" : "bg-rose-600"
                             )}
                         >
+                            <span>{!product.stock && <CircleAlert className="w-4"/>}</span>
                             Stock: {product.stock}
-                        </p>
+                        </div>
                     </div>
                 </div>
             </div>
