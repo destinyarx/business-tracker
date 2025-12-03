@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { SearchableSelect } from '@/components/molecules/SearchableSelect'
 import { PRODUCT_CATEGORY } from '@/constants'
-import { useNotify } from '@/hooks/useNotification'
 import { useProductFormStore } from '@/features/products/store/useProductFormStore';
 import { useProducts } from '../hooks/useProducts'
 import { FormState } from '@/features/products/products.types'
@@ -39,8 +38,6 @@ const schema = z.object({
 type ProductFormValues = z.infer<typeof schema>
 
 export default function ProductForm() {
-  const api = useApi()
-  const notify = useNotify()
   const { formState, product, closeForm } = useProductFormStore()
   const { createProduct, updateProduct } = useProducts()
 

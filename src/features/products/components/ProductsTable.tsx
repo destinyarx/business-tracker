@@ -49,7 +49,7 @@ export default function ProductTable({ products }: Props) {
     return (
         <div className="w-full pb-5">
             <div className="flex flex-row justify-between mb-3">
-                <div className="relative w-full max-w-xs">
+                {/* <div className="relative w-full max-w-xs">
                     <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                     <Input
                         value={searchQuery}
@@ -59,6 +59,16 @@ export default function ProductTable({ products }: Props) {
                         }}
                         placeholder="Search products..."
                         className="pl-10 bg-white border border-slate-300 focus-visible:ring-teal-500"
+                    />
+                </div> */}
+
+                <div className="relative w-full lg:w-1/2">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        placeholder="Search products..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10"
                     />
                 </div>
 

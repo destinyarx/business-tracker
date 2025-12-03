@@ -1,18 +1,18 @@
 'use client'
 
-import type { Product } from './products.types'
+import type { Customer } from './customers.types'
 import { useApi } from '@/hooks/useApi'
 import { useToast } from '@/hooks/useToast'
 import { toast } from 'sonner'
 
-export function useProductService() {
+export function useCustomerService() {
   const api = useApi()
   const appToast = useToast()
 
   return {
     async getAll() {
       try {
-        const result = await api.get('/products')
+        const result = await api.get('/customers')
         console.log(result.data.data)
         return result?.data.data ?? []
       } catch (err) {
@@ -21,49 +21,50 @@ export function useProductService() {
       }
     },
 
-    async create(data: Product) {
+    async create(data: Customer) {
       try {
-        const toastId = appToast.loading({
-          title: "Creating customer...",
+        const id = appToast.loading({
+          title: "Saving customer...",
           description: "Please wait."
         })
+        
+        await api.post('/customers', data)
 
-        await api.post('/products', data)
-      
-        toast.dismiss(toastId)
+        toast.dismiss(id)
         appToast.success({
-          title: "Product added",
-          description: "The new product has been saved."
+          title: "Customer added",
+          description: "The new record has been saved."
         })
+
       } catch (err) {
         console.log(err)
 
         appToast.error({
-          title: "Failed to create product",
+          title: "Failed to save",
           description: "Please try again."
         })
       }
     },
 
-    async update(id: number, data: Product) {
+    async update(id: number, data: Customer) {
       try {
         const toastId = appToast.loading({
           title: "Updating customer...",
           description: "Please wait."
         })
 
-        await api.patch(`/products/${id}`, data)
+        await api.patch(`/customers/${id}`, data)
 
         toast.dismiss(toastId)
         appToast.success({
-          title: "Product updated",
-          description: "The product has been updated."
+          title: "Customer added",
+          description: "The new record has been saved."
         })
       } catch (err) {
         console.log(err)
 
         appToast.error({
-          title: "Failed to update product details",
+          title: "Failed to update customer record",
           description: "Please try again."
         })
       }
@@ -76,17 +77,18 @@ export function useProductService() {
           description: "Please wait."
         })
 
-        await api.delete(`/products/${id}`)
-      
+        await api.delete(`/customers/${id}`)
+
         toast.dismiss(toastId)
         appToast.success({
-          title: "Product deleted",
-          description: "The product has been deleted."
+          title: "Customer added",
+          description: "The new record has been saved."
         })
       } catch (err) {
         console.log(err)
+
         appToast.error({
-          title: "Failed to delete product",
+          title: "Failed to delete customer record",
           description: "Please try again."
         })
       }

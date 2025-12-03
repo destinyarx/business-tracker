@@ -1,8 +1,8 @@
-import { Roboto } from "next/font/google"
+import { Roboto } from 'next/font/google'
 import './globals.css';
 import type { ReactNode } from 'react';
-import ClientToastProvider  from './ClientToastProvider';
 import { Providers } from './providers'
+import { Toaster } from '@/components/ui/sonner'
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -16,7 +16,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body  className="font-sans">
         <Providers>
           {children}
-          <ClientToastProvider/>
+          <Toaster 
+            position="top-right"
+            richColors
+            closeButton
+          />
         </Providers>
       </body>
     </html>
