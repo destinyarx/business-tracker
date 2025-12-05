@@ -11,7 +11,8 @@ export function useCustomers() {
     const customerQuery = useQuery({
         queryKey: ['customers'],
         queryFn: () => customerService.getAll(),
-        enabled: isLoaded
+        enabled: isLoaded,
+        refetchOnWindowFocus: false
     })
 
     const createCustomer = useMutation({

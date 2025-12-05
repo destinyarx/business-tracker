@@ -35,12 +35,11 @@ export function CustomerTable({
 
   const columns: ColumnDef<Customer>[] = [
     {
-      accessorKey: "fullName",
+      accessorKey: "name",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="hover:bg-transparent px-0"
           >
             Customer Name
@@ -49,7 +48,7 @@ export function CustomerTable({
         );
       },
       cell: ({ row }) => (
-        <div className="font-medium">{row.getValue("fullName")}</div>
+        <div className="font-medium">{row.getValue('name')}</div>
       ),
     },
     {
@@ -74,7 +73,7 @@ export function CustomerTable({
     {
       accessorKey: "phone",
       header: "Contact Number",
-      cell: ({ row }) => <div>{row.getValue("phone")}</div>,
+      cell: ({ row }) => <div>{row.getValue('phone') ?? '—'}</div>,
     },
     {
       accessorKey: "customerType",
@@ -90,13 +89,19 @@ export function CustomerTable({
           </Button>
         );
       },
-      cell: ({ row }) => <CustomerBadge type={row.getValue("customerType")} />,
+      cell: ({ row }) => 
+      <>
+        { row.getValue("customerType") ?
+          <CustomerBadge type={row.getValue("customerType")} />
+          :  '—'
+        }
+      </>,
     },
     {
-      accessorKey: "notes",
+      accessorKey: "email",
       header: "Notes",
       cell: ({ row }) => {
-        const notes = row.getValue("notes") as string;
+        const notes = row.getValue("email") as string;
         return (
           <div className="max-w-[300px] truncate text-muted-foreground">
             {notes || "—"}
@@ -149,10 +154,10 @@ export function CustomerTable({
     },
     globalFilterFn: (row, columnId, filterValue) => {
       const searchValue = filterValue.toLowerCase();
-      const customerName = row.original.fullName.toLowerCase();
+      const customerName = row.original.name.toLowerCase();
       const customerType = row.original.customerType.toLowerCase();
       const phone = row.original.phone.toLowerCase();
-      const notes = (row.original.notes || "").toLowerCase();
+      const notes = (row.original.email || "").toLowerCase();
 
       return (
         customerName.includes(searchValue) ||

@@ -1,29 +1,25 @@
 'use client'
 
-import { useState } from "react";
-import { Customer, CustomerType } from "@/features/customers/customers.types";
-import { mockCustomers } from "@/features/customers/customers.data";
-import { CustomerTable } from "@/features/customers/components/CustomerTable";
-import { CustomerForm } from "@/features/customers/components/CustomerForm";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useState } from 'react';
+import { useCustomers } from '@/features/customers/hooks/useCustomers'
+import { Customer, CustomerType } from '@/features/customers/customers.types';
+import { mockCustomers } from '@/features/customers/customers.data';
+import { CustomerTable } from '@/features/customers/components/CustomerTable';
+import { CustomerForm } from '@/features/customers/components/CustomerForm';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { toast } from 'sonner'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Plus, Search } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel,AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Plus, Search } from 'lucide-react';
+
+import Loading from '@/components/organisms/Loading'
 
 export default function Customers() {
+    const { customerQuery, createCustomer, updateCustomer, deleteCustomer } = useCustomers()
+
     const [customers, setCustomers] = useState<Customer[]>(mockCustomers);
-    const [searchQuery, setSearchQuery] = useState("");
+    const [searchQuery, setSearchQuery] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
@@ -61,7 +57,6 @@ export default function Customers() {
         );
         setIsFormOpen(false);
         setSelectedCustomer(null);
-        // toast.success("Customer updated successfully!");
 
         console.log('HAHAHA')
         toast("⏳ Server Waking Up…", {
@@ -70,13 +65,15 @@ export default function Customers() {
         })
     };
 
-    const handleDeleteCustomer = () => {
-        if (!selectedCustomer) return;
+    const handleDeleteCustomer = async () => {
+        if (!selectedCustomer?.id) return;
 
-        setCustomers(customers.filter((customer) => customer.id !== selectedCustomer.id));
+        console.log(selectedCustomer.id)
+
+        await deleteCustomer.mutateAsync(selectedCustomer.id)
+
         setIsDeleteDialogOpen(false);
         setSelectedCustomer(null);
-        // toast.success("Customer deleted successfully!");
     };
 
     const openEditDialog = (customer: Customer) => {
@@ -114,12 +111,17 @@ export default function Customers() {
                     </Button>
                 </div>
 
-                <CustomerTable
-                    data={customers}
-                    onEdit={openEditDialog}
-                    onDelete={openDeleteDialog}
-                    globalFilter={searchQuery}
-                />
+                {customerQuery.isLoading ? (
+                    <Loading />
+                ) : (
+                    <CustomerTable
+                        data={customerQuery.data ?? []}
+                        onEdit={openEditDialog}
+                        onDelete={openDeleteDialog}
+                        globalFilter={searchQuery}
+                    />
+                )}
+                
             </div>
 
             <Dialog open={isFormOpen} onOpenChange={closeFormDialog}>
@@ -148,17 +150,17 @@ export default function Customers() {
                         <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                         <AlertDialogDescription>
                         This will permanently delete{" "}
-                        <span className="font-semibold">{selectedCustomer?.fullName}</span>.
+                        <span className="font-semibold">{selectedCustomer?.name}</span>.
                         This action cannot be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                        onClick={handleDeleteCustomer}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            onClick={handleDeleteCustomer}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
-                        Delete
+                            Delete
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

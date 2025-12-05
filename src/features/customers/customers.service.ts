@@ -82,7 +82,7 @@ export function useCustomerService() {
         toast.dismiss(toastId)
         appToast.success({
           title: "Customer added",
-          description: "The new record has been saved."
+          description: "The new record has been deleted."
         })
       } catch (err) {
         console.log(err)
