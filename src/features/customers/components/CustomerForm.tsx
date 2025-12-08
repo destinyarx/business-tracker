@@ -9,9 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const customerSchema = z.object({
-  fullName: z.string().min(1, "Customer name is required").max(100),
-  phone: z.string().min(1, "Contact number is required"),
+  name: z.string().min(1, "Customer name is required").max(100),
+  phone: z.string().optional(),
   customerType: z.enum(["normal", "loyal", "deluxe", "premium", "VIP"]),
+  email: z.string().max(50).optional(),
   notes: z.string().max(500).optional(),
 });
 
@@ -27,22 +28,29 @@ export function CustomerForm({ customer, onSubmit, onCancel }: CustomerFormProps
   const form = useForm<CustomerFormData>({
     resolver: zodResolver(customerSchema),
     defaultValues: {
-      fullName: customer?.fullName || "",
-      phone: customer?.phone || "",
-      customerType: customer?.customerType || "normal",
-      notes: customer?.notes || "",
+      name: customer?.name || '',
+      phone: customer?.phone || '',
+      customerType: customer?.customerType || 'normal',
+      notes: customer?.notes || '',
+      email: customer?.email || '',
     },
   });
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form 
+        onSubmit={form.handleSubmit(onSubmit)} 
+        className="flex flex-col gap-5"
+      >
         <FormField
           control={form.control}
-          name="fullName"
+          name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Customer Name</FormLabel>
+              <FormLabel>
+                Customer Name
+                <strong className="text-red-700">*</strong>
+              </FormLabel>
               <FormControl>
                 <Input placeholder="Enter customer name" {...field} />
               </FormControl>
@@ -58,44 +66,60 @@ export function CustomerForm({ customer, onSubmit, onCancel }: CustomerFormProps
             <FormItem>
               <FormLabel>Contact Number</FormLabel>
               <FormControl>
-                <Input placeholder="+1 (555) 123-4567" {...field} />
+                <Input placeholder="0948123456" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="customerType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Customer Type</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+        <div className="flex flex-row w-full gap-4">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select customer type" />
-                  </SelectTrigger>
+                  <Input placeholder="sample@gmail.com" {...field} />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="normal">Normal</SelectItem>
-                  <SelectItem value="loyal">Loyal</SelectItem>
-                  <SelectItem value="deluxe">Deluxe</SelectItem>
-                  <SelectItem value="premium">Premium</SelectItem>
-                  <SelectItem value="VIP">VIP</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="customerType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Type</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select customer type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="normal">Normal</SelectItem>
+                    <SelectItem value="loyal">Loyal</SelectItem>
+                    <SelectItem value="deluxe">Deluxe</SelectItem>
+                    <SelectItem value="premium">Premium</SelectItem>
+                    <SelectItem value="VIP">VIP</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
           name="notes"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Notes (Optional)</FormLabel>
+              <FormLabel>Notes</FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Add any additional notes..."

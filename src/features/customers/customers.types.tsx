@@ -3,9 +3,9 @@ export type CustomerType = "normal" | "loyal" | "deluxe" | "premium" | "VIP";
 export interface Customer {
   id?: number
   name: string
-  contact_number: string
-  email: string
-  status: number
-  customerType: CustomerType
+  status?: number
+  customerType: 'normal' | 'loyal' | 'deluxe' | 'premium' | 'VIP'
+  phone?: string
+  email?: string
   notes?: string
 }

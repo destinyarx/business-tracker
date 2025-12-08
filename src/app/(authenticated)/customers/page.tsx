@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useCustomers } from '@/features/customers/hooks/useCustomers'
 import { Customer, CustomerType } from '@/features/customers/customers.types';
-import { mockCustomers } from '@/features/customers/customers.data';
 import { CustomerTable } from '@/features/customers/components/CustomerTable';
 import { CustomerForm } from '@/features/customers/components/CustomerForm';
 import { Button } from '@/components/ui/button';
@@ -17,61 +16,28 @@ import Loading from '@/components/organisms/Loading'
 
 export default function Customers() {
     const { customerQuery, createCustomer, updateCustomer, deleteCustomer } = useCustomers()
-
-    const [customers, setCustomers] = useState<Customer[]>(mockCustomers);
     const [searchQuery, setSearchQuery] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
-    const handleAddCustomer = (data: {
-        fullName: string;
-        phone: string;
-        customerType: CustomerType;
-        notes?: string;
-    }) => {
-        const newCustomer: Customer = {
-        id: Date.now().toString(),
-        ...data,
-        createdAt: new Date(),
-        };
-        setCustomers([newCustomer, ...customers]);
+    const handleAddCustomer = async (data: Customer) => {
+        await createCustomer.mutateAsync(data)
         setIsFormOpen(false);
-        toast.success("Customer added successfully!");
     };
 
-    const handleUpdateCustomer = (data: {
-        fullName: string;
-        phone: string;
-        customerType: CustomerType;
-        notes?: string;
-    }) => {
-        if (!selectedCustomer) return;
+    const handleUpdateCustomer = async (data: Customer) => {
+        if (!selectedCustomer?.id) return;
 
-        setCustomers(
-        customers.map((customer) =>
-            customer.id === selectedCustomer.id
-            ? { ...customer, ...data }
-            : customer
-        )
-        );
+        await updateCustomer.mutateAsync({ id: selectedCustomer.id, values: data })
         setIsFormOpen(false);
         setSelectedCustomer(null);
-
-        console.log('HAHAHA')
-        toast("⏳ Server Waking Up…", {
-          description: "Our backend is cold starting on free-tier hosting. Please wait 10–30 seconds.",
-          duration: 4000
-        })
     };
 
     const handleDeleteCustomer = async () => {
         if (!selectedCustomer?.id) return;
 
-        console.log(selectedCustomer.id)
-
         await deleteCustomer.mutateAsync(selectedCustomer.id)
-
         setIsDeleteDialogOpen(false);
         setSelectedCustomer(null);
     };
@@ -91,17 +57,21 @@ export default function Customers() {
         setSelectedCustomer(null);
     };
 
+    if (customerQuery.isLoading) {
+        return <Loading />
+    }
+
     return (
-        <div className="w-full max-w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 via-gray-50 to-teal-100 text-gray-800">
-            <div className="container mx-auto px-6 pb-8">
+        <div className="w-full max-w-full min-h-screen flex justify-center bg-gradient-to-br from-teal-50 via-gray-50 to-teal-100 text-gray-800">
+            <div className="container mx-auto px-6 pb-8 mt-5">
                 <div className="flex flex-col md:flex-row md:justify-between sm:gap-5 mb-5">
                     <div className="relative w-full lg:w-1/2">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
-                        placeholder="Search customers..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10"
+                            placeholder="Search customers..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pl-10"
                         />
                     </div>
 
@@ -111,29 +81,28 @@ export default function Customers() {
                     </Button>
                 </div>
 
-                {customerQuery.isLoading ? (
+                {/* {customerQuery.isLoading ? (
                     <Loading />
-                ) : (
+                ) : ( */}
                     <CustomerTable
                         data={customerQuery.data ?? []}
                         onEdit={openEditDialog}
                         onDelete={openDeleteDialog}
                         globalFilter={searchQuery}
                     />
-                )}
-                
+                {/* )} */}
             </div>
 
             <Dialog open={isFormOpen} onOpenChange={closeFormDialog}>
                 <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
                         <DialogTitle>
-                        {selectedCustomer ? "Update Customer" : "Add New Customer"}
+                            {selectedCustomer ? "Update Customer" : "Add New Customer"}
                         </DialogTitle>
-                        <DialogDescription>
-                        {selectedCustomer
-                            ? "Update the customer information below."
-                            : "Fill in the details to add a new customer."}
+                        <DialogDescription className="text-xs font-light mb-2">
+                            {selectedCustomer
+                                ? "Update the customer information below."
+                                : "Fill in the details to add a new customer."}
                         </DialogDescription>
                     </DialogHeader>
                     <CustomerForm
