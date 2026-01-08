@@ -1,3 +1,5 @@
+'use client'
+
 import { Roboto } from 'next/font/google'
 import './globals.css';
 import type { ReactNode } from 'react';

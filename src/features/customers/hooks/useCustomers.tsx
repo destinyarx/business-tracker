@@ -11,8 +11,8 @@ export function useCustomers() {
     const customerQuery = useQuery({
         queryKey: ['customers'],
         queryFn: () => customerService.getAll(),
+        staleTime: 1000 * 60 * 5,
         enabled: isLoaded,
-        refetchOnWindowFocus: false
     })
 
     const createCustomer = useMutation({

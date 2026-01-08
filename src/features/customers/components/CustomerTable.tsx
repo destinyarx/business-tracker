@@ -118,7 +118,7 @@ export function CustomerTable({
       cell: ({ row }) => {
         const customer = row.original;
         return (
-          <div className="flex gap-2">
+          <div className="flex gap-1">
             <Button
               variant="ghost"
               size="icon"
@@ -160,9 +160,7 @@ export function CustomerTable({
       const searchValue = filterValue.toLowerCase();
       const name = row.original.name.toLowerCase();
       const customerType = row.original.customerType.toLowerCase();
-      const notes = (row.original.notes || "").toLowerCase();
-
-      console.log(row)
+      const notes = (row.original.notes || '').toLowerCase();
 
       return (
         name.includes(searchValue) ||

@@ -22,15 +22,15 @@ export default function Customers() {
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
     const handleAddCustomer = async (data: Customer) => {
-        await createCustomer.mutateAsync(data)
         setIsFormOpen(false);
+        await createCustomer.mutateAsync(data)
     };
 
     const handleUpdateCustomer = async (data: Customer) => {
         if (!selectedCustomer?.id) return;
 
-        await updateCustomer.mutateAsync({ id: selectedCustomer.id, values: data })
         setIsFormOpen(false);
+        await updateCustomer.mutateAsync({ id: selectedCustomer.id, values: data })
         setSelectedCustomer(null);
     };
 

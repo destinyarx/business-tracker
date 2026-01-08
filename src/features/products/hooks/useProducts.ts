@@ -8,12 +8,10 @@ export function useProducts() {
     const qc = useQueryClient()
     const productService = useProductService()
     const { closeForm } = useProductFormStore()
-    const { isLoaded } = useAuth()
 
     const productsQuery = useQuery({
         queryKey: ['products'],
         queryFn: productService.getAll,
-        enabled: isLoaded,
     })
 
     const createProduct = useMutation({

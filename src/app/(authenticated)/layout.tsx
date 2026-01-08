@@ -1,5 +1,7 @@
 import { cookies } from "next/headers"
 import type { Metadata } from 'next'
+import { ClerkLoaded, ClerkLoading, RedirectToSignIn } from '@clerk/nextjs'
+import Loading from '@/components/organisms/Loading'
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from '@/components/organisms/AppSidebar'
 import {
@@ -33,33 +35,39 @@ export default async function RootLayout({
 
   return (
     <ClerkProvider>
-      <header className="fixed top-0 left-0 w-full shadow-sm z-50 h-16 flex items-center bg-gradient-to-br from-teal-400 via-teal-200 to-teal-100 px-4">
-        <SignedIn>
-          <div className="flex justify-between w-full">
-            <div className="bg-zinc-50 border-1 border-teal-600 rounded-lg py-1">
-              <Image
-                src="/logo-with-title.png"
-                alt="logo"
-                width={200}
-                height={200}
-              />
+      <ClerkLoading>
+        <Loading/>
+      </ClerkLoading>
+
+      <ClerkLoaded>
+          <header className="fixed top-0 left-0 w-full shadow-sm z-50 h-16 flex items-center bg-gradient-to-br from-teal-400 via-teal-200 to-teal-100 px-4">
+            <SignedIn>
+              <div className="flex justify-between w-full">
+                <div className="bg-zinc-50 border-1 border-teal-600 rounded-lg py-1">
+                  <Image
+                    src="/logo-with-title.png"
+                    alt="logo"
+                    width={200}
+                    height={200}
+                  />
+                </div>
+            
+                <UserButton />
+              </div>
+            </SignedIn>
+          </header>
+
+          {/* Sidebar + Main layout */}
+          <SidebarProvider>
+            <div className="flex flex-row w-screen max-w-screen pt-16">
+              <AppSidebar />
+
+              <div className="w-full bg-gray-50 min-h-[calc(100vh-3rem)] p-4">
+                {children}
+              </div>
             </div>
-        
-            <UserButton />
-          </div>
-        </SignedIn>
-      </header>
-
-      {/* Sidebar + Main layout */}
-      <SidebarProvider>
-        <div className="flex flex-row w-screen max-w-screen pt-16">
-          <AppSidebar />
-
-          <div className="w-full bg-gray-50 min-h-[calc(100vh-3rem)] p-4">
-            {children}
-          </div>
-        </div>
-      </SidebarProvider>
+          </SidebarProvider>
+      </ClerkLoaded>
     </ClerkProvider>
   );
 }
