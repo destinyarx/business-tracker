@@ -22,13 +22,13 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="flex flex-row gap-8 text-gray-500 text-[1rem] font-semibold">
+          {/* <div className="flex flex-row gap-8 text-gray-500 text-[1rem] font-semibold">
             <div className="hover:text-gray-800">Features</div>
             <div className="hover:text-gray-800">Services</div>
             <div className=" hover:text-gray-800">Pricing</div>
             <div className=" hover:text-gray-800">About</div>
             <div className="hover:text-gray-800">FAQ</div>
-          </div>
+          </div> */}
         </div>
 
         <div className="flex flex-col justify-center items-center h-[85vh]">

@@ -5,6 +5,7 @@ import { DropdownMenu,  DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigg
 import { Product } from '@/features/products/products.types'
 import { useProductFormStore } from '@/features/products/store/useProductFormStore';
 import { useProducts } from '@/features/products/hooks/useProducts'
+import { PRODUCT_CATEGORY } from '@/constants'
 
 interface ProductProps {
     product: Product
@@ -61,20 +62,22 @@ export default function ProductCard({ product }: ProductProps ) {
                 <div className="flex flex-col justify-between">
                     <div className="flex flex-col flex-1 mb-2">
                         <div className="flex flex-row justify-between items-center px-2 mt-1">
-                            <p className="text-gray-400 font-semibold text-[0.8rem] mt-1">
-                                {product.sku}
+                            <p className="text-gray-400 font-light text-[0.7rem] mt-1">
+                                {product.sku && (
+                                    <span>#{product.sku}</span>
+                                )}
                             </p>
 
                             <p className="border rounded-xl bg-slate-800 text-white text-[0.6rem] px-2">
-                                {product.category}
+                                { product.category ? PRODUCT_CATEGORY.find(c => c.value === product.category)?.name : ''}
                             </p>
                         </div>
 
-                        <p className="text-[1.1rem] text-gray-600 font-semibold ml-2 -mt-1">
+                        <p className="text-[1.1rem] text-gray-600 font-semibold ml-2">
                             {product.title}
                         </p>
 
-                        <p className="min-h-2 text-[0.7rem] text-slate-500 font-light italic truncate ml-2">
+                        <p className="min-h-2 text-[0.7rem] text-slate-500 font-light italic truncate ml-2 -mt-1">
                             {product.description ?? null}
                         </p>
                     </div>

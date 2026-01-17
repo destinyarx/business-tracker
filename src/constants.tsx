@@ -47,4 +47,18 @@ export const PRODUCT_CATEGORY = [
     { value: "pet-supplies", name: "Pet Supplies" },
     { value: "toys-games", name: "Toys & Games" },
 ];
+
+export const ORDER_STATUS = [
+    { name: 'Pending', value: 'pending', color: 'bg-amber-500' },
+    { name: 'In Progress', value: 'in_progress', color: 'bg-[#3B82F6]' },
+    { name: 'Completed', value: 'completed', color: 'bg-[#16A34A]' },
+    { name: 'Cancelled', value: 'cancelled', color: 'bg-[#DC2626]' },
+] as const
+
+export const ORDER_STATUS_VALUE = {
+    'pending': 'Pending',
+    'in_progress': 'Progress',
+    'completed': 'Completed',
+    'cancelled': 'Cancelled'
+}
   

@@ -1,12 +1,12 @@
 'use client'
 
-import { Roboto } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import './globals.css';
 import type { ReactNode } from 'react';
 import { Providers } from './providers'
 import { Toaster } from '@/components/ui/sonner'
 
-const roboto = Roboto({
+const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"], 
   variable: "--font-roboto",
@@ -14,7 +14,7 @@ const roboto = Roboto({
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={roboto.variable}>
+    <html lang="en" className={inter.variable}>
       <body  className="font-sans">
         <Providers>
           {children}

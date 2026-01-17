@@ -7,11 +7,11 @@ export default function OrderCartList() {
     const { carts, removeFromCart, increaseItem, decreaseItem } = useOrderStore()
 
     return (
-        <div className="w-full max-w-md space-y-3">
+        <div className="flex flex-col justify-center items-center w-full max-w-md space-y-3">
             {carts.map((item) => (
                 <div
                     key={item.id}
-                    className="flex items-center justify-between rounded-lg border bg-white px-4 py-3 shadow-sm"
+                    className="grid grid-cols-1 lg:grid-cols-2 gap-4 justify-between rounded-lg border bg-white px-4 py-3 shadow-sm"
                 >
                     <div className="flex flex-col">
                         <span className="text-sm font-medium text-gray-900">
