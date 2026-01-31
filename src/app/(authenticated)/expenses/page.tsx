@@ -91,9 +91,6 @@ export default function Index() {
     }
 
     const updateExpenses = async (data: ExpensesData) => {
-        const confirm = await confirmation('Are you sure?', 'You want to update this record.')
-        if (!confirm) return
-        
         await updateExpense.mutateAsync(data)
 
         setExpensesForm(formDefault)

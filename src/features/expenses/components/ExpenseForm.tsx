@@ -30,7 +30,7 @@ export default function ExpensesForm({ formMode, data, onCreate, onUpdate, updat
         defaultValues: {
             title: data?.title ?? '',
             description: data?.description ?? '',
-            dateIncurred: data?.dateIncurred ?? new Date(),
+            dateIncurred: data?.dateIncurred ? new Date(data.dateIncurred) : new Date(),
             referenceNumber: data?.referenceNumber ?? '',
             category: data?.category ?? 'rent',
             categoryOther: data?.categoryOther ?? '',
@@ -44,13 +44,8 @@ export default function ExpensesForm({ formMode, data, onCreate, onUpdate, updat
 
     const submitOrder = async () => {
         const prompt = data?.id ? 'You want to update this expenses?' : 'You want to add this new expenses?'
-
         const confirm = await confirmation('Are you sure?', prompt)
         if(!confirm) return
-
-        // console.log(form.getValues())
-
-        // return
 
         const { amount, ...rest } = form.getValues()
 

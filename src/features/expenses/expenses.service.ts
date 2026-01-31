@@ -75,7 +75,7 @@ export function useExpensesService() {
             })
 
             try {
-                await api.post(`/expenses/${form.id}`, form)
+                await api.patch(`/expenses/${form.id}`, form)
 
                 toast.dismiss(toastId)
                 appToast.success({
