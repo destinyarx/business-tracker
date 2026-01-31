@@ -102,7 +102,7 @@ export function ConfirmationProvider({ children }: { children: ReactNode }) {
           <AlertDialogFooter>
             <AlertDialogCancel
               onClick={() => close(false)}
-              className='rounded-xl'
+              className='rounded-xl text-white bg-rose-600 hover:bg-rose-400'
             >
               {opts.cancelText}
             </AlertDialogCancel>
@@ -112,7 +112,7 @@ export function ConfirmationProvider({ children }: { children: ReactNode }) {
               className={
                 opts.destructive
                   ? 'rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90'
-                  : 'rounded-xl'
+                  : 'rounded-xl text-white bg-green-500 hover:bg-green-300'
               }
             >
               {opts.confirmText}

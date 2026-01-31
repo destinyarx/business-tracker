@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { format } from "date-fns";
 import {
   ColumnDef,
   flexRender,
@@ -11,11 +12,11 @@ import {
   ColumnFiltersState,
 } from "@tanstack/react-table";
 import { Customer } from "@/features/customers/customers.types";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { CustomerBadge } from "./CustomerBadge";
-import { Pencil, Trash2, ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
-import { format } from "date-fns";
+import { Pencil, Trash2, ChevronLeft, ChevronRight, ArrowUpDown, ArrowRight, ArrowLeft } from "lucide-react";
+import ActionButton from "@/components/molecules/ActionButton";
 
 interface CustomerTableProps {
   data: Customer[];
@@ -40,10 +41,10 @@ export function CustomerTable({
         return (
           <Button
             variant="ghost"
-            className="hover:bg-transparent px-0"
+            className="hover:bg-transparent text-xs px-0"
           >
-            Customer Name
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            NAME
+            <ArrowUpDown className="ml-2 h-3 w-3" />
           </Button>
         );
       },
@@ -58,10 +59,10 @@ export function CustomerTable({
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="hover:bg-transparent px-0"
+            className="hover:bg-transparent text-xs px-0"
           >
-            Date Added
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            DATE ADDED
+            <ArrowUpDown className="ml-2 h-3 w-3" />
           </Button>
         );
       },
@@ -72,7 +73,11 @@ export function CustomerTable({
     },
     {
       accessorKey: "phone",
-      header: "Contact Number",
+      header: () => (
+        <div className="text-xs font-medium text-white">
+          CONTACT NUMBER
+        </div>
+      ),
       cell: ({ row }) => {
         const phone = (row.getValue('phone') as string) || ''
         return <div>{phone.trim() || '—'}</div>
@@ -85,10 +90,10 @@ export function CustomerTable({
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="hover:bg-transparent px-0"
+            className="hover:bg-transparent text-xs px-0"
           >
-            Customer Type
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            TYPE
+            <ArrowUpDown className="ml-2 h-3 w-3" />
           </Button>
         );
       },
@@ -102,7 +107,11 @@ export function CustomerTable({
     },
     {
       accessorKey: "notes",
-      header: "Notes",
+      header: () => (
+        <div className="text-xs font-medium text-white">
+          NOTES
+        </div>
+      ),
       cell: ({ row }) => {
         const notes = row.getValue("notes") as string;
         return (
@@ -114,31 +123,25 @@ export function CustomerTable({
     },
     {
       id: "actions",
-      header: "Actions",
+      header: () => (
+        <div className="text-xs font-medium text-white">
+          ACTION
+        </div>
+      ),
       cell: ({ row }) => {
-        const customer = row.original;
         return (
-          <div className="flex gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onEdit(customer)}
-              className="h-8 w-8 text-orange-400 hover:bg-orange-200"
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onDelete(customer)}
-              className="h-8 w-8 text-rose-600 hover:bg-destructive/10 hover:text-destructive"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+          <div>
+            <ActionButton
+              onUpdate={() => onEdit(row.original)}
+              onDelete={() => onDelete(row.original)}
+            />
           </div>
         );
       },
+      size: 56,
+      minSize: 56,
+      maxSize: 56,
+      enableResizing: false,
     },
   ];
 
@@ -178,12 +181,20 @@ export function CustomerTable({
   return (
     <div className="space-y-4">
       <div className="rounded-lg border bg-card shadow-sm">
-        <Table>
+        <Table className="w-full">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="hover:bg-transparent">
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="font-semibold">
+                  <TableHead 
+                    key={header.id}
+                    className="font-semibold"
+                    style={
+                      header.column.id === "actions"
+                        ? { width: '5%', maxWidth: '10%' }
+                        : undefined
+                    }
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -226,40 +237,47 @@ export function CustomerTable({
               </TableRow>
             )}
           </TableBody>
+          <TableFooter>
+            <TableCell colSpan={6}>
+              {/* Pagination */}
+              <div className="flex items-center justify-between px-2">
+                <div className="text-sm text-muted-foreground">
+                  Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{" "}
+                  {Math.min(
+                    (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+                    table.getFilteredRowModel().rows.length
+                  )}{" "}
+                  of {table.getFilteredRowModel().rows.length} customers
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                    className="bg-teal-600 text-white hover:bg-teal-700"
+                  >
+                    <ArrowLeft className="h-3 w-3" />
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                    className="bg-teal-600 text-white hover:bg-teal-700"
+                  >
+                    Next
+                    <ArrowRight className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+            </TableCell>
+          </TableFooter>
         </Table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between px-2">
-        <div className="text-sm text-muted-foreground">
-          Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{" "}
-          {Math.min(
-            (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
-            table.getFilteredRowModel().rows.length
-          )}{" "}
-          of {table.getFilteredRowModel().rows.length} customers
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronLeft className="h-4 w-4 mr-1" />
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-            <ChevronRight className="h-4 w-4 ml-1" />
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }

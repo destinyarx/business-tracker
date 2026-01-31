@@ -55,7 +55,7 @@ export default function Pricing() {
                         <div className="flex flex-row gap-2 items-center">
                             <BadgeCheck className="!h-7 !w-7"/>
                             <p className="text-[0.7rem] text-gray-500">
-                                Store customer contact details and purchase history in one place.
+                                Store customer details and purchase history in one place.
                             </p>
                         </div>
                         <div className="flex flex-row gap-2 items-center">
@@ -87,8 +87,8 @@ export default function Pricing() {
                             <p className="text-2xl font-semibold mb-2">Premium</p>
 
                             <p className="text-[0.7rem] mb-15">
-                            Great for businesses that want to use AI 
-                            for smarter insights and easy custom PDF receipt generation.
+                                Great for businesses that want to use AI 
+                                for smarter insights and easy custom PDF receipt generation.
                             </p>
                         </div>
 
@@ -107,12 +107,18 @@ export default function Pricing() {
                     </div>
 
                     <div className="flex flex-col gap-3 w-[70%] bg-gray-200 text-slate-700 rounded-xl p-5">
-                        <div className="font-semibold text-md">
-                            Features
+                        <div className="flex flex-row justify-between items-center">
+                            <div className="font-semibold text-md">
+                                Features
+                            </div>
+
+                            <div className="bg-slate-600 text-gray-300 text-[0.6rem] font-semibold rounded-full px-2 py-1 -mt-2">
+                                Coming Soon 🔒
+                            </div>
                         </div>
 
                         <div className="flex flex-row items-center gap-2">
-                            <BadgeCheck className="!h-7 !w-7"/>
+                            <BadgeCheck className="h-5 w-5"/>
                             <p className="text-[0.7rem] text-gray-500">
                                 All in Free Tier plan.
                             </p>
@@ -130,7 +136,7 @@ export default function Pricing() {
                             </p>
                         </div>
                         <div className="flex flex-row items-center gap-2">
-                            <BadgeCheck className="!h-7 !w-7"/>
+                            <BadgeCheck className="!h-5 !w-5"/>
                             <p className="text-[0.7rem] text-gray-500">
                                 Access to Queue Management Feature.
                             </p>

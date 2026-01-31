@@ -59,7 +59,7 @@ export default function Order({ products, triggerCheckout }: Props) {
 
                         <Button 
                             onClick={() => setShowForm(true)}
-                            className="mt-4 w-full rounded-lg bg-gray-900 py-3 text-sm font-medium text-white hover:bg-gray-800"
+                            className="mt-4 w-full rounded-lg bg-teal-400 py-3 text-sm font-medium text-white hover:bg-teal-200"
                         >
                             Checkout
                         </Button>

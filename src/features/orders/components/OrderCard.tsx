@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
-import type { OrderData } from '@/features/orders/order.type'
+import type { OrderData, OrderStatus } from '@/features/orders/order.type'
 import { ORDER_STATUS } from '@/constants'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
@@ -14,7 +14,7 @@ type Props = {
     orderNumber: number,
     onDelete: (id: number) => void,
     onUpdate: (data: OrderData) => void,
-    updateStatus: (id: number, status: string) => void
+    updateStatus: (id: number, status: OrderStatus) => void
 }
 
 export default function OrderCard({ order, orderNumber, onDelete, onUpdate, updateStatus }: Props) {
@@ -27,18 +27,18 @@ export default function OrderCard({ order, orderNumber, onDelete, onUpdate, upda
     return (
         <Card className="flex h-full flex-col pt-3">
             <CardHeader>
-                <div className="flex flex-row justify-between gap-3">
-                    <div className="flex flex-row gap-3">
+                <div className="flex flex-row items-start justify-between gap-3">
+                    <div className="flex flex-row items-start gap-3">
                         <div className="bg-amber-400 text-white text-[0.8rem] rounded-lg font-semibold py-1 px-2">
                             #{orderNumber}
                         </div>
 
-                        <div className="font-semibold text-[1.1rem]">
+                        <div className="font-semibold leading-snug line-clamp-1 text-[1rem]">
                             {order?.orderName?.trim() ? order.orderName : `${order?.customer?.name}'s Order`}
                         </div>
                     </div>
 
-                    <div className={cn(statusConfig?.color, 'text-white text-[0.8rem] font-semibold py-1 px-3 rounded-lg')}>
+                    <div className={cn(statusConfig?.color, 'text-white text-[0.8rem] font-semibold whitespace-nowrap leading-none shrink-0 py-1 px-3 rounded-lg items-start self-start')}>
                         {order.status ? statusConfig?.name : 'Pending'}
                     </div>
                 </div>
@@ -48,13 +48,18 @@ export default function OrderCard({ order, orderNumber, onDelete, onUpdate, upda
                         {Boolean(order.orderName?.trim() && order.customer?.name?.trim()) && (
                             <div className="flex flex-row items-center gap-1 text-[0.75rem] font-semibold">
                                 <CircleUserRound className="w-4 h-4 text-sky-600" />
-                                <p>{order.customer.name}</p>
+                                <p>{order?.customer?.name ?? ''}</p>
                             </div>
                         )}
                     </div>
 
                     <p className="text-right text-light text-[0.7rem] text-gray-400 -mt-1">
-                        {format(new Date(order.createdAt), 'MMMM d, yyyy')} • {format(new Date(order.createdAt), 'hh:mm a')}
+                        {order.createdAt && (
+                            <>
+                                {format(new Date(order.createdAt), 'MMMM d, yyyy')} • {' '}
+                                {format(new Date(order.createdAt), 'hh:mm a')}
+                            </>
+                        )}
                     </p>
                 </div>
 
@@ -75,19 +80,19 @@ export default function OrderCard({ order, orderNumber, onDelete, onUpdate, upda
                     <table className='w-full border-collapse text-xs mt-2'>
                         <thead>
                             <tr className='border-b bg-muted font-semibold [&_th]:px-3 [&_th]:py-2'>
-                                <th className='text-left w-[10%]'>Qty</th>
+                                <th className='text-left w-[5%]'>Qty</th>
                                 <th className='text-left'>Title</th>
                                 <th className='text-right'>Price</th>
                                 <th className='text-right'>Total</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {order.items.map((item: CartItem) => (
-                                <tr key={item.id} className='border-b last:border-0 [&_td]:px-3 [&_td]:py-2'>
-                                    <td>{item.quantity}</td>
+                            {order.items.map((item: CartItem, index) => (
+                                <tr key={index} className='border-b last:border-0 [&_td]:px-3 [&_td]:py-2'>
+                                    <td className="w-[5%]">{item.quantity}</td>
                                     <td>{item?.product?.title}</td>
-                                    <td className='text-right'>₱ {item.priceAtPurchase}</td>
-                                    <td className='text-right'>₱ {item.priceAtPurchase * item.quantity}</td>
+                                    <td className='text-right min-w-[60px]'>₱ {item.priceAtPurchase}</td>
+                                    <td className='text-right min-w-[60px]'>₱ {item.priceAtPurchase! * item.quantity!}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -114,7 +119,7 @@ export default function OrderCard({ order, orderNumber, onDelete, onUpdate, upda
                 </Button>
 
                 <Button
-                    onClick={() => onDelete(order.id)}
+                    onClick={() => onDelete(order.id!)}
                     variant="outline"
                     size="sm"
                     className="flex-1 dark:text-white hover:text-white hover:bg-rose-400"
@@ -129,7 +134,7 @@ export default function OrderCard({ order, orderNumber, onDelete, onUpdate, upda
                             onClick={() => undefined}
                             size="sm"
                             variant="outline"
-                            className="flex-1 text-white bg-green-500 hover:bg-green-300"
+                            className="flex-1 text-white bg-teal-400 hover:bg-teal-200"
                         >
                             Update Status
                         </Button>
@@ -138,7 +143,7 @@ export default function OrderCard({ order, orderNumber, onDelete, onUpdate, upda
                         {ORDER_STATUS.map((status) => (
                             <DropdownMenuItem
                                 key={status.name}
-                                onClick={() => updateStatus(order.id, status.value)}
+                                onClick={() => updateStatus(order.id!, status.value)}
                                 className="cursor-pointer"
                             >
                                 {status.name}

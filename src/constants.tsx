@@ -61,4 +61,39 @@ export const ORDER_STATUS_VALUE = {
     'completed': 'Completed',
     'cancelled': 'Cancelled'
 }
+
+export const EXPENSE_CATEGORIES = [
+    { name: 'Rent', value: 'rent' },
+    { name: 'Utilities', value: 'utilities' },
+    { name: 'Supplies', value: 'supplies' },
+    { name: 'Inventory', value: 'inventory' },
+    { name: 'Shipping', value: 'shipping' },
+    { name: 'Marketing', value: 'marketing' },
+    { name: 'Fees', value: 'fees' },
+    { name: 'Software', value: 'Software' },
+    { name: 'Salary', value: 'salary' },
+    { name: 'Maintenance', value: 'maintenance' },
+    { name: 'Equipment', value: 'equipment' },
+    { name: 'Taxes', value: 'taxes' },
+    { name: 'Professional Services', value: 'professional_services' },
+    { name: 'Transportation', value: 'Transportation' },
+    { name: 'Meals', value: 'meals' },
+    { name: 'Other', value: 'other' },
+] as const
+
+export const PAYMENT_METHOD = [
+    { name: 'Cash', value: 'cash' },
+    { name: 'Gcash', value: 'gcash' },
+    { name: 'Maya', value: 'maya' },
+    { name: 'Bank Transfer', value: 'bank_transfer' },
+    { name: 'Credit Card', value: 'credit_card' },
+    { name: 'Loan', value: 'loan' },
+] as const
   
+export const TIME_PERIOD = [
+    { name: 'Today', value: 'today' },
+    { name: 'Yesterday', value: 'yesterday' },
+    { name: 'This Week', value: 'week' },
+    { name: 'Last Week', value: 'last_week' },
+    { name: 'This Month', value: 'month' },
+] as const

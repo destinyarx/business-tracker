@@ -10,7 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 const customerSchema = z.object({
   name: z.string().min(1, "Customer name is required").max(100),
-  phone: z.string().optional(),
+  // phone: z.string()
+  //   .transform((v) => (v === '' ? null : v))
+  //   .pipe(
+  //     z.string().max(11, 'Phone must be 11 digits maximum')
+  //   )
+  //   .optional(),
+  phone: z.string().max(11, 'Phone number should only at 11 digits').optional(),
   customerType: z.enum(["normal", "loyal", "deluxe", "premium", "VIP"]),
   email: z.string().max(50).optional(),
   notes: z.string().max(500).optional(),
@@ -48,7 +54,7 @@ export function CustomerForm({ customer, onSubmit, onCancel }: CustomerFormProps
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-                Customer Name
+                Name
                 <strong className="text-red-700">*</strong>
               </FormLabel>
               <FormControl>
@@ -137,8 +143,9 @@ export function CustomerForm({ customer, onSubmit, onCancel }: CustomerFormProps
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit">
-            {customer ? "Update Customer" : "Add Customer"}
+
+          <Button type="submit" className="bg-teal-600 hover:bg-teal-300">
+            {customer ? "Update" : "Submit"}
           </Button>
         </div>
       </form>

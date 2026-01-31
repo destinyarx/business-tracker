@@ -5,7 +5,8 @@ import { cn } from '@/lib/utils'
 import { useProducts } from '@/features/products/hooks/useProducts'
 import { useOrderStore } from '@/features/orders/useOrderStore'
 import { useToast } from '@/hooks/useToast'
-import { toast } from 'sonner'
+import { toast } 
+from 'sonner'
 import { useApi } from '@/hooks/useApi'
 import { useCustomers } from '@/features/customers/hooks/useCustomers'
 import { useConfirmation } from '@/app/provider/ConfirmationProvider'
@@ -81,13 +82,14 @@ export default function index() {
   }
 
   const handleUpdateStatus = async (id: number, status: OrderStatus) => {
-    
     const statusName =  ORDER_STATUS.find((item) => item.value === status)?.name ?? ''
 
     const confirm = await confirmation('Are you sure', `You want to update the order status to ${statusName}`)
     if (!confirm) return
 
-    updateOrderStatus.mutateAsync({id, status})
+    await updateOrderStatus.mutateAsync({id, status})
+
+    setFilterStatus(status)
   }
 
   const returnToMainPage = async () => {
@@ -97,14 +99,22 @@ export default function index() {
     setOrderState('show_orders')
   }
 
+  const cartsArray = carts.map((item) => {
+    return {
+      productId: item.id,
+      price: item.price,
+      quantity: item.quantity,
+    }
+  })
+
   const checkout = async (data: any) => {
     const form = {
       orderName: data.orderName ?? null,
       customerId: data.customerId ?? null,
       notes: data.notes ?? null,
-      orderStatus: 'pending',
-      orderItems: carts,
-      totalAmount: total
+      orderItems: cartsArray,
+      totalAmount: String(total),
+      status: 'pending'
     }
     
     const toastId = appToast.loading({
@@ -136,54 +146,55 @@ export default function index() {
 
   return (
     <>
-      <div className="flex justify-between items-center mx-3">
-        <div className="flex flex-row w-full lg:w-1/3 gap-3">
+      <div className={cn('flex items-center mx-3', orderState === 'show_orders' ? 'justify-between' : 'justify-end')}>
+        { orderState === 'show_orders' && (
+          <div className="flex flex-row w-full lg:w-1/3 gap-3">
+            <div className="relative w-2/3">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                  placeholder="Search orders..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+              />
+            </div>
 
-          <div className="relative w-2/3">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-                placeholder="Search orders..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-            />
-          </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant='outline' className='gap-2'>
+                  <Filter className='h-4 w-4' />
+                  <span className='text-sm'>
+                    {filterStatus === 'all' ? 'All Status' : ORDER_STATUS.find((item) => item.value === filterStatus)?.name ?? ''}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='outline' className='gap-2'>
-                <Filter className='h-4 w-4' />
-                <span className='text-sm'>
-                  {filterStatus === 'all' ? 'All Status' : ORDER_STATUS.find((item) => item.value === filterStatus)?.name ?? ''}
-                </span>
-              </Button>
-            </DropdownMenuTrigger>
+              <DropdownMenuContent align='end' className='w-52'>
+                <DropdownMenuLabel>Status</DropdownMenuLabel>
+                <DropdownMenuSeparator />
 
-            <DropdownMenuContent align='end' className='w-52'>
-              <DropdownMenuLabel>Status</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-
-              <DropdownMenuCheckboxItem
-                checked={filterStatus === 'all'}
-                onCheckedChange={() => setFilterStatus('all')}
-              >
-                All
-              </DropdownMenuCheckboxItem>
-
-              <DropdownMenuSeparator />
-
-              {ORDER_STATUS.map((status) => (
                 <DropdownMenuCheckboxItem
-                  key={status.value}
-                  checked={filterStatus === status.value}
-                  onCheckedChange={() => setFilterStatus(status.value)}
+                  checked={filterStatus === 'all'}
+                  onCheckedChange={() => setFilterStatus('all')}
                 >
-                  {status.name}
+                  All
                 </DropdownMenuCheckboxItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+
+                <DropdownMenuSeparator />
+
+                {ORDER_STATUS.map((status) => (
+                  <DropdownMenuCheckboxItem
+                    key={status.value}
+                    checked={filterStatus === status.value}
+                    onCheckedChange={() => setFilterStatus(status.value)}
+                  >
+                    {status.name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
 
         <Button
           onClick={() =>  orderState === 'show_orders' ? setOrderState('add_order') : returnToMainPage()}

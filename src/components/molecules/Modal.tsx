@@ -31,9 +31,11 @@ export function Modal({
       <DialogContent className={cn(className)}>
         {(title || description) && (
           <DialogHeader>
-            {title && (
-              <DialogTitle className="text-xl">{title}</DialogTitle>
-            )}
+            <div className="text-center">
+              {title && (
+                <DialogTitle className="text-xl">{title}</DialogTitle>
+              )}
+            </div>
 
             {description && (
               <DialogDescription>{description}</DialogDescription>

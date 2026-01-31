@@ -16,12 +16,10 @@ interface Props {
     onSubmit: (data: any) => void
 }
 
-const ORDER_STATUS = ['pending', 'in_progress', 'success', 'failed', 'reverted']
-
 const orderFormSchema = z.object({
     customerId: z.coerce.number().int().nullable(),
     orderName: z.string().optional(),
-    orderStatus: z.enum(ORDER_STATUS),
+    status: z.enum(['pending', 'in_progress', 'failed', 'completed', 'cancelled']),
     notes: z.string().optional()
 })
 
@@ -36,7 +34,7 @@ export default function OrderForm({ customers, onSubmit }: Props ) {
         defaultValues: {
             customerId: orderForm?.customerId ?? null,
             orderName: orderForm?.orderName ?? '',
-            orderStatus: orderForm?.orderStatus ?? 'pending',
+            status: orderForm?.status ?? 'pending',
             notes: orderForm?.notes ?? ''
         }
     })
@@ -48,7 +46,6 @@ export default function OrderForm({ customers, onSubmit }: Props ) {
         form.clearErrors(['orderName', 'customerId'])
 
         if (!customer && !orderName) {
-            console.log('Warning!!')
             form.setError('orderName', { type: 'manual', message: 'Fill up order name or customer field' })
             form.setError('customerId', { type: 'manual', message: 'Fill up order name or customer field' })
             return
