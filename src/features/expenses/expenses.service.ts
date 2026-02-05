@@ -1,6 +1,6 @@
 'use client'
 
-import type { ExpensesFormData } from '@/features/expenses/expenses.types'
+import type { ExpensesFormData, ExpenseFilters } from '@/features/expenses/expenses.types'
 import { useApi } from '@/hooks/useApi'
 import { useToast } from '@/hooks/useToast'
 import { toast } from 'sonner'
@@ -10,16 +10,17 @@ export function useExpensesService() {
     const appToast = useToast()
 
     return {
-        async getPaginated(limit: number, offset: number, category?: string, filterPaymentMethod?: string) {
+        async getPaginated(limit: number, offset: number, filters?: ExpenseFilters) {
             try {
                 const params = new URLSearchParams({
                     limit: String(limit),
                     offset: String(offset)
                 })
 
-                if (category) params.append('category', category)
-
-                if (filterPaymentMethod) params.append('filter', filterPaymentMethod)
+                if (filters?.searchKey) params.append('searchKey', filters.searchKey);
+                if (filters?.category) params.append('category', filters.category);
+                if (filters?.paymentMethod) params.append('paymentMethod', filters.paymentMethod);
+                if (filters?.timePeriod) params.append('timePeriod', filters.timePeriod);
 
                 return await api.get(`/expenses/paginated?${params.toString()}`)
             } catch (error) {

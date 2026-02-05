@@ -6,6 +6,7 @@ import { Product } from '@/features/products/products.types'
 import { useProductFormStore } from '@/features/products/store/useProductFormStore';
 import { useProducts } from '@/features/products/hooks/useProducts'
 import { PRODUCT_CATEGORY } from '@/constants'
+import { useConfirmation } from '@/app/provider/ConfirmationProvider'
 
 interface ProductProps {
     product: Product
@@ -14,9 +15,13 @@ interface ProductProps {
 export default function ProductCard({ product }: ProductProps ) {
     const { deleteProduct } = useProducts()
     const { editForm, viewForm, closeForm } = useProductFormStore()
+    const confirmation = useConfirmation()
 
     const handleDelete = async (id: number|undefined) => {
         if(!id) return
+
+        const confirm = await confirmation('Are you sure?', 'You want to delete this product.')
+        if (!confirm) return
         
         try {
             const request = await deleteProduct.mutateAsync(id)
@@ -27,11 +32,11 @@ export default function ProductCard({ product }: ProductProps ) {
     }
 
     return (
-        <div className="w-full max-w-full bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-lg transition-shadow duration-300">
+        <div className="w-full max-w-full bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl hover:animate-pulse transition-shadow duration-300">
             <div className="flex flex-col justify-between h-full">
                 <div className="relative w-full h-48">
                     <Image
-                        src={product.image ?? 'https://foodish-api.com/images/pasta/pasta1.jpg'}
+                        src={product.imageUrl ?? 'https://foodish-api.com/images/pasta/pasta1.jpg'}
                         alt={product.title}
                         sizes='(max-width: 640px) 100vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw'
                         fill

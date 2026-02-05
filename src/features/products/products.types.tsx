@@ -21,7 +21,8 @@ export interface Product {
     profitPercentage?: number
     profit?: number
     category?: string
-    image?: string
+    image?: string,
+    imageUrl?: string
 }
 
 export enum FormState {

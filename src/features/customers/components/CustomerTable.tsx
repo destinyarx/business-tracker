@@ -74,13 +74,13 @@ export function CustomerTable({
     {
       accessorKey: "phone",
       header: () => (
-        <div className="text-xs font-medium text-white">
+        <div className="text-xs font-medium">
           CONTACT NUMBER
         </div>
       ),
       cell: ({ row }) => {
         const phone = (row.getValue('phone') as string) || ''
-        return <div>{phone.trim() || '—'}</div>
+        return <div className="text-xs font-light">{phone.trim() || '—'}</div>
       }, 
     },
     {
@@ -108,14 +108,14 @@ export function CustomerTable({
     {
       accessorKey: "notes",
       header: () => (
-        <div className="text-xs font-medium text-white">
+        <div className="text-xs font-medium">
           NOTES
         </div>
       ),
       cell: ({ row }) => {
         const notes = row.getValue("notes") as string;
         return (
-          <div className="max-w-[300px] truncate text-justify text-muted-foreground text-xs">
+          <div className="max-w-[300px] truncate text-justify font-light text-muted-foreground text-xs italic">
             {notes || "—"}
           </div>
         );
@@ -124,7 +124,7 @@ export function CustomerTable({
     {
       id: "actions",
       header: () => (
-        <div className="text-xs font-medium text-white">
+        <div className="text-xs font-medium">
           ACTION
         </div>
       ),

@@ -24,3 +24,10 @@ export type ExpensesData = Omit<ExpensesFormData, 'id'> & {
     id?: number | null
     createdAt?: Date | string
 }
+
+export type ExpenseFilters = {
+    searchKey?: string,
+    category?: string,
+    paymentMethod?: string,
+    timePeriod?: string,
+}

@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { cn } from '@/lib/utils'
-import type { ExpensesFormData, ExpensesData } from '@/features/expenses/expenses.types'
+import type { ExpensesFormData, ExpensesData, ExpenseFilters } from '@/features/expenses/expenses.types'
 import type { FormMode } from '@/types/global.types'
 import { useExpenseMutation } from '@/features/expenses/hooks/useExpenseMutation'
 import { EXPENSE_CATEGORIES, PAYMENT_METHOD, TIME_PERIOD } from '@/constants'
@@ -17,6 +17,7 @@ import { Plus, Search, RefreshCw, CalendarSearch, Tags, CircleDollarSign, Circle
 import ExpensesTable from '@/features/expenses/components/ExpensesTable';
 import ExpensesForm from '@/features/expenses/components/ExpenseForm';
 import { Modal } from '@/components/molecules/Modal';
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 export default function Index() {
     const { createExpense, updateExpense, deleteExpense } = useExpenseMutation()
@@ -36,17 +37,32 @@ export default function Index() {
         paymentMethodOther: ''
     }
 
-    // table state
-    const [searchQuery, setSearchQuery] = useState<string>('')
-    const [filterCategory, setFilterCategory] = useState<string>('')
-    const [filterMethod, setFilterMethod] = useState<string>('')
-    const [filterTimePeriod, setFilterTimePeriod] = useState<string>('')
-
     // form state
     const [formMode, setFormMode] =useState<FormMode>('create')
     const [showForm, setShowForm] = useState<boolean>(false)
     const [expensesForm, setExpensesForm] = useState<ExpensesFormData | typeof formDefault>(formDefault)
     const updateId = useRef<number | null>(null)
+
+    // table state
+    const [currentPage, setCurrentPage] = useState(1)
+    const [offset, setoffset] = useState(0)
+    const [filters, setFilters] = useState<ExpenseFilters>({
+        searchKey: undefined,
+        category: undefined,
+        paymentMethod: undefined,
+        timePeriod: undefined,
+    })
+
+    const setFilter = async (key: keyof ExpenseFilters, value: string) => {
+        if (key === 'searchKey') {
+            await new Promise(r => setTimeout(r, 1000))
+        }
+
+        setFilters((prev) => ({
+            ...prev,
+            [key]: value,
+        }))
+    }
 
     const modalTitle = {
         'view': 'View Expense Details',
@@ -54,8 +70,24 @@ export default function Index() {
         'update': 'Update Expense',
     }
 
+    const [animate, setAnimate] = useState(false)
     const handleRefresh = () => {
+        setAnimate(true)
+
+        setoffset(0)
+        setCurrentPage(1)
+        setFilters({
+            searchKey: undefined,
+            category: undefined,
+            paymentMethod: undefined,
+            timePeriod: undefined,
+        })
+
         invalidateKey('expenses')
+
+        setTimeout(() => {
+            setAnimate(false)
+        }, 300)
     }
 
     const setFormValues = (data: ExpensesData) => {
@@ -113,7 +145,7 @@ export default function Index() {
                             <Input
                                 placeholder="Search expenses..."
                                 value={undefined}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onChange={(e) => setFilter('searchKey', e.target.value)}
                                 className="pl-10"
                             />
                         </div>
@@ -122,9 +154,9 @@ export default function Index() {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant='outline' className='gap-2'>
-                                    <Tags className={cn('h-4 w-4', filterCategory && 'text-amber-400')} />
+                                    <Tags className={cn('h-4 w-4', filters.category && 'text-amber-400')} />
                                     <span className='text-sm'>
-                                        {filterCategory ? EXPENSE_CATEGORIES.find((item) => item.value === filterCategory)?.name : 'Category'}
+                                        {filters.category ? EXPENSE_CATEGORIES.find((item) => item.value === filters.category)?.name : 'Category'}
                                     </span>
                                 </Button>
                             </DropdownMenuTrigger>
@@ -133,15 +165,15 @@ export default function Index() {
                                 {EXPENSE_CATEGORIES.map((category) => (
                                     <DropdownMenuCheckboxItem
                                         key={category.value}
-                                        checked={filterCategory === category.value}
-                                        onCheckedChange={() => setFilterCategory(category.value)}
+                                        checked={filters.category === category.value}
+                                        onCheckedChange={() => setFilter('category', category.value)}
                                     >
                                         {category.name}
                                     </DropdownMenuCheckboxItem>
                                 ))}
 
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => setFilterCategory('')} className="flex justify-center text-muted-foreground">
+                                <DropdownMenuItem onClick={() => setFilter('category', '')} className="flex justify-center text-muted-foreground">
                                     <CircleX className="h-4 w-4 text-red-600" />
                                     Clear
                                 </DropdownMenuItem>
@@ -152,9 +184,9 @@ export default function Index() {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant='outline' className='gap-2'>
-                                <CircleDollarSign className={cn('h-4 w-4', filterMethod && 'text-green-400')} />
+                                <CircleDollarSign className={cn('h-4 w-4', filters.paymentMethod && 'text-green-400')} />
                                 <span className='text-sm'>
-                                    {filterMethod ? PAYMENT_METHOD.find((item) => item.value === filterMethod)?.name : 'Payment Method'}
+                                    {filters.paymentMethod ? PAYMENT_METHOD.find((item) => item.value === filters.paymentMethod)?.name : 'Payment Method'}
                                 </span>
                                 </Button>
                             </DropdownMenuTrigger>
@@ -163,15 +195,15 @@ export default function Index() {
                                 {PAYMENT_METHOD.map((method) => (
                                     <DropdownMenuCheckboxItem
                                         key={method.value}
-                                        checked={filterCategory === method.value}
-                                        onCheckedChange={() => setFilterMethod(method.value)}
+                                        checked={filters.paymentMethod === method.value}
+                                        onCheckedChange={() => setFilter('paymentMethod', method.value)}
                                     >
                                         {method.name}
                                     </DropdownMenuCheckboxItem>
                                 ))}
 
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => setFilterMethod('')} className="flex justify-center text-muted-foreground">
+                                <DropdownMenuItem onClick={() => setFilter('paymentMethod', '')} className="flex justify-center text-muted-foreground">
                                     <CircleX className="h-4 w-4 text-red-600" />
                                     Clear
                                 </DropdownMenuItem>
@@ -182,9 +214,9 @@ export default function Index() {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant='outline' className='gap-2'>
-                                <CalendarSearch className={cn('h-4 w-4', filterTimePeriod && 'text-sky-500')} />
+                                <CalendarSearch className={cn('h-4 w-4', filters.timePeriod && 'text-sky-500')} />
                                 <span className='text-sm'>
-                                    {filterTimePeriod ? TIME_PERIOD.find((item) => item.value === filterTimePeriod)?.name : 'Time Period'}
+                                    {filters.timePeriod ? TIME_PERIOD.find((item) => item.value === filters.timePeriod)?.name : 'Time Period'}
                                 </span>
                                 </Button>
                             </DropdownMenuTrigger>
@@ -193,15 +225,15 @@ export default function Index() {
                                 {TIME_PERIOD.map((method) => (
                                     <DropdownMenuCheckboxItem
                                         key={method.value}
-                                        checked={filterCategory === method.value}
-                                        onCheckedChange={() => setFilterTimePeriod(method.value)}
+                                        checked={filters.timePeriod === method.value}
+                                        onCheckedChange={() => setFilter('timePeriod', method.value)}
                                     >
                                         {method.name}
                                     </DropdownMenuCheckboxItem>
                                 ))}
 
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => setFilterTimePeriod('')} className="flex justify-center text-muted-foreground">
+                                <DropdownMenuItem onClick={() => setFilter('timePeriod', '')} className="flex justify-center text-muted-foreground">
                                     <CircleX className="h-4 w-4 text-red-600" />
                                     Clear
                                 </DropdownMenuItem>
@@ -209,14 +241,24 @@ export default function Index() {
                         </DropdownMenu>
 
                         {/* table reload */}
-                        <Button 
-                            onClick={() => handleRefresh()}
-                            variant="outline" 
-                            size="icon-sm" 
-                            className="bg-sky-800 hover:bg-sky-400"
-                        >
-                            <RefreshCw className="h-4 w-4 text-white" />
-                        </Button>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button 
+                                    onClick={() => handleRefresh()}
+                                    variant="outline" 
+                                    size="icon-sm" 
+                                    className={cn("bg-sky-800 hover:bg-sky-400", animate && 'animate-spin')}
+                                >
+                                    <RefreshCw className="h-4 w-4 text-white" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Refresh Data</p>
+                            </TooltipContent>
+                        </Tooltip>
+
+
+                        
                     </div>
 
                     <Button
@@ -234,6 +276,11 @@ export default function Index() {
                         onView={handleView}
                         onDelete={handleDelete}
                         onUpdate={handleUpdate}
+                        offset={offset}
+                        onOffsetChange={setoffset}
+                        currentPage={currentPage}
+                        onPageChange={setCurrentPage}
+                        filters={filters}
                     />
                </div>
             </div>

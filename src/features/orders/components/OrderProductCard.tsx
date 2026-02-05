@@ -21,8 +21,8 @@ export default function OrderProductCard({ product, isSelected, onClick }: Props
       {/* Image */}
       <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-md bg-slate-100">
         <img
-          src="https://images.unsplash.com/photo-1542291026-7eec264c27ff"
-          alt="Product image"
+          src={product.imageUrl ?? 'https://images.unsplash.com/photo-1542291026-7eec264c27ff'}
+          alt="Product Image"
           className="h-full w-full object-cover"
         />
       </div>

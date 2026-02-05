@@ -46,6 +46,8 @@ export const PRODUCT_CATEGORY = [
     { value: "books-stationery", name: "Books & Stationery" },
     { value: "pet-supplies", name: "Pet Supplies" },
     { value: "toys-games", name: "Toys & Games" },
+
+    { value: "others", name: "Others" },
 ];
 
 export const ORDER_STATUS = [

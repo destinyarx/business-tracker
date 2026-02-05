@@ -6,11 +6,11 @@ interface CustomerBadgeProps {
 }
 
 const badgeVariants: Record<CustomerType, string> = {
-  normal: "bg-muted text-muted-foreground",
+  normal: "bg-slate-700 text-zinc-50",
   loyal: "bg-primary/20 text-primary",
-  deluxe: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+  deluxe: "bg-amber-500 text-white dark:bg-amber-900/30 dark:text-amber-400",
   premium: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400",
-  VIP: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
+  VIP: "bg-emerald-400 text-zinc-50 dark:bg-emerald-900/30 dark:text-emerald-400",
 };
 
 export function CustomerBadge({ type }: CustomerBadgeProps) {

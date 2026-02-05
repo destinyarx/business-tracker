@@ -238,7 +238,7 @@ export default function ExpensesForm({ formMode, data, onCreate, onUpdate, updat
                                     <Input 
                                         readOnly={formMode === 'view'}
                                         maxLength={50} 
-                                        placeholder="e.g. OR-102394, INV-7781" 
+                                        placeholder={formMode !== 'view' ? 'e.g. OR-102394, INV-7781' : 'N/A'} 
                                         {...field} 
                                     />
                                 </FormControl>
@@ -257,7 +257,7 @@ export default function ExpensesForm({ formMode, data, onCreate, onUpdate, updat
                                     <Textarea 
                                         readOnly={formMode === 'view'}
                                         maxLength={255} 
-                                        placeholder="Add additional details about this expense (optional)" 
+                                        placeholder={formMode !== 'view' ? 'Add additional details about this expense (optional)' : 'N/A'} 
                                         {...field} 
                                     />
                                 </FormControl>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
-import type { ExpensesData } from '@/features/expenses/expenses.types'
+import type { ExpensesData, ExpenseFilters } from '@/features/expenses/expenses.types'
 import { usePaginatedExpensesQuery } from '@/features/expenses/hooks/usePaginatedExpensesQuery'
 import { PAYMENT_METHOD } from '@/constants'
 
@@ -11,10 +11,16 @@ import { ArrowLeft, ArrowRight, Banknote, CalendarDays, CreditCard, PhilippinePe
 import { Button } from '@/components/ui/button'
 import ActionButton from '@/components/molecules/ActionButton'
 
+
 type Props = {
     onView: (data: ExpensesData) => void,
     onUpdate: (data: ExpensesData) => void,
     onDelete: (id: number) => void,
+    offset: number,
+    onOffsetChange: (value: number) => void,
+    currentPage: number,
+    onPageChange: (value: number) => void,
+    filters: ExpenseFilters
 }
 
 type MethodVisual = {
@@ -22,17 +28,15 @@ type MethodVisual = {
     color: string
 }
 
-export default function ExpensesTable({ onView, onUpdate, onDelete }: Props) {
+export default function ExpensesTable({ onView, onUpdate, onDelete, offset, onOffsetChange, currentPage, onPageChange, filters }: Props) {
     const [limit, setLimit] = useState(10)
-    const [offset, setOffset] = useState(0)
-    const [currentPage, setCurrentPage] = useState(1)
 
-    const { data, isLoading, isPending } = usePaginatedExpensesQuery({ limit, offset })
+    const { data, isLoading, isPending, isError } = usePaginatedExpensesQuery({ limit, offset, filters })
     const expenses = data?.data?.data?.results ?? []
     const hasNext = data?.data?.data?.hasNext ?? false
 
     useEffect(() => {
-        setOffset((currentPage * limit) - limit )
+        onOffsetChange((currentPage * limit) - limit )
     }, [currentPage])
       
     function methodVisual(method?: string): MethodVisual {
@@ -112,6 +116,21 @@ export default function ExpensesTable({ onView, onUpdate, onDelete }: Props) {
         )
     }
 
+    function errorMessage() {
+        return (
+            <TableRow>
+              <TableCell colSpan={7} className="py-10">
+                <div className="flex flex-col items-center justify-center gap-2 text-center">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Inbox className="h-5 w-5" />
+                    <span className="text-sm font-medium">Error encountered while fetching data.</span>
+                  </div>
+                </div>
+              </TableCell>
+            </TableRow>
+        )
+    }
+
     function loadingMessage() {
         return (
           <TableRow>
@@ -166,7 +185,7 @@ export default function ExpensesTable({ onView, onUpdate, onDelete }: Props) {
                         </TableCell>
 
                         <TableCell className="max-w-[360px] text-muted-foreground">
-                            <p className="text-xs line-clamp-1">
+                            <p className="text-xs ">
                                 {expense.description?.trim() ? expense.description : '—'}
                             </p>
                         </TableCell>
@@ -192,7 +211,7 @@ export default function ExpensesTable({ onView, onUpdate, onDelete }: Props) {
 
             <Table className="overflow-hidden rounded-xl border border-border">
                 <TableHeader className="bg-muted/40">
-                    <TableRow className="hover:bg-transparent [&_th]:h-11 [&_th]:text-xs [&_th]:font-semibold [&_th]:text-white [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-muted-foreground [&_th:last-child]:pr-6">
+                    <TableRow className="hover:bg-transparent [&_th]:h-11 [&_th]:text-xs [&_th]:font-semibold dark:[&_th]:text-white [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-muted-foreground [&_th:last-child]:pr-6">
                         <TableHead className="pl-7">Name</TableHead>
                         <TableHead>Date</TableHead>
                         <TableHead>Category</TableHead>
@@ -203,11 +222,12 @@ export default function ExpensesTable({ onView, onUpdate, onDelete }: Props) {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {isLoading || isPending ? loadingMessage()
-                        : expenses.length === 0
-                        ? emptyMessage()
-                        : renderTableData()
-                    }
+                    { isError ? errorMessage() : (
+                        isLoading || isPending ? loadingMessage()
+                            : expenses.length === 0
+                            ? emptyMessage()
+                            : renderTableData()
+                    )}
                 </TableBody>
                 <TableFooter className="w-full">
                     <TableRow>
@@ -217,7 +237,7 @@ export default function ExpensesTable({ onView, onUpdate, onDelete }: Props) {
                                     variant="outline"
                                     size="sm"
                                     disabled={currentPage === 1}
-                                    onClick={() => setCurrentPage(currentPage - 1)}
+                                    onClick={() => onPageChange(currentPage - 1)}
                                     className="bg-teal-600 text-white hover:bg-teal-700"
                                 >
                                     <ArrowLeft className="h-3 w-3" />
@@ -228,7 +248,7 @@ export default function ExpensesTable({ onView, onUpdate, onDelete }: Props) {
                                     variant="outline"
                                     size="sm"
                                     disabled={!hasNext}
-                                    onClick={() => setCurrentPage(currentPage + 1)}
+                                    onClick={() => onPageChange(currentPage + 1)}
                                     className="bg-teal-600 text-white hover:bg-teal-700"
                                 >
                                     Next

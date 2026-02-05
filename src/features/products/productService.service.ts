@@ -5,9 +5,28 @@ import { useApi } from '@/hooks/useApi'
 import { useToast } from '@/hooks/useToast'
 import { toast } from 'sonner'
 
+type UploadProductImageResponse = {
+  data: {
+    data: {
+      publicUrl: string;
+    };
+  };
+};
+
 export function useProductService() {
   const api = useApi()
   const appToast = useToast()
+
+  async function uploadProductImage(file: File): Promise<UploadProductImageResponse> {
+    const buffer = await file.arrayBuffer();
+   
+    return await api.post(`files/upload/product-image`, buffer, {
+      headers: { 
+        'Content-Type': file.type,
+        'X-Filename': file.name,
+       }
+    });
+  }
 
   return {
     async getAll() {
@@ -21,14 +40,19 @@ export function useProductService() {
       }
     },
 
-    async create(data: Product) {
+    async create(form: Product, file: any) {
       try {
         const toastId = appToast.loading({
-          title: "Creating customer...",
+          title: "Adding product...",
           description: "Please wait."
         })
 
-        await api.post('/products', data)
+        if (file && !form.imageUrl) {
+          const productImage = await uploadProductImage(file.file)
+          form.imageUrl = productImage.data.data.publicUrl
+        }
+
+        await api.post('/products', form)
       
         toast.dismiss(toastId)
         appToast.success({
@@ -90,6 +114,6 @@ export function useProductService() {
           description: "Please try again."
         })
       }
-    }
+    },
   }
 }

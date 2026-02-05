@@ -49,25 +49,15 @@ export default function ProductTable({ products }: Props) {
     return (
         <div className="w-full pb-5">
             <div className="flex flex-row justify-between mb-3">
-                {/* <div className="relative w-full max-w-xs">
-                    <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-                    <Input
-                        value={searchQuery}
-                        onChange={(e) => {
-                            setSearchQuery(e.target.value)
-                            setCurrentPage(1)
-                        }}
-                        placeholder="Search products..."
-                        className="pl-10 bg-white border border-slate-300 focus-visible:ring-teal-500"
-                    />
-                </div> */}
-
                 <div className="relative w-full lg:w-1/2">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                         placeholder="Search products..."
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onChange={(e) => {
+                            setSearchQuery(e.target.value)
+                            setCurrentPage(1)
+                        }}
                         className="pl-10"
                     />
                 </div>
@@ -89,7 +79,7 @@ export default function ProductTable({ products }: Props) {
                     {currentItems.map((product) => (
                             <ProductCard key={product.id} product={product} />
                     ))}
-                    </div>
+                </div>
             ) : (
                 <div className="text-2xl text-center text-semibold text-gray-600 mt-10 mb-5">No Products Found.</div>
             )}
