@@ -13,17 +13,19 @@ interface ProductProps {
 }
 
 export default function ProductCard({ product }: ProductProps ) {
-    const { deleteProduct } = useProducts()
+    const { deleteProduct, deleteProductImage } = useProducts()
     const { editForm, viewForm, closeForm } = useProductFormStore()
     const confirmation = useConfirmation()
 
-    const handleDelete = async (id: number|undefined) => {
+    const handleDelete = async (id: number|undefined, image: string | undefined) => {
         if(!id) return
 
         const confirm = await confirmation('Are you sure?', 'You want to delete this product.')
         if (!confirm) return
         
         try {
+            if (image) await deleteProductImage.mutateAsync(image)
+            
             const request = await deleteProduct.mutateAsync(id)
             closeForm()
         } catch (error) {
@@ -57,7 +59,7 @@ export default function ProductCard({ product }: ProductProps ) {
                             <DropdownMenuItem onClick={() => editForm(product)}>
                                 Update
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDelete(product.id)}>
+                            <DropdownMenuItem onClick={() => handleDelete(product.id, product.image)}>
                                 Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>

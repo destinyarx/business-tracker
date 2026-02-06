@@ -11,6 +11,8 @@ export function useProducts() {
     const productsQuery = useQuery({
         queryKey: ['products'],
         queryFn: productService.getAll,
+        staleTime: 5 * 60 * 1000,
+        gcTime: 10 * 60 * 1000,
     })
 
     const createProduct = useMutation({
@@ -37,11 +39,16 @@ export function useProducts() {
         }
     })
 
+    const deleteProductImage = useMutation({
+        mutationFn: (image: string) => productService.deleteImage(image)
+    })
+
     return {
         productsQuery,
         createProduct,
         updateProduct,
-        deleteProduct
+        deleteProduct,
+        deleteProductImage
     }
 
 }

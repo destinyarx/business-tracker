@@ -32,7 +32,7 @@ export default function ExpensesForm({ formMode, data, onCreate, onUpdate, updat
             description: data?.description ?? '',
             dateIncurred: data?.dateIncurred ? new Date(data.dateIncurred) : new Date(),
             referenceNumber: data?.referenceNumber ?? '',
-            category: data?.category ?? 'rent',
+            category: data?.category ?? undefined,
             categoryOther: data?.categoryOther ?? '',
             paymentMethod: data?.paymentMethod ?? 'cash',
             amount: data?.amount ? Number(data.amount) : undefined,

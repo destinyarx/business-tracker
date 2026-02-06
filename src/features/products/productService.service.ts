@@ -8,7 +8,8 @@ import { toast } from 'sonner'
 type UploadProductImageResponse = {
   data: {
     data: {
-      publicUrl: string;
+      publicUrl: string
+      imageName: string
     };
   };
 };
@@ -50,6 +51,7 @@ export function useProductService() {
         if (file && !form.imageUrl) {
           const productImage = await uploadProductImage(file.file)
           form.imageUrl = productImage.data.data.publicUrl
+          form.image = productImage.data.data.imageName
         }
 
         await api.post('/products', form)
@@ -115,5 +117,17 @@ export function useProductService() {
         })
       }
     },
+
+    async deleteImage(image: string) {
+      try {
+        await api.delete(`files/delete/product-image/${image}`)
+      } catch (error) {
+        console.log(error)
+        appToast.error({
+          title: "Failed to delete product image",
+          description: "Please try again."
+        })
+      }
+    }
   }
 }

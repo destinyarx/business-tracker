@@ -39,6 +39,7 @@ const schema = z.object({
   ),
   profit: z.preprocess((val) => Number(val), z.number().optional()),
   category: z.string().min(1, 'Category is required'),
+  image: z.string().optional(),
   imageUrl: z.string().optional(),
 })
 
@@ -59,17 +60,17 @@ export default function ProductForm() {
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(schema) as any,
     defaultValues: {
-      id: 0,
-      title: 'test',
+      id: undefined,
+      title: '',
       description: '',
-      category: 'snacks',
+      category: '',
       sku: '',
       barcode: '',
       supplier: '',
-      price: 20,
-      stock: 0,
-      profit: 0,
-      profitPercentage: 0,
+      price: undefined,
+      stock: undefined,
+      profit: undefined,
+      profitPercentage: undefined,
     }
   })
 
@@ -194,7 +195,10 @@ export default function ProductForm() {
 
       <div className='grid grid-cols-3 gap-7'>
         <div>
-          <Label className='mb-2'>Category</Label>
+          <Label className='mb-1 flex items-center gap-1'>
+            <span>Category</span>
+            <span className='text-red-700 font-bold'>*</span>
+          </Label>
           <SearchableSelect 
             value={form.watch('category')}
             items={PRODUCT_CATEGORY.map(c => ({ value: c.value, label: c.name }))}
