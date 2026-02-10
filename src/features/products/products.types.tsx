@@ -12,7 +12,7 @@
 export interface Product {
     id?: number
     title: string
-    description?: string
+    description: string | null;
     sku?: string
     barcode?: string
     supplier?: string

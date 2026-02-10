@@ -16,7 +16,7 @@ export function useProducts() {
     })
 
     const createProduct = useMutation({
-        mutationFn: ({values, file}: { values: Product, file: any }) => productService.create(values, file),
+        mutationFn: ({values, file}: { values: Product|any, file: any }) => productService.create(values, file),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['products'] })
             closeForm()
@@ -24,7 +24,7 @@ export function useProducts() {
     })
 
     const updateProduct = useMutation({
-        mutationFn: ({id, values}: {id: number, values: Product}) => productService.update(id, values),
+        mutationFn: ({id, values}: { id: number, values: Product | any }) => productService.update(id, values),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['products'] })
             closeForm()
