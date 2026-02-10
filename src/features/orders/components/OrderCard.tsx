@@ -14,7 +14,7 @@ type Props = {
     orderNumber: number,
     onDelete: (id: number) => void,
     onUpdate: (data: OrderData) => void,
-    updateStatus: (id: number, status: OrderStatus) => void
+    updateStatus: (data: OrderData, status: OrderStatus) => void
 }
 
 export default function OrderCard({ order, orderNumber, onDelete, onUpdate, updateStatus }: Props) {
@@ -139,16 +139,19 @@ export default function OrderCard({ order, orderNumber, onDelete, onUpdate, upda
                             Update Status
                         </Button>
                     </DropdownMenuTrigger>
+
                     <DropdownMenuContent className="w-44">
-                        {ORDER_STATUS.map((status) => (
-                            <DropdownMenuItem
-                                key={status.name}
-                                onClick={() => updateStatus(order.id!, status.value)}
-                                className="cursor-pointer"
-                            >
-                                {status.name}
-                            </DropdownMenuItem>
-                        ))}
+                        {ORDER_STATUS.filter(status => status.value !== order.status)
+                            .map((status) => (
+                                <DropdownMenuItem
+                                    key={status.name}
+                                    onClick={() => updateStatus(order, status.value)}
+                                    className="cursor-pointer"
+                                >
+                                    {status.name}
+                                </DropdownMenuItem>
+                            )
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             </CardFooter>

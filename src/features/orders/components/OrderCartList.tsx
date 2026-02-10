@@ -1,4 +1,3 @@
-import type { CartItem } from '@/features/orders/order.type'
 import { useOrderStore } from '../useOrderStore'
 import { Button } from '@/components/ui/button'
 import { Minus, Plus, Trash2 } from 'lucide-react'
@@ -41,6 +40,7 @@ export default function OrderCartList() {
                             size="icon"
                             variant="outline"
                             className="h-8 w-8"
+                            disabled={item.quantity === item.stock}
                             onClick={() => increaseItem(item.id)}
                         >
                             <Plus className="h-4 w-4" />

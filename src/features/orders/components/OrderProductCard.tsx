@@ -21,7 +21,7 @@ export default function OrderProductCard({ product, isSelected, onClick }: Props
       {/* Image */}
       <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-md bg-slate-100">
         <img
-          src={product.imageUrl ?? 'https://images.unsplash.com/photo-1542291026-7eec264c27ff'}
+          src={product.imageUrl ?? '/default-product-image.png'}
           alt="Product Image"
           className="h-full w-full object-cover"
         />
@@ -30,7 +30,7 @@ export default function OrderProductCard({ product, isSelected, onClick }: Props
       {/* Info */}
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="truncate text-sm font-medium text-slate-900">
-          {product.title}
+          {product.title} {product.stock}
         </div>
 
         <div className="text-xs text-slate-500">
@@ -38,7 +38,7 @@ export default function OrderProductCard({ product, isSelected, onClick }: Props
         </div>
 
         <div className="mt-0.5 text-sm font-semibold text-teal-600">
-          ₱{product.price}
+          ₱{product.price} - {product.stock}
         </div>
       </div>
     </div>

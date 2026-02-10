@@ -27,34 +27,31 @@ const schema = z.object({
     z.number().optional()
   ),
   title: z.string().min(2, 'Title is required'),
-  description: z.string().optional(),
-  sku: z.string().optional(),
-  barcode: z.string().optional(),
-  supplier: z.string().optional(),
+  description: z.string().nullable(),
+  sku: z.string().nullable(),
+  barcode: z.string().nullable(),
+  supplier: z.string().nullable(),
   price: z.preprocess((val) => Number(val), z.number().min(1, 'Price must greater than 0')),
   stock: z.preprocess((val) => Number(val), z.number().min(0, 'Stock must be 0 or greater')),
   profitPercentage: z.preprocess(
     (val) => Number(val),
-    z.number().max(90, 'Profit must not be more than 90% of the price').optional()
+    z.number().max(90, 'Profit must not be more than 90% of the price').nullable()
   ),
-  profit: z.preprocess((val) => Number(val), z.number().optional()),
+  profit: z.preprocess((val) => Number(val), z.number().nullable()),
   category: z.string().min(1, 'Category is required'),
-  image: z.string().optional(),
-  imageUrl: z.string().optional(),
+  image: z.string().nullable(),
+  imageUrl: z.string().nullable(),
 })
 
 type ProductFormValues = z.infer<typeof schema>
 
 export default function ProductForm() {
-  const { formState, product, closeForm } = useProductFormStore()
+  const { formState, product } = useProductFormStore()
   const { createProduct, updateProduct } = useProducts()
   const confirmation = useConfirmation()
   const appToast = useToast()
 
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [image, setImage] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
-
   const [imageMode, setImageMode] = useState<string>('upload')
 
   const form = useForm<ProductFormValues>({
@@ -71,6 +68,8 @@ export default function ProductForm() {
       stock: undefined,
       profit: undefined,
       profitPercentage: undefined,
+      image: null,
+      imageUrl: null
     }
   })
 
@@ -108,9 +107,12 @@ export default function ProductForm() {
   }
 
   const onSubmit = async (values: ProductFormValues) => {
+    console.log(values.id)
+    const updateId = values.id ?? product?.id
+
     if (formState === FormState.ADD) {
       await handleAddProduct(values)
-    } else if (formState === FormState.EDIT && values.id) {
+    } else if (formState === FormState.EDIT && updateId) {
       setIsLoading(true)
       await updateProduct.mutateAsync({ id, values })
     } 
@@ -157,10 +159,22 @@ export default function ProductForm() {
   useEffect(() => {
     if (product) {
       form.reset(product)
+
+      if (product.imageSource === 'url') {
+        setImageMode('url')
+      } else if(product.imageSource === 'upload') {
+        setImageMode('current')
+      }
+
     } else {
       form.reset()
     }
   }, [product])
+
+  useEffect(() => {
+    console.log('FORM ERRORS:', form.formState.errors)
+    console.log(form.getValues())
+  }, [form.formState.errors])
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 w-full'>
@@ -257,7 +271,7 @@ export default function ProductForm() {
               className='-me-px rounded-r-none shadow-none' 
             />
             <span className='border-input bg-background text-muted-foreground -z-1 inline-flex items-center rounded-r-md border px-3 text-sm'>
-              <PhilippinePeso className='size-4' />
+              <PhilippinePeso className='size-4 text-green-700' />
             </span>
           </div>
 
@@ -279,7 +293,7 @@ export default function ProductForm() {
               className='-me-px rounded-r-none shadow-none' 
             />
             <span className='border-input bg-background text-muted-foreground -z-1 inline-flex items-center rounded-r-md border px-3 text-sm'>
-              <Layers className='size-4' />
+              <Layers className='size-4 text-purple-700' />
             </span>
           </div>
           
@@ -305,7 +319,7 @@ export default function ProductForm() {
               className='-me-px rounded-r-none shadow-none' 
             />
             <span className='border-input bg-background text-muted-foreground -z-1 inline-flex items-center rounded-r-md border px-3 text-sm'>
-              <Percent className='size-4' />
+              <Percent className='size-4 text-blue-700' />
             </span>
           </div>
 
@@ -331,7 +345,7 @@ export default function ProductForm() {
                 className='-me-px rounded-r-none shadow-none' 
               />
               <span className='border-input bg-background text-muted-foreground -z-1 inline-flex items-center rounded-r-md border px-3 text-sm'>
-                <PhilippinePeso className='size-4' />
+                <PhilippinePeso className='size-4 text-green-700' />
               </span>
             </div>
 
@@ -348,26 +362,39 @@ export default function ProductForm() {
         value={imageMode}
         onValueChange={setImageMode}
         defaultValue='upload' 
-        className="flex flex-row mt-5"
+        className="flex flex-row gap-7 mt-5"
       >
+        {product?.id && (
+          <div className='flex items-center gap-2'>
+            <RadioGroupItem
+              value='current'
+              id='current'
+              className='border-primary focus-visible:border-primary border-dashed'
+            />
+            <Label htmlFor='current' className="flex-1">Use previously uploaded image</Label>
+          </div>
+        )}
+
         <div className='flex items-center gap-2'>
           <RadioGroupItem
             value='upload'
             id='upload'
             className='border-primary focus-visible:border-primary border-dashed'
           />
-          <Label htmlFor='standard' className="flex-1">Upload Product Image</Label>
+          <Label htmlFor='upload' className="flex-1">Upload Product Image</Label>
         </div>
+
         <div className='flex items-center gap-2'>
           <RadioGroupItem
             value='url'
             id='url'
             className='border-primary focus-visible:border-primary border-dashed'
           />
-          <Label htmlFor='express' className="flex-1">URL Image</Label>
+          <Label htmlFor='url' className="flex-1">URL Image</Label>
         </div>
+      </RadioGroup>
 
-        {!!(imageMode === 'url') && (
+      {!!(imageMode === 'url') && (
           <div className='flex-1 w-full px-2'>
             <div className='flex rounded-md shadow-xs'>
               <Input 
@@ -377,12 +404,11 @@ export default function ProductForm() {
                 className='-me-px rounded-r-none shadow-none' 
               />
               <span className='border-input bg-background text-muted-foreground -z-1 inline-flex items-center rounded-r-md border px-3 text-sm'>
-                <Image className='size-4' />
+                <Image className='size-4 text-sky-600' />
               </span>
             </div>
           </div>
-        )}
-      </RadioGroup>
+      )}
 
       {!!(imageMode === 'upload') && (
         <div className="w-full">
@@ -418,11 +444,19 @@ export default function ProductForm() {
       {formState !== FormState.VIEW && (
         <div className='flex justify-end'>
           {formState === FormState.EDIT ? (
-            <Button disabled={isLoading} className='bg-teal-600 hover:bg-teal-700 text-white px-6'>
+            <Button 
+              type="submit"
+              disabled={isLoading} 
+              className='bg-teal-600 hover:bg-teal-700 text-white px-6'
+            >
               Update Product
             </Button>
           ) : (
-            <Button disabled={isLoading} className='bg-teal-600 hover:bg-teal-700 text-white px-6'>
+            <Button 
+              type="submit"
+              disabled={isLoading} 
+              className='bg-teal-600 hover:bg-teal-700 text-white px-6'
+            >
               Save Product
             </Button>
           )}

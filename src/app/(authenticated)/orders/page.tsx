@@ -13,6 +13,7 @@ import { useConfirmation } from '@/app/provider/ConfirmationProvider'
 import { useOrders } from '@/features/orders/hooks/useOrders'
 import { ORDER_STATUS } from '@/constants'
 import type { OrderStatus, OrderData } from '@/features/orders/order.type'
+import type { Product } from '@/features/products/products.types'
 
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Plus, ArrowLeft, Search, Filter } from 'lucide-react'
@@ -36,6 +37,12 @@ export default function index() {
   const { carts, resetCart, showForm, setShowForm, resetOrderForm, orderState, setOrderState } = useOrderStore()
 
   const orders = ordersQuery.data ?? []
+
+  console.log(orders)
+  
+  const availableProducts = useMemo(() => {
+    return (productsQuery.data ?? []).filter((product: Product) => product.stock > 0)
+  }, [productsQuery.data])
 
   const filteredOrders = useMemo(() => {
     const searchKey = searchQuery.trim().toLowerCase()
@@ -81,13 +88,13 @@ export default function index() {
     await deleteOrder.mutateAsync(id)
   }
 
-  const handleUpdateStatus = async (id: number, status: OrderStatus) => {
+  const handleUpdateStatus = async (data: OrderData, status: OrderStatus) => {
     const statusName =  ORDER_STATUS.find((item) => item.value === status)?.name ?? ''
 
     const confirm = await confirmation('Are you sure', `You want to update the order status to ${statusName}`)
     if (!confirm) return
 
-    await updateOrderStatus.mutateAsync({id, status})
+    await updateOrderStatus.mutateAsync({data, status})
 
     setFilterStatus(status)
   }
@@ -101,7 +108,7 @@ export default function index() {
 
   const cartsArray = carts.map((item) => {
     return {
-      productId: item.id,
+      id: item.id,
       price: item.price,
       quantity: item.quantity,
     }
@@ -226,7 +233,7 @@ export default function index() {
           </div>
         ) : (
           <Order 
-            products={productsQuery.data}
+            products={availableProducts ?? []}
             triggerCheckout={checkout}
           />
       )}

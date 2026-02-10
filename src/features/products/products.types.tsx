@@ -22,7 +22,8 @@ export interface Product {
     profit?: number
     category?: string
     image?: string,
-    imageUrl?: string
+    imageUrl?: string,
+    imageSource?: 'url' | 'upload' | undefined
 }
 
 export enum FormState {

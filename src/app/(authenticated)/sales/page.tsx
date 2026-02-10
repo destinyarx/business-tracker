@@ -1,56 +1,114 @@
-import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { ArrowUpRight, DollarSign, ShoppingCart, TrendingUp } from 'lucide-react'
 
-export default function ComingSoonPage() {
+export default function SalesPage() {
   return (
-    <div className="w-full max-w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 via-zinc-50 to-teal-100 text-gray-800 -mt-10">
-      <div className="text-center p-8 rounded-2xl shadow-lg bg-white/80 backdrop-blur-md border border-gray-200 max-w-lg">
-          <div className="flex justify-center mb-6">
-              {/* Business icon */}
-              <div className="w-20 h-20 flex items-center justify-center rounded-full bg-teal-600 text-white shadow-md">
-              <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.8}
-                  stroke="currentColor"
-                  className="w-10 h-10"
-              >
-                  <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 14l2-2m0 0l2-2m-2 2v6m8 4H5a2 2 0 01-2-2V5a2 2 0 012-2h8l6 6v13a2 2 0 01-2 2z"
-                  />
-              </svg>
-              </div>
-          </div>
-  
-          <h1 className="text-2xl font-bold text-teal-800 mb-3">
-              This Feature is Coming Soon 🚀
-          </h1>
-  
-          <p className="text-gray-600 text-relaxed justify-center mb-10">
-              We're working hard to bring this feature to you.  
-              Stay tuned <br/> it's designed to help you manage your business smarter
-              and track success effortlessly.
-          </p>
-  
-          <Link href="/dashboard">
-              <button
-                  type="button"
-                  className="px-6 py-3 rounded-lg font-semibold bg-teal-600 text-white hover:bg-teal-300 transition-colors shadow-md"
-              >
-                  Back to Dashboard
-              </button>
-          </Link>
-  
-          <div className="mt-8 text-sm text-teal-600 italic font-light">
-              <div className="px-3 py-1 rounded-md bg-mustard-200/50 text-mustard-700 font-medium">
-                  #NegosyoTracker <br/>
-                  #SmallBusinessOwner <br/>
-              </div>
-          </div>
+    <div className="space-y-6 p-6">
+      {/* Top KPI Cards */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <Card className="bg-blue-500 text-white">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-medium">Sales Today</CardTitle>
+            <DollarSign className="h-4 w-4 opacity-80" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">₱5,200</div>
+            <p className="text-xs opacity-80">+8.2% from yesterday</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-medium">Profit</CardTitle>
+            <TrendingUp className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">₱2,150</div>
+            <p className="text-xs text-muted-foreground">Net profit today</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-medium">Orders</CardTitle>
+            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">72</div>
+            <p className="text-xs text-muted-foreground">Completed orders</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Sales Table */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Sales Today</CardTitle>
+          <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Order</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Profit</TableHead>
+                <TableHead>Date & Time</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>RS-X3 Puzzle</TableCell>
+                <TableCell>Juan Dela Cruz</TableCell>
+                <TableCell>₱2,200</TableCell>
+                <TableCell className="text-green-600">₱850</TableCell>
+                <TableCell>Feb 7, 2026 · 10:32 AM</TableCell>
+                <TableCell>
+                  <Badge className="bg-green-100 text-green-700">Paid</Badge>
+                </TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>Air Max 90</TableCell>
+                <TableCell>Maria Santos</TableCell>
+                <TableCell>₱3,000</TableCell>
+                <TableCell className="text-green-600">₱1,300</TableCell>
+                <TableCell>Feb 7, 2026 · 1:10 PM</TableCell>
+                <TableCell>
+                  <Badge className="bg-green-100 text-green-700">Paid</Badge>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Optional Insights Section */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Average Order Value</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">₱72.22</div>
+            <p className="text-xs text-muted-foreground">Based on today’s sales</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Product Today</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="font-medium">RS-X3 Puzzle</div>
+            <p className="text-xs text-muted-foreground">Highest revenue & profit</p>
+          </CardContent>
+        </Card>
       </div>
     </div>
-  );
+  )
 }
-  

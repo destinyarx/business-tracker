@@ -38,7 +38,7 @@ export default function ProductCard({ product }: ProductProps ) {
             <div className="flex flex-col justify-between h-full">
                 <div className="relative w-full h-48">
                     <Image
-                        src={product.imageUrl ?? 'https://foodish-api.com/images/pasta/pasta1.jpg'}
+                        src={product.imageUrl ?? '/default-product-image.png'}
                         alt={product.title}
                         sizes='(max-width: 640px) 100vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw'
                         fill

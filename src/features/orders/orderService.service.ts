@@ -1,6 +1,6 @@
 'use client'
 
-import type { CartItem, OrderStatus } from './order.type'
+import type { OrderData, CartItem, OrderStatus } from './order.type'
 import { useApi } from '@/hooks/useApi'
 import { useToast } from '@/hooks/useToast'
 import { toast } from 'sonner'
@@ -104,16 +104,21 @@ export function useOrderService() {
             }
         },
 
-        async updateOrderStatus(id: number, status: string) {
+        async updateOrderStatus(orderDetails: OrderData, status: OrderStatus) {
             const toastId = appToast.loading({
                 title: 'Updating Order Status',
                 description: 'Please wait...'
             })
 
-            console.log(status)
+            const { id, items } = orderDetails
+
+            const payload = {
+                orderItems: items,
+                status
+            }
 
             try {
-                await api.patch(`/orders/status/${id}`, {status})
+                await api.patch(`/orders/${id}/status`, payload)
                 toast.dismiss(toastId)
             } catch (error) {
                 console.log(error)

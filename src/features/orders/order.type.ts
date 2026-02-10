@@ -5,6 +5,7 @@ export interface CartItem extends Product {
   quantity?: number
   priceAtPurchase?: number
   product?: any
+  stock: number
 }
 
 export type OrderStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled' | 'failed'

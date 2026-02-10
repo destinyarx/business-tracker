@@ -36,9 +36,10 @@ export function useOrders() {
     })
 
     const updateOrderStatus = useMutation({
-        mutationFn: ({id, status}: { id: number, status: string}) => orderService.updateOrderStatus(id, status),
+        mutationFn: ({data, status}: {data: OrderData, status: OrderStatus}) => orderService.updateOrderStatus(data, status),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['orders']})
+            qc.invalidateQueries({ queryKey: ['products']})
         }
     })
 

@@ -52,6 +52,9 @@ export function useProductService() {
           const productImage = await uploadProductImage(file.file)
           form.imageUrl = productImage.data.data.publicUrl
           form.image = productImage.data.data.imageName
+          form.imageSource = 'upload'
+        } else if (form.imageUrl) {
+          form.imageSource = 'url'
         }
 
         await api.post('/products', form)
