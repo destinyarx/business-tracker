@@ -6,7 +6,7 @@ import type { ExpensesData, ExpenseFilters } from '@/features/expenses/expenses.
 import { usePaginatedExpensesQuery } from '@/features/expenses/hooks/usePaginatedExpensesQuery'
 import { PAYMENT_METHOD } from '@/constants'
 
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableFooter, TableRow } from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableFooter, TableRow } from '@/components/ui/table'
 import { ArrowLeft, ArrowRight, Banknote, CalendarDays, CreditCard, PhilippinePeso, Inbox, Landmark, Loader2, Tag, Wallet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import ActionButton from '@/components/molecules/ActionButton'

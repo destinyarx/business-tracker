@@ -1,11 +1,17 @@
 'use client'
 
-import type { OrderData, CartItem, OrderStatus } from './order.type'
+import type { OrderData, OrderForm, OrderStatus } from './order.type'
 import { useApi } from '@/hooks/useApi'
 import { useToast } from '@/hooks/useToast'
 import { toast } from 'sonner'
 import { useOrderStore } from '@/features/orders/useOrderStore'
 
+type Params = {
+    searchKey?: string,
+    filter?: string,
+    offset?: number,
+    limit?: number
+}
 
 export function useOrderService() {
     const api = useApi()
@@ -13,9 +19,23 @@ export function useOrderService() {
     const { orderState, setOrderState } = useOrderStore()
 
     return {
-        async getAll() {
+        async getAll(params?: Params) {
             try {
-                const result = await api.get('/orders') 
+                const orderParams = new URLSearchParams()
+
+                if (typeof params?.limit === 'number') 
+                    orderParams.set('limit', String(params.limit))
+                
+                if (typeof params?.offset === 'number') 
+                    orderParams.set('offset', String(params.offset))
+                
+                if (params?.filter)   
+                    orderParams.set('filter', params.filter)
+
+                if (params?.searchKey)   
+                    orderParams.set('searchKey', params.searchKey)
+                
+                const result = await api.get('/orders', { params: orderParams }) 
                 return result?.data.data ?? []
             } catch (error) {
                 console.log(error)
@@ -27,7 +47,7 @@ export function useOrderService() {
             }
         },
 
-        async create(data: any) {
+        async create(data: OrderForm) {
             const toastId = appToast.loading({
                 title: 'Creating Order',
                 description: 'Please wait...'

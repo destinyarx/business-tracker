@@ -107,7 +107,7 @@ export default function OrderCard({ order, orderNumber, onDelete, onUpdate, upda
                 </div>
             </CardContent>
 
-            <CardFooter className="flex flex-row justify-end gap-2">
+            <CardFooter className="flex flex-row flex-wrap justify-end gap-2">
                 <Button
                     onClick={() => onUpdate(order)}
                     size="sm"

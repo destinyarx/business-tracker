@@ -19,7 +19,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
     // 🔎 fingerprint
     ;(globalThis as any).__QUERY_CLIENT__ = qc
-    console.log('QueryClient created:', qc)
 
     return qc
   })

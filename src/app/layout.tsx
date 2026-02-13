@@ -15,7 +15,7 @@ const inter = Inter({
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={inter.variable}>
-      <body  className="font-sans">
+      <body  className="font-sans" suppressHydrationWarning>
         <Providers>
           {children}
           <Toaster 

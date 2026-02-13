@@ -1,20 +1,14 @@
 'use client'
 
-import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
+import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { useOrderService } from '@/features/orders/orderService.service'
-import type { OrderData, OrderStatus } from '@/features/orders/order.type'
+import type { OrderData, OrderStatus, OrderForm } from '@/features/orders/order.type'
 
-export function useOrders() {
+export function useOrderMutation() {
     const qc = useQueryClient()
     const orderService = useOrderService()
 
-    const ordersQuery = useQuery({
-        queryKey: ['orders'],
-        queryFn: orderService.getAll
-    })
-
     const addOrder = useMutation({
-        // TODO: add strict type here
         mutationFn: (data: any) => orderService.create(data),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['orders'] })
@@ -44,7 +38,6 @@ export function useOrders() {
     })
 
     return {
-        ordersQuery,
         addOrder,
         updateOrder,
         deleteOrder,

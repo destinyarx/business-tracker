@@ -4,7 +4,7 @@ import type { Customer } from '@/features/customers/customers.types'
 export interface CartItem extends Product {
   quantity?: number
   priceAtPurchase?: number
-  product?: any
+  product?: Product
   stock: number
 }
 
@@ -28,4 +28,11 @@ export type OrderData = OrderForm & {
   priceAtPurchase?: number,
   customer?: Customer,
   createdAt?: string,
-}  
+} 
+
+export type OrderParams = {
+  filter?: string,
+  searchKey?: string,
+  offset?: number,
+  limit?: number
+}

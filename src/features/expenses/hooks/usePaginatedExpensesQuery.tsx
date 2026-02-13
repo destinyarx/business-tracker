@@ -13,8 +13,6 @@ export function usePaginatedExpensesQuery({ limit, offset, filters }: Props) {
     const { getPaginated } = useExpensesService()
     const { isLoaded } = useAuth()
 
-    console.log(limit, offset)
-
     return useQuery({
         queryKey: ['expenses', limit, offset, filters],
         queryFn: () => getPaginated(limit, offset, filters),

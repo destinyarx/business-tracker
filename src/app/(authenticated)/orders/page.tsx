@@ -1,64 +1,86 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { useProducts } from '@/features/products/hooks/useProducts'
 import { useOrderStore } from '@/features/orders/useOrderStore'
 import { useToast } from '@/hooks/useToast'
-import { toast } 
-from 'sonner'
-import { useApi } from '@/hooks/useApi'
+import { toast }  from 'sonner'
 import { useCustomers } from '@/features/customers/hooks/useCustomers'
 import { useConfirmation } from '@/app/provider/ConfirmationProvider'
-import { useOrders } from '@/features/orders/hooks/useOrders'
+import { useOrderMutation } from '@/features/orders/hooks/useOrderMutation'
+import { useOrderQuery } from '@/features/orders/hooks/useOrderQuery'
 import { ORDER_STATUS } from '@/constants'
 import type { OrderStatus, OrderData } from '@/features/orders/order.type'
 import type { Product } from '@/features/products/products.types'
 
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Plus, ArrowLeft, Search, Filter } from 'lucide-react'
+import { Plus, ArrowLeft, Search, Filter, ArrowRight } from 'lucide-react'
 import { Input } from '@/components/ui/input';
 import Loading from '@/components/organisms/Loading'
 import { Button } from '@/components/ui/button'
 import OrderCard from '@/features/orders/components/OrderCard'
 import Order from '@/features/orders/components/Order'
+import { OrderParams } from '@/features/orders/order.type'
+import { convertSegmentPathToStaticExportFilename } from 'next/dist/shared/lib/segment-cache/segment-value-encoding'
 
 export default function index() {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [filterStatus, setFilterStatus] = useState('pending')
-
-  const { productsQuery } = useProducts()
-  const { customerQuery } = useCustomers()
-  const { ordersQuery, addOrder, deleteOrder, updateOrderStatus } = useOrders()
-
-  const api = useApi()
   const appToast = useToast()
   const confirmation = useConfirmation()
+  const { productsQuery } = useProducts()
+  const { customerQuery } = useCustomers()
+  const { addOrder, deleteOrder, updateOrderStatus } = useOrderMutation()
   const { carts, resetCart, showForm, setShowForm, resetOrderForm, orderState, setOrderState } = useOrderStore()
 
-  const orders = ordersQuery.data ?? []
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [filter, setFilter] = useState<string|undefined>('pending')
+  const [params, setParams] = useState<OrderParams>({
+    filter: filter,
+    searchKey: undefined,
+    offset: 0,
+    limit: 6
+  })
 
-  console.log(orders)
+  // useEffect(() => {
+  //   console.log("params updated:", params);
+  //   console.log()
+  // }, [params]);
+
+  useEffect(() => {
+    if (params.filter !== filter) {
+      setCurrentPage(1)
+    }
+
+    if (params?.limit) {
+      setParams((prev) => ({
+        ...prev,
+        filter: filter,
+        offset: currentPage !== 1 ? ((currentPage * params.limit!) - params.limit! + 1) : 0,
+        searchKey: debouncedSearch || undefined
+      }))
+    }
+
+  }, [currentPage, filter, debouncedSearch])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery.trim())
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  // order list pagination
+  const { ordersQuery } = useOrderQuery(params)
+  const hasNext = ordersQuery.data?.hasNext ?? false
+
+  const orders = ordersQuery.data?.orders ?? []
   
   const availableProducts = useMemo(() => {
     return (productsQuery.data ?? []).filter((product: Product) => product.stock > 0)
   }, [productsQuery.data])
-
-  const filteredOrders = useMemo(() => {
-    const searchKey = searchQuery.trim().toLowerCase()
-
-    return orders.filter((order: OrderData) => {
-      const matchStatus = filterStatus === 'all' || order.status === filterStatus
-  
-      const orderName = order?.orderName?.toLowerCase() ?? ''
-      const customerName = order?.customer?.name?.toLowerCase() ?? ''
-  
-      const matchSearch = orderName.includes(searchKey) || customerName.includes(searchKey)
-  
-      return matchStatus && matchSearch
-    })
-
-  }, [orders, searchQuery, filterStatus])
 
   const total = carts.reduce<number>((sum, item) => sum + item.price * (item.quantity ?? 0), 0);
 
@@ -76,6 +98,7 @@ export default function index() {
     )
   }
 
+  // TODO: add update function
   const handleUpdate = async (data: any) => {
     console.log('Update: ')
     console.log(data)
@@ -96,7 +119,7 @@ export default function index() {
 
     await updateOrderStatus.mutateAsync({data, status})
 
-    setFilterStatus(status)
+    setFilter(status)
   }
 
   const returnToMainPage = async () => {
@@ -171,7 +194,7 @@ export default function index() {
                 <Button variant='outline' className='gap-2'>
                   <Filter className='h-4 w-4' />
                   <span className='text-sm'>
-                    {filterStatus === 'all' ? 'All Status' : ORDER_STATUS.find((item) => item.value === filterStatus)?.name ?? ''}
+                    {!filter ? 'All Status' : ORDER_STATUS.find((item) => item.value === filter)?.name ?? ''}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
@@ -181,8 +204,8 @@ export default function index() {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuCheckboxItem
-                  checked={filterStatus === 'all'}
-                  onCheckedChange={() => setFilterStatus('all')}
+                  checked={!filter}
+                  onCheckedChange={() => setFilter(undefined)}
                 >
                   All
                 </DropdownMenuCheckboxItem>
@@ -192,8 +215,8 @@ export default function index() {
                 {ORDER_STATUS.map((status) => (
                   <DropdownMenuCheckboxItem
                     key={status.value}
-                    checked={filterStatus === status.value}
-                    onCheckedChange={() => setFilterStatus(status.value)}
+                    checked={filter === status.value}
+                    onCheckedChange={() => setFilter(status.value)}
                   >
                     {status.name}
                   </DropdownMenuCheckboxItem>
@@ -218,19 +241,47 @@ export default function index() {
 
       {orderState === 'show_orders' 
         ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mx-3 mt-3">
-            {/* TODO:  add strict type here.. */}
-            {filteredOrders.map((order: any, index: number) => (
-              <OrderCard 
-                key={order.id}
-                order={order}
-                orderNumber={index + 1}
-                onUpdate={handleUpdate}
-                onDelete={handleDelete}
-                updateStatus={handleUpdateStatus}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mx-3 mt-3">
+              {orders.map((order: OrderData, index: number) => (
+                <OrderCard 
+                  key={order.id}
+                  order={order}
+                  orderNumber={index + 1}
+                  onUpdate={handleUpdate}
+                  onDelete={handleDelete}
+                  updateStatus={handleUpdateStatus}
+                />
+              ))}
+            </div>
+
+            {ordersQuery?.data?.orders?.length && (
+              <div className="flex w-full items-center justify-end gap-2 px-4 py-2">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    className="bg-teal-600 text-white hover:bg-teal-700"
+                >
+                    <ArrowLeft className="h-3 w-3" />
+                    Previous
+                </Button>
+
+                {currentPage}
+                <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={!hasNext}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    className="bg-teal-600 text-white hover:bg-teal-700"
+                >
+                    Next
+                    <ArrowRight className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+          </>
         ) : (
           <Order 
             products={availableProducts ?? []}
