@@ -107,7 +107,6 @@ export default function ProductForm() {
   }
 
   const onSubmit = async (values: ProductFormValues) => {
-    console.log(values.id)
     const updateId = values.id ?? product?.id
 
     if (formState === FormState.ADD) {

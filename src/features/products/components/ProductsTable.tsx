@@ -10,6 +10,8 @@ import { Plus, Search } from 'lucide-react'
 import { Product } from '@/features/products/products.types'
 import { useProductFormStore } from '@/features/products/store/useProductFormStore';
 import ProductCard from '@/features/products/components/productCard';
+import NoItemFound from '@/components/organisms/NoItemFound'
+
 interface Props {
     products: Product[],
 }
@@ -81,7 +83,7 @@ export default function ProductTable({ products }: Props) {
                     ))}
                 </div>
             ) : (
-                <div className="text-2xl text-center text-semibold text-gray-600 mt-10 mb-5">No Products Found.</div>
+                <NoItemFound title="Your product list is empty" description="Once you add products, they’ll appear here."/>
             )}
             
 

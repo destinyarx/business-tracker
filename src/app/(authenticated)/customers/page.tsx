@@ -11,7 +11,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { AlertDialog, AlertDialogAction, AlertDialogCancel,AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Plus, Search, RefreshCw } from 'lucide-react';
 import { useInvalidateQuery } from '@/hooks/useInvalidateQuery';
-
 import Loading from '@/components/organisms/Loading'
 
 export default function Customers() {

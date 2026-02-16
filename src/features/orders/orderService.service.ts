@@ -9,8 +9,9 @@ import { useOrderStore } from '@/features/orders/useOrderStore'
 type Params = {
     searchKey?: string,
     filter?: string,
+    timePeriod?: string,
     offset?: number,
-    limit?: number
+    limit?: number,
 }
 
 export function useOrderService() {
@@ -34,6 +35,9 @@ export function useOrderService() {
 
                 if (params?.searchKey)   
                     orderParams.set('searchKey', params.searchKey)
+
+                if (params?.timePeriod)   
+                    orderParams.set('timePeriod', params.timePeriod)
                 
                 const result = await api.get('/orders', { params: orderParams }) 
                 return result?.data.data ?? []

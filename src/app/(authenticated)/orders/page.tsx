@@ -22,7 +22,7 @@ import { Button } from '@/components/ui/button'
 import OrderCard from '@/features/orders/components/OrderCard'
 import Order from '@/features/orders/components/Order'
 import { OrderParams } from '@/features/orders/order.type'
-import { convertSegmentPathToStaticExportFilename } from 'next/dist/shared/lib/segment-cache/segment-value-encoding'
+import NoItemFound from '@/components/organisms/NoItemFound'
 
 export default function index() {
   const appToast = useToast()
@@ -42,11 +42,6 @@ export default function index() {
     offset: 0,
     limit: 6
   })
-
-  // useEffect(() => {
-  //   console.log("params updated:", params);
-  //   console.log()
-  // }, [params]);
 
   useEffect(() => {
     if (params.filter !== filter) {
@@ -242,6 +237,10 @@ export default function index() {
       {orderState === 'show_orders' 
         ? (
           <>
+            {!orders.length && (
+              <NoItemFound />
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mx-3 mt-3">
               {orders.map((order: OrderData, index: number) => (
                 <OrderCard 
@@ -255,7 +254,8 @@ export default function index() {
               ))}
             </div>
 
-            {ordersQuery?.data?.orders?.length && (
+
+            {!!ordersQuery?.data?.orders?.length && (
               <div className="flex w-full items-center justify-end gap-2 px-4 py-2">
                 <Button
                     variant="outline"
@@ -268,7 +268,6 @@ export default function index() {
                     Previous
                 </Button>
 
-                {currentPage}
                 <Button
                     variant="outline"
                     size="sm"

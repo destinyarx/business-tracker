@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { CustomerBadge } from "./CustomerBadge";
 import { Pencil, Trash2, ChevronLeft, ChevronRight, ArrowUpDown, ArrowRight, ArrowLeft } from "lucide-react";
 import ActionButton from "@/components/molecules/ActionButton";
+import NoItemFound from '@/components/organisms/NoItemFound'
 
 interface CustomerTableProps {
   data: Customer[];
@@ -226,12 +227,9 @@ export function CustomerTable({
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  <div className="text-muted-foreground">
-                    No customers found. Add your first customer to get started!
+                <TableCell colSpan={columns.length}>
+                  <div className="flex justify-center items-center">
+                    <NoItemFound title="No customer records found" description="Start building your customer list today."/>
                   </div>
                 </TableCell>
               </TableRow>
@@ -242,12 +240,16 @@ export function CustomerTable({
               {/* Pagination */}
               <div className="flex items-center justify-between px-2">
                 <div className="text-sm text-muted-foreground">
-                  Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{" "}
-                  {Math.min(
-                    (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
-                    table.getFilteredRowModel().rows.length
-                  )}{" "}
-                  of {table.getFilteredRowModel().rows.length} customers
+                  {Boolean(table.getRowModel().rows?.length) && (
+                    <span>
+                      Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{" "}
+                      {Math.min(
+                        (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+                        table.getFilteredRowModel().rows.length
+                      )}{" "}
+                      of {table.getFilteredRowModel().rows.length} customers
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2">

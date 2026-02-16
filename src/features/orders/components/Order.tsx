@@ -1,14 +1,16 @@
 import OrderProductCard from '@/features/orders/components/OrderProductCard'
 import OrderCartList from '@/features/orders/components/OrderCartList'
-import { useProducts } from '@/features/products/hooks/useProducts'
-import type { Product } from '@/features/products/products.types'
-import { useOrderStore } from '@/features/orders/useOrderStore'
+import NoItemFound from '@/components/organisms/NoItemFound'
 import { ShoppingCart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/useToast'
-import { useApi } from '@/hooks/useApi'
 import { Modal } from '@/components/molecules/Modal'
 import OrderForm from '@/features/orders/components/OrderForm'
+
+import { useProducts } from '@/features/products/hooks/useProducts'
+import type { Product } from '@/features/products/products.types'
+import { useOrderStore } from '@/features/orders/useOrderStore'
+import { useApi } from '@/hooks/useApi'
 import { useCustomers } from '@/features/customers/hooks/useCustomers'
 
 interface Props {
@@ -25,17 +27,21 @@ export default function Order({ products, triggerCheckout }: Props) {
     return (
         <div className="flex h-[87vh] w-full max-w-full flex-col md:flex-row bg-gradient-to-br from-teal-50 via-gray-50 to-teal-100 text-gray-800">
             {/* Products */}
-            <div className="w0full md:w-[70%] h-full overflow-y-auto px-3">
-                <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                    {products.map((product: Product) => (
-                        <OrderProductCard
-                            key={product.id}
-                            product={product}
-                            onClick={() => addToCart(product)}
-                        />
-                    ))}
+            {products.length ? (
+                <div className="w-full md:w-[70%] h-full overflow-y-auto px-3">
+                    <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                        {products.map((product: Product) => (
+                            <OrderProductCard
+                                key={product.id}
+                                product={product}
+                                onClick={() => addToCart(product)}
+                            />
+                        ))}
+                    </div>
                 </div>
-            </div>
+            ) : (
+                <NoItemFound title="Your product list is empty" description="Add a product before you create an order." className="-mt-24"/>
+            )}
 
             {/* Cart */}
             <div className="w-full md:w-[30%] h-full overflow-y-auto border-l p-3">

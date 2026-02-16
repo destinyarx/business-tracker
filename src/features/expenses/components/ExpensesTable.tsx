@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableFooter, Table
 import { ArrowLeft, ArrowRight, Banknote, CalendarDays, CreditCard, PhilippinePeso, Inbox, Landmark, Loader2, Tag, Wallet } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import ActionButton from '@/components/molecules/ActionButton'
-
+import NoItemFound from '@/components/organisms/NoItemFound'
 
 type Props = {
     onView: (data: ExpensesData) => void,
@@ -101,15 +101,9 @@ export default function ExpensesTable({ onView, onUpdate, onDelete, offset, onOf
     function emptyMessage() {
         return (
             <TableRow>
-              <TableCell colSpan={7} className="py-10">
-                <div className="flex flex-col items-center justify-center gap-2 text-center">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Inbox className="h-5 w-5" />
-                    <span className="text-sm font-medium">No expenses yet</span>
-                  </div>
-                  <p className="max-w-md text-sm text-muted-foreground">
-                    Add your first expense to see it listed here.
-                  </p>
+              <TableCell colSpan={7}>
+                <div className="flex flex-col items-center justify-center">
+                  <NoItemFound title="No expenses recorded" description="Start tracking expenses to keep your records up to date."/>
                 </div>
               </TableCell>
             </TableRow>
@@ -181,11 +175,11 @@ export default function ExpensesTable({ onView, onUpdate, onDelete, offset, onOf
                         </TableCell>
 
                         <TableCell className="text-muted-foreground">
-                            { displayPaymentMethod(expense.paymentMethod) }
+                            {displayPaymentMethod(expense.paymentMethod)}
                         </TableCell>
 
                         <TableCell className="max-w-[360px] text-muted-foreground">
-                            <p className="text-xs ">
+                            <p className="text-xs italic">
                                 {expense.description?.trim() ? expense.description : '—'}
                             </p>
                         </TableCell>

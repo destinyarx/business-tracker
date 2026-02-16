@@ -106,7 +106,7 @@ export default function OrderForm({ customers, onSubmit }: Props ) {
                                         onClick={() => field.onChange(null)}
                                         size="sm"
                                         variant="outline"
-                                        className="bg-rose-500"
+                                        className="bg-rose-500 text-white"
                                     >
                                         Clear
                                     </Button>

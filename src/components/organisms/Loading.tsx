@@ -1,4 +1,6 @@
 import { LoaderPinwheel, Package } from 'lucide-react'
+import Image from 'next/image';
+
 
 interface Props {
     message?: string,
@@ -12,7 +14,13 @@ export default function Loading ({
 {
     return (
         <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
-            <LoaderPinwheel className="w-16 h-16 animate-spin text-teal-500" />
+            {/* <LoaderPinwheel className="w-16 h-16 animate-spin text-teal-500" /> */}
+            <Image
+              src="/moving-truck.gif"
+              alt="logo"
+              width={200}
+              height={200}
+            />
             <div className="flex items-center gap-2 text-teal-600 text-2xl font-medium">
                 <Package className="w-8 h-8 text-amber-700" />
                 {message}

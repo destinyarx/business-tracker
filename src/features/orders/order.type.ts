@@ -21,7 +21,10 @@ export type OrderForm = {
 
 export type OrderData = OrderForm & {
   id?: number,
+  orderName?: string,
   orderItems: CartItem[],
+  totalAmount?: number,
+  totalProfit?: number,
   status?: OrderStatus,
   items: Product[],
   quantity?: number
@@ -30,9 +33,12 @@ export type OrderData = OrderForm & {
   createdAt?: string,
 } 
 
+export type Period = 'today' | 'yesterday' | 'week' | 'last_week' | 'month'
+
 export type OrderParams = {
   filter?: string,
   searchKey?: string,
   offset?: number,
-  limit?: number
+  limit?: number,
+  timePeriod?: Period
 }
