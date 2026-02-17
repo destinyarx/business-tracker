@@ -9,9 +9,9 @@ export default function DeveloperSection() {
 
         <div className="flex-1 flex justify-center lg:justify-start">
             <Image
-                src="/developer.png"
+                src="/dev-illustration.png"
                 alt="NegosyoTracker illustration"
-                width={300}
+                width={500}
                 height={300}
                 className="w-full max-w-md rounded-xl shadow-lg"
             />
@@ -37,7 +37,7 @@ export default function DeveloperSection() {
             <h3 className="text-xl font-semibold text-slate-800 mb-2">Built With:</h3>
             <ul className="list-disc list-inside text-gray-700 space-y-1">
               <li>Frontend: <span className="font-semibold">Next.js / Tailwind CSS / Shadcn / Tanstack / Zustand</span></li>
-              <li>Backend: <span className="font-semibold">Nest.js / Supabase (PostgreSQL) / Drizzle ORM</span></li>
+              <li>Backend: <span className="font-semibold">Nest.js / Supabase (Storage & PostgreSQL) / Drizzle ORM</span></li>
               <li>Authentication: <span className="font-semibold">Clerk OAuth / JWT</span></li>
               <li>Deployment: 
                 <span className="font-semibold text-[0.83rem]">
