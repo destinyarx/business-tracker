@@ -5,15 +5,14 @@ import Link from 'next/link'
 export default function DeveloperSection() {
   return (
     <section className="w-full max-w-full py-5">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 flex flex-col lg:flex-row items-center gap-12">
-
-        <div className="flex-1 flex justify-center lg:justify-start">
+      <div className="flex flex-col lg:flex-row lg:justify-between mx-auto px-6 lg:px-12 gap-12">
+        <div className="flex-1 flex justify-center items-center">
             <Image
                 src="/dev-illustration.png"
                 alt="NegosyoTracker illustration"
-                width={500}
-                height={300}
-                className="w-full max-w-md rounded-xl shadow-lg"
+                width={700}
+                height={700}
+                className="w-[700px] rounded-xl shadow-lg"
             />
         </div>
 
