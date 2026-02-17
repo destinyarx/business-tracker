@@ -15,15 +15,9 @@ export default function FrequentQuestion() {
                 The built-in NegosyoAI analyzes your data to show sales trends, best-selling products, and forecasts, helping you make smart, data-driven decisions.`,
         },
         {
-            question: "Can multiple users or staff access the system?",
-            answer: `Yes! You and your staff can use the system together. 
-                Most core features like sales tracking, customer management, and inventory are free to use.
-                Only advanced tools like NegosyoAI, PDF reports, and automatic email receipts are part of the premium features.`,
-        },
-        {
             question: "Can I access the system on mobile devices?",
-            answer: `NegosyoTracker works perfectly on desktop and mobile browsers.
-                After the main features are fully developed, a dedicated mobile app version will be released for easier access on the go.`,
+            answer: `NegosyoTracker works perfectly on desktop and tablet.
+                After the main features are fully developed, a dedicated mobile app version developed using React Native Expo will be released for easier access on the go.`,
         },
         {
             question: "Is my data secure?",

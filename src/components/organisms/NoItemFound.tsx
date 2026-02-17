@@ -5,34 +5,35 @@ export default function NoItemFound({
 }) {
   return (
     <div className={`flex min-h-[60vh] w-full items-center justify-center p-6 ${className}`}>
-      <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-        {/* Soft decorative blobs */}
-        <div className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-teal-100/70 blur-2xl" />
-        <div className="pointer-events-none absolute -right-28 -bottom-28 h-72 w-72 rounded-full bg-sky-100/70 blur-2xl" />
+    <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-slate-200/80 bg-emerald-100/50 dark:bg-slate-50 p-8 shadow-md">
+      {/* Soft decorative blobs */}
+      <div className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-teal-100 dark:bg-teal-200/40 blur-2xl" />
+      <div className="pointer-events-none absolute -right-28 -bottom-28 h-72 w-72 rounded-full bg-emerald-200/50 dark:bg-sky-200/40 blur-2xl" />
 
-        <div className="relative flex flex-col items-center text-center">
-          {/* Illustration */}
-          <div className="mb-6">
-            <Illustration className="h-36 w-36" />
-          </div>
-
-          {/* Title */}
-          <h2 className="text-xl font-semibold tracking-tight text-slate-900">
-            {title}
-          </h2>
-
-          {/* Description */}
-          {description ? (
-            <p className="mt-2 max-w-sm text-sm leading-relaxed text-slate-600">
-              {description}
-            </p>
-          ) : null}
-
-          {/* Subtle divider */}
-          <div className="mt-6 h-px w-24 bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+      <div className="relative flex flex-col items-center text-center">
+        {/* Illustration */}
+        <div className="mb-6">
+          <Illustration className="h-36 w-36" />
         </div>
+
+        {/* Title */}
+        <h2 className="text-xl font-semibold tracking-tight text-slate-800">
+          {title}
+        </h2>
+
+        {/* Description */}
+        {description ? (
+          <p className="mt-2 max-w-sm text-sm leading-relaxed text-slate-500">
+            {description}
+          </p>
+        ) : null}
+
+        {/* Subtle divider */}
+        <div className="mt-6 h-px w-24 bg-gradient-to-r from-transparent via-slate-300/70 dark:via-slate-300/70 to-transparent" />
       </div>
     </div>
+  </div>
+
   );
 }
 

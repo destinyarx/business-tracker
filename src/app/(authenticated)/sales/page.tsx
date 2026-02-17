@@ -254,7 +254,7 @@ export default function SalesPage() {
                 <TableRow>
                   <TableCell colSpan={5}>
                     <div className="flex flex-row justify-center items-center">
-                      <NoItemFound title="No sales recorded" description="Sales will appear here once orders are completed."/>
+                      <NoItemFound title={`No sales recorded ${timePeriod}`} description="Sales will appear here once orders are completed."/>
                     </div>
                   </TableCell>
                 </TableRow>

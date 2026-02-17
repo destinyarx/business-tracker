@@ -24,7 +24,7 @@ const items = [
   { title: "Orders", url: "/orders", icon: ShoppingCart },
   { title: "Sales", url: "/sales", icon: BadgeDollarSign },
   { title: "Services", url: "/services", icon: Wrench },
-  { title: "Inventory", url: "/inventory", icon: SquareChartGantt },
+  // { title: "Inventory", url: "/inventory", icon: SquareChartGantt },
   { title: "Expenses", url: "/expenses", icon: Receipt },
   { title: "Schedule", url: "/schedules", icon: CalendarDays },
   { title: "Customers", url: "/customers", icon: CircleUserRound },
