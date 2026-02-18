@@ -5,6 +5,7 @@ export interface CartItem extends Product {
   quantity?: number
   priceAtPurchase?: number
   product?: Product
+  profit?: number
   stock: number
 }
 

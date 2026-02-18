@@ -95,7 +95,6 @@ export const PAYMENT_METHOD = [
 export const TIME_PERIOD = [
     { name: 'Today', value: 'today' },
     { name: 'Yesterday', value: 'yesterday' },
-    { name: 'This Week', value: 'week' },
-    { name: 'Last Week', value: 'last_week' },
+    { name: 'Last 7 days', value: 'week' },
     { name: 'This Month', value: 'month' },
 ] as const

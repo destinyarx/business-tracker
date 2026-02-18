@@ -129,6 +129,7 @@ export default function index() {
       id: item.id,
       price: item.price,
       quantity: item.quantity,
+      profit: item.profit
     }
   })
 
@@ -141,6 +142,9 @@ export default function index() {
       totalAmount: String(total),
       status: 'pending'
     }
+
+    const confirm = await confirmation('Confirm Order', `Please review your order items and details before placing the order.`)
+    if (!confirm) return
     
     const toastId = appToast.loading({
       title: "Checking out orders...",

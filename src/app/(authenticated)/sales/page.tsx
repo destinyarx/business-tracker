@@ -60,7 +60,7 @@ export default function SalesPage() {
       
       totalProfit += Number(order.totalProfit) ?? 0
       totalOrders++
-      totalCustomer += order?.customer?.name ? 1 : 0
+      totalCustomer += 1 // order?.customer?.name ? 1 : 0
     }
 
     return { totalSales, totalProfit, totalOrders, totalCustomer }
