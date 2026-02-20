@@ -12,6 +12,7 @@ type Params = {
     timePeriod?: string,
     offset?: number,
     limit?: number,
+    sortByStatus?: 'asc' | 'desc',
 }
 
 export function useOrderService() {
@@ -38,6 +39,9 @@ export function useOrderService() {
 
                 if (params?.timePeriod)   
                     orderParams.set('timePeriod', params.timePeriod)
+
+                if (params?.sortByStatus)   
+                    orderParams.set('sortByStatus', params.sortByStatus)
                 
                 const result = await api.get('/orders', { params: orderParams }) 
                 return result?.data.data ?? []

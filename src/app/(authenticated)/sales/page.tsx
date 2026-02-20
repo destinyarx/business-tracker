@@ -2,14 +2,14 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { RefreshCw, ArrowUp, ArrowDown, Users, ShoppingCart, CalendarSearch, ArrowRight, ArrowLeft, Search, PhilippinePeso } from 'lucide-react'
+import { RefreshCw, ArrowUp, ArrowDown, Users, ShoppingCart, CalendarSearch, ArrowRight, ArrowLeft, Search, PhilippinePeso, ListFilter } from 'lucide-react'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input';
 import Loading from '@/components/organisms/Loading'
 import NoItemFound from '@/components/organisms/NoItemFound'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { TIME_PERIOD } from '@/constants'
 import { useOrderQuery } from '@/features/orders/hooks/useOrderQuery'
 import { useInvalidateQuery } from '@/hooks/useInvalidateQuery'
@@ -19,6 +19,7 @@ import { format } from 'date-fns'
 type TimePeriodValue = typeof TIME_PERIOD[number]['value'];
 
 export default function SalesPage() {
+  const [sort, setSort] = useState<'asc'|'desc'>('desc')
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [searchQuery, setSearchQuery] = useState('')
   const [timePeriod, setTimePeriod] = useState<Period>('today')
@@ -26,7 +27,8 @@ export default function SalesPage() {
   const [params, setParams] = useState<OrderParams>({
     filter: 'completed',
     searchKey: undefined,
-    timePeriod: 'today'
+    timePeriod: 'today',
+    sortByStatus: 'desc'
   })
 
   const timePeriodName = TIME_PERIOD.find((item) => item.value === timePeriod)?.name ?? ''
@@ -37,17 +39,21 @@ export default function SalesPage() {
   const orders = ordersQuery.data?.orders ?? []
 
   const filteredData = useMemo(() => {
-    if (!searchQuery.trim()) return orders
-
     const query = searchQuery.toLowerCase()
+    
+    const sortedOrders = sort === 'asc'
+      ? [...orders].sort((a, b) => +new Date(a.createdAt) - +new Date(b.createdAt))
+      : [...orders].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
 
-    return orders.filter((item: any) => {
+    if (!searchQuery.trim()) return sortedOrders
+
+    return sortedOrders.filter((item: any) => {
       return (
         item.orderName?.toLowerCase().includes(query) ||
         item.customer?.name?.toLowerCase().includes(query)
       )
     })
-  }, [orders, searchQuery])
+  }, [orders, searchQuery, sort])
 
   const orderStats = useMemo(() => {
     let totalSales = 0
@@ -60,7 +66,7 @@ export default function SalesPage() {
       
       totalProfit += Number(order.totalProfit) ?? 0
       totalOrders++
-      totalCustomer += 1 // order?.customer?.name ? 1 : 0
+      totalCustomer += 1 // TODO: Add better logic for counting customers
     }
 
     return { totalSales, totalProfit, totalOrders, totalCustomer }
@@ -218,6 +224,33 @@ export default function SalesPage() {
               </DropdownMenuContent>
             </DropdownMenu>
 
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                  <Button variant='outline' className='gap-2'>
+                    <ListFilter className="h-4 w-4 text-amber-500" />
+                    <span className='text-sm'>
+                        {sort === 'asc' ? 'Oldest First' : 'Newest First'}
+                    </span>
+                  </Button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align='end' className='w-52'>
+                    <DropdownMenuCheckboxItem
+                        checked={sort == 'desc'}
+                        onCheckedChange={() => setSort('desc')}
+                    >
+                        Latest to oldest
+                    </DropdownMenuCheckboxItem>
+
+                    <DropdownMenuCheckboxItem
+                        checked={sort == 'asc'}
+                        onCheckedChange={() => setSort('asc')}
+                    >
+                        Oldest to latest
+                    </DropdownMenuCheckboxItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Button 
               onClick={() => invalidateKey('orders')}
               variant="outline" 
@@ -241,8 +274,8 @@ export default function SalesPage() {
             </TableHeader>
             <TableBody>
               {filteredData.length ? (
-                filteredData.map((item: OrderData) => (
-                  <TableRow>
+                filteredData.map((item: OrderData, index) => (
+                  <TableRow key={index}>
                     <TableCell className="font-semibold">{item.orderName ?? 'N/A'}</TableCell>
                     <TableCell className="font-light">{item?.customer?.name ?? 'N/A'}</TableCell>
                     <TableCell className={item?.totalAmount ? 'text-green-600' : 'text-gray-700'}>{item.totalAmount ? `₱ ${item.totalAmount}` : ''}</TableCell>

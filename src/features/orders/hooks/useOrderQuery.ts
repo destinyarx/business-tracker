@@ -4,7 +4,7 @@ import { useQuery, useQueryClient  } from "@tanstack/react-query"
 import { useOrderService } from '@/features/orders/orderService.service'
 import { OrderParams } from '@/features/orders/order.type'
 
-export function useOrderQuery({ filter, searchKey, timePeriod, offset, limit }: OrderParams) {
+export function useOrderQuery({ filter, searchKey, timePeriod, offset, limit, sortByStatus }: OrderParams) {
     const qc = useQueryClient()
     const orderService = useOrderService()
     
@@ -12,6 +12,7 @@ export function useOrderQuery({ filter, searchKey, timePeriod, offset, limit }: 
         ...(filter ? { filter } : {}),
         ...(searchKey ? { searchKey } : {}),
         ...(timePeriod ? { timePeriod } : {}),
+        ...(sortByStatus ? { sortByStatus } : {}),
         ...(typeof offset === 'number' ? { offset } : {}),
         ...(typeof limit === 'number' ? { limit } : {}),
     }

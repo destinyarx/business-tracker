@@ -51,7 +51,7 @@ export default function ProductTable({ products }: Props) {
     return (
         <div className="w-full pb-5">
             <div className="flex flex-row justify-between mb-3">
-                <div className="relative w-full lg:w-1/2">
+                <div className="relative w-full lg:w-1/3 md:w-2/3">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                         placeholder="Search products..."

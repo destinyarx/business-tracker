@@ -41,5 +41,6 @@ export type OrderParams = {
   searchKey?: string,
   offset?: number,
   limit?: number,
-  timePeriod?: Period
+  timePeriod?: Period,
+  sortByStatus?: 'asc' | 'desc'
 }
