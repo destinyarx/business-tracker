@@ -15,7 +15,7 @@ import type { OrderStatus, OrderData } from '@/features/orders/order.type'
 import type { Product } from '@/features/products/products.types'
 
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Plus, ArrowLeft, Search, Filter, ArrowRight } from 'lucide-react'
+import { Plus, ArrowLeft, Search, Filter, ArrowRight, ListFilter } from 'lucide-react'
 import { Input } from '@/components/ui/input';
 import Loading from '@/components/organisms/Loading'
 import { Button } from '@/components/ui/button'
@@ -40,7 +40,8 @@ export default function index() {
     filter: filter,
     searchKey: undefined,
     offset: 0,
-    limit: 6
+    limit: 6,
+    sort: 'desc'
   })
 
   useEffect(() => {
@@ -57,6 +58,7 @@ export default function index() {
       }))
     }
 
+    console.log(params)
   }, [currentPage, filter, debouncedSearch])
 
   useEffect(() => {
@@ -66,6 +68,11 @@ export default function index() {
 
     return () => clearTimeout(timer)
   }, [searchQuery])
+
+  useEffect(() => {
+    console.log("params updated:", params);
+    console.log()
+  }, [params]);
 
   // order list pagination
   const { ordersQuery } = useOrderQuery(params)
@@ -220,6 +227,33 @@ export default function index() {
                     {status.name}
                   </DropdownMenuCheckboxItem>
                 ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                  <Button variant='outline' className='gap-2'>
+                    <ListFilter className="h-4 w-4 text-amber-500" />
+                    <span className='text-sm'>
+                        {params.sort === 'asc' ? 'Oldest First' : 'Newest First'}
+                    </span>
+                  </Button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align='end' className='w-52'>
+                    <DropdownMenuCheckboxItem
+                        checked={params.sort == 'desc'}
+                        onCheckedChange={() => setParams((prev) => ({ ...prev, sort: 'desc' }))}
+                    >
+                        Latest to oldest
+                    </DropdownMenuCheckboxItem>
+
+                    <DropdownMenuCheckboxItem
+                        checked={params.sort == 'asc'}
+                        onCheckedChange={() => setParams((prev) => ({ ...prev, sort: 'asc' }))}
+                    >
+                        Oldest to latest
+                    </DropdownMenuCheckboxItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

@@ -32,6 +32,8 @@ export type OrderData = OrderForm & {
   priceAtPurchase?: number,
   customer?: Customer,
   createdAt?: string,
+  statusUpdatedAt?: string,
+  profitInaccurate?: boolean
 } 
 
 export type Period = 'today' | 'yesterday' | 'week' | 'last_week' | 'month'
@@ -42,5 +44,6 @@ export type OrderParams = {
   offset?: number,
   limit?: number,
   timePeriod?: Period,
+  sort?: 'asc' | 'desc'
   sortByStatus?: 'asc' | 'desc'
 }

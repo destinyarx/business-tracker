@@ -12,6 +12,7 @@ type Params = {
     timePeriod?: string,
     offset?: number,
     limit?: number,
+    sort?: 'asc' | 'desc',
     sortByStatus?: 'asc' | 'desc',
 }
 
@@ -39,6 +40,9 @@ export function useOrderService() {
 
                 if (params?.timePeriod)   
                     orderParams.set('timePeriod', params.timePeriod)
+
+                if (params?.sort)   
+                    orderParams.set('sort', params.sort)
 
                 if (params?.sortByStatus)   
                     orderParams.set('sortByStatus', params.sortByStatus)

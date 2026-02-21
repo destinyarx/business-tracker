@@ -33,9 +33,16 @@ export default function OrderCard({ order, orderNumber, onDelete, onUpdate, upda
                             #{orderNumber}
                         </div>
 
-                        <div className="font-semibold leading-snug line-clamp-1 text-[1rem]">
-                            {order?.orderName?.trim() ? order.orderName : `${order?.customer?.name}'s Order`}
-                        </div>
+                        {order?.orderName?.trim() ? (
+                            <div className="font-semibold leading-snug line-clamp-1 text-[1rem]">
+                                {order?.orderName?.trim() ? order.orderName : ''}
+                            </div>
+                        ) : (
+                            <p className="text-gray-400 text-lg font-semibold">
+                                N/A
+                            </p>
+                        )}
+                        
                     </div>
 
                     <div className={cn(statusConfig?.color, 'text-white text-[0.8rem] font-semibold whitespace-nowrap leading-none shrink-0 py-1 px-3 rounded-lg items-start self-start')}>
@@ -45,7 +52,7 @@ export default function OrderCard({ order, orderNumber, onDelete, onUpdate, upda
 
                 <div className="flex flex-row justify-between items-center">
                     <div>
-                        {Boolean(order.orderName?.trim() && order.customer?.name?.trim()) && (
+                        {order.customer?.name?.trim() && (
                             <div className="flex flex-row items-center gap-1 text-[0.75rem] font-semibold">
                                 <CircleUserRound className="w-4 h-4 text-sky-600" />
                                 <p>{order?.customer?.name ?? ''}</p>

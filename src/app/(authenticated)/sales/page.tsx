@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { RefreshCw, ArrowUp, ArrowDown, Users, ShoppingCart, CalendarSearch, ArrowRight, ArrowLeft, Search, PhilippinePeso, ListFilter } from 'lucide-react'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input';
 import Loading from '@/components/organisms/Loading'
@@ -15,6 +16,7 @@ import { useOrderQuery } from '@/features/orders/hooks/useOrderQuery'
 import { useInvalidateQuery } from '@/hooks/useInvalidateQuery'
 import type { OrderParams, Period, OrderData } from '@/features/orders/order.type'
 import { format } from 'date-fns'
+import { cn } from '@/lib/utils'
 
 type TimePeriodValue = typeof TIME_PERIOD[number]['value'];
 
@@ -60,16 +62,18 @@ export default function SalesPage() {
     let totalProfit = 0
     let totalOrders = 0
     let totalCustomer = 0
+    let profitInaccurate = false
 
     for (const order of orders) {
+      if (order.profitInaccurate) profitInaccurate = true
+
       totalSales += Number(order.totalAmount)
-      
       totalProfit += Number(order.totalProfit) ?? 0
       totalOrders++
       totalCustomer += 1 // TODO: Add better logic for counting customers
     }
 
-    return { totalSales, totalProfit, totalOrders, totalCustomer }
+    return { totalSales, totalProfit, totalOrders, totalCustomer, profitInaccurate }
   }, [orders])
 
   useEffect(() => {
@@ -118,7 +122,21 @@ export default function SalesPage() {
             <div className="flex flex-row flex-wrap items-center justify-between">
               <div className="flex flex-col gap-1">
                 <p className="text-xs font-gray-600 font-light">Total Revenue {timePeriodName}</p>
-                <p className="text-lg font-semibold">₱ {orderStats.totalProfit}</p>
+
+                <div className="flex flex-row gap-2">
+                  <p className="text-lg font-semibold">₱ {orderStats.totalProfit}</p>
+                  
+                  {(orderStats.profitInaccurate && true) && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <p className="text-xl">⚠️</p>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="bg-amber-100 text-amber-800 border border-amber-200">
+                        <p> Inaccurate Profit </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </div>
               </div>
 
               <div className="border rounded-full p-2 bg-teal-400">
@@ -180,8 +198,17 @@ export default function SalesPage() {
         </Card>
       </div>
 
+      {orderStats.profitInaccurate && (
+        <div className="flex justify-end -mt-3">
+          <div className="inline-flex items-center justify-start w-auto bg-amber-100 text-gray-600 text-xs italic rounded-xl px-2 mx-5">
+            <p className="text-lg">⚠️</p>
+            <p className="-mb-1">Some orders contain items without recorded profit. Total profits may be inaccurate.</p>
+          </div>
+        </div>
+      )}
+
       {/* Sales Table */}
-      <Card>
+      <Card className="-mt-3">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Sales {timePeriodName}</CardTitle>
           
@@ -276,11 +303,36 @@ export default function SalesPage() {
               {filteredData.length ? (
                 filteredData.map((item: OrderData, index) => (
                   <TableRow key={index}>
-                    <TableCell className="font-semibold">{item.orderName ?? 'N/A'}</TableCell>
-                    <TableCell className="font-light">{item?.customer?.name ?? 'N/A'}</TableCell>
-                    <TableCell className={item?.totalAmount ? 'text-green-600' : 'text-gray-700'}>{item.totalAmount ? `₱ ${item.totalAmount}` : ''}</TableCell>
-                    <TableCell className={item?.totalProfit ? 'text-green-600' : 'text-gray-700'}>{item?.totalProfit ?? 'N/A'}</TableCell>
-                    <TableCell className="text-xs italic">{item?.createdAt ? format(item.createdAt, 'MMM. dd, yyyy · hh:mm a') : 'N/A'}</TableCell>
+                    <TableCell className="font-semibold">
+                      {item.orderName ?? 'N/A'}
+                    </TableCell>
+
+                    <TableCell className="font-light">
+                      {item?.customer?.name ?? 'N/A'}
+                    </TableCell>
+
+                    <TableCell className={item?.totalAmount ? 'text-green-600' : 'text-gray-700'}>
+                      {item.totalAmount ? `₱ ${item.totalAmount}` : ''}
+                    </TableCell>
+
+                    <TableCell className={cn('flex flex-row justify-center items-center gap-1', item?.totalProfit ? 'text-green-600' : 'text-gray-700')}>
+                      <p>{item?.totalProfit ?? 'N/A'}</p>
+
+                      {(item?.profitInaccurate && true) && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <p className="text-xl">⚠️</p>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="bg-amber-100 text-amber-800 border border-amber-200">
+                            <p> Inaccurate Profit </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </TableCell>
+
+                    <TableCell className="text-xs italic">
+                      {item?.statusUpdatedAt ? format(item.statusUpdatedAt, 'MMM. dd, yyyy · hh:mm a') : 'N/A'}
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (

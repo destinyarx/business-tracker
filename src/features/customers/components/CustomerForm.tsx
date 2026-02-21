@@ -35,10 +35,10 @@ export function CustomerForm({ customer, onSubmit, onCancel }: CustomerFormProps
     resolver: zodResolver(customerSchema),
     defaultValues: {
       name: customer?.name || '',
-      phone: customer?.phone || '',
+      phone: customer?.phone || undefined,
       customerType: customer?.customerType || 'normal',
-      notes: customer?.notes || '',
-      email: customer?.email || '',
+      notes: customer?.notes || undefined,
+      email: customer?.email || undefined,
     },
   });
 
