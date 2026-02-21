@@ -4,7 +4,8 @@ const nextConfig: NextConfig = {
   images: {
     domains: [
       'foodish-api.com',
-      'jsrifeeyjadnwyuiuzno.supabase.co'
+      'jsrifeeyjadnwyuiuzno.supabase.co',
+      'picsum.photos'
     ],
   },
 };

@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input';
 import Loading from '@/components/organisms/Loading'
 import NoItemFound from '@/components/organisms/NoItemFound'
+import { Modal } from '@/components/molecules/Modal'
+import SalesCard from '@/features/sales/components/SalesCard'
 
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { TIME_PERIOD } from '@/constants'
@@ -21,6 +23,9 @@ import { cn } from '@/lib/utils'
 type TimePeriodValue = typeof TIME_PERIOD[number]['value'];
 
 export default function SalesPage() {
+  const [showSalesDetails, setShowSalesDetails] = useState<boolean>(false)
+  const [orderDetails, setOrderDetails] = useState<Partial<OrderData>>()
+
   const [sort, setSort] = useState<'asc'|'desc'>('desc')
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [searchQuery, setSearchQuery] = useState('')
@@ -75,6 +80,21 @@ export default function SalesPage() {
 
     return { totalSales, totalProfit, totalOrders, totalCustomer, profitInaccurate }
   }, [orders])
+
+  const handleTableRowClick = (item: Partial<OrderData>) => {
+    setOrderDetails({
+      orderName: item.orderName,
+      items: item.items,
+      totalAmount: item.totalAmount,
+      totalProfit: item.totalProfit,
+      profitInaccurate: item.profitInaccurate,
+      notes: item.notes,
+      customer: item.customer,
+      createdAt: item.statusUpdatedAt
+    })
+
+    setShowSalesDetails(true)
+  }
 
   useEffect(() => {
     setParams((prev) => ({
@@ -302,7 +322,7 @@ export default function SalesPage() {
             <TableBody>
               {filteredData.length ? (
                 filteredData.map((item: OrderData, index) => (
-                  <TableRow key={index}>
+                  <TableRow key={index} onClick={() => handleTableRowClick(item)}>
                     <TableCell className="font-semibold">
                       {item.orderName ?? 'N/A'}
                     </TableCell>
@@ -378,6 +398,17 @@ export default function SalesPage() {
           </Table>
         </CardContent>
       </Card>
+
+      <Modal 
+        open={showSalesDetails} 
+        onOpenChange={setShowSalesDetails} 
+        title="Sales Details"
+        className="lg:max-w-3xl max-h-[85vh] overflow-y-auto"
+      >
+        <div className="-mt-3">
+          <SalesCard order={orderDetails}/>
+        </div>
+      </Modal>
     </div>
   )
 }

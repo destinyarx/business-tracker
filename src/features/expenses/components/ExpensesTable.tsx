@@ -203,7 +203,7 @@ export default function ExpensesTable({ onView, onUpdate, onDelete, offset, onOf
     return (
         <div className="rounded-lg border bg-card shadow-sm">
 
-            <Table className="overflow-hidden rounded-xl border border-border">
+            <Table className="overflow-x-auto rounded-xl table-auto border border-border">
                 <TableHeader className="bg-muted/40">
                     <TableRow className="hover:bg-transparent [&_th]:h-11 [&_th]:text-xs [&_th]:font-semibold dark:[&_th]:text-white [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-muted-foreground [&_th:last-child]:pr-6">
                         <TableHead className="pl-7">Name</TableHead>
@@ -212,7 +212,7 @@ export default function ExpensesTable({ onView, onUpdate, onDelete, offset, onOf
                         <TableHead className="text-center">Amount</TableHead>
                         <TableHead className="text-center">Method</TableHead>
                         <TableHead>Description</TableHead>
-                        <TableHead className="text-center">Action</TableHead>
+                        <TableHead className="text-center w-[5%] whitespace-nowrap">Action</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>

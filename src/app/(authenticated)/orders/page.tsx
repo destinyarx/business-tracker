@@ -184,7 +184,7 @@ export default function index() {
     <>
       <div className={cn('flex items-center mx-3', orderState === 'show_orders' ? 'justify-between' : 'justify-end')}>
         { orderState === 'show_orders' && (
-          <div className="flex flex-row w-full lg:w-1/3 gap-3">
+          <div className="flex flex-row w-full md:w-[65%] lg:w-1/2 gap-3">
             <div className="relative w-2/3">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
