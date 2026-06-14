@@ -94,16 +94,12 @@ export default function Customers() {
                     </Button>
                 </div>
 
-                {/* {customerQuery.isLoading ? (
-                    <Loading />
-                ) : ( */}
-                    <CustomerTable
-                        data={customerQuery.data ?? []}
-                        onEdit={openEditDialog}
-                        onDelete={openDeleteDialog}
-                        globalFilter={searchQuery}
-                    />
-                {/* )} */}
+                <CustomerTable
+                    data={customerQuery.data ?? []}
+                    onEdit={openEditDialog}
+                    onDelete={openDeleteDialog}
+                    globalFilter={searchQuery}
+                />
             </div>
 
             <Dialog open={isFormOpen} onOpenChange={closeFormDialog}>
