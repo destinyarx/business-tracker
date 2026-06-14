@@ -17,10 +17,7 @@ export function useApi(): AxiosInstance {
   useEffect(() => {
     const interceptor = api.interceptors.request.use(
       async (config) => {
-        const token = await getToken({
-          template: 'supabase-jwt',
-          skipCache: true
-        })
+        const token = await getToken()
 
         if (!token || !userId) {
           return Promise.reject({
