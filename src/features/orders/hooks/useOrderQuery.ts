@@ -22,5 +22,5 @@ export function useOrderQuery({ filter, searchKey, timePeriod, offset, limit, so
         queryFn: () => orderService.getAll(params)
     })
 
-    return ordersQuery 
+    return { ordersQuery }
 }
