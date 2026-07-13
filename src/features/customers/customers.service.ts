@@ -1,6 +1,5 @@
 'use client'
 
-import { useMemo } from 'react'
 import { createCustomersApi } from './customers.api'
 import { customersResponseSchema } from './customers.schema'
 import type { CreateCustomerCommand, Customer, UpdateCustomerCommand } from './customers.types'
@@ -9,7 +8,7 @@ import { ensureFeatureError } from '@/lib/feature-error'
 
 export function useCustomerService() {
   const api = useApi()
-  const customersApi = useMemo(() => createCustomersApi(api), [api])
+  const customersApi = createCustomersApi(api)
 
   return {
     async getAll(): Promise<Customer[]> {

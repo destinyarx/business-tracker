@@ -1,6 +1,5 @@
 'use client'
 
-import { useMemo } from 'react'
 import { createProductsApi } from './products.api'
 import { productImageUploadResponseSchema, productsResponseSchema } from './products.schema'
 import type {
@@ -14,7 +13,7 @@ import { ensureFeatureError } from '@/lib/feature-error'
 
 export function useProductService() {
   const api = useApi()
-  const productsApi = useMemo(() => createProductsApi(api), [api])
+  const productsApi = createProductsApi(api)
 
   return {
     async getAll(): Promise<Product[]> {

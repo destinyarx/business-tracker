@@ -29,6 +29,9 @@ export function useApi(): AxiosInstance {
 
         config.headers.Authorization = `Bearer ${token}`
 
+        // Ownership is derived by the backend from this verified token.
+        // Never attach browser-controlled createdBy, userId, or orgId fields here.
+
         return config
       }
     )

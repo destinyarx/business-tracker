@@ -1,6 +1,5 @@
 'use client'
 
-import { useMemo } from 'react'
 import { createExpensesApi } from './expenses.api'
 import { paginatedExpensesResponseSchema } from './expenses.schema'
 import type {
@@ -14,7 +13,7 @@ import { ensureFeatureError } from '@/lib/feature-error'
 
 export function useExpensesService() {
     const api = useApi()
-    const expensesApi = useMemo(() => createExpensesApi(api), [api])
+    const expensesApi = createExpensesApi(api)
 
     return {
         async getPaginated(

@@ -1,6 +1,5 @@
 'use client'
 
-import { useMemo } from 'react'
 import { createOrdersApi } from './order.api'
 import { paginatedOrdersResponseSchema } from './order.schema'
 import type {
@@ -16,7 +15,7 @@ import { ensureFeatureError } from '@/lib/feature-error'
 
 export function useOrderService() {
   const api = useApi()
-  const ordersApi = useMemo(() => createOrdersApi(api), [api])
+  const ordersApi = createOrdersApi(api)
 
   return {
     async getAll(params?: OrderParams): Promise<PaginatedOrders> {
