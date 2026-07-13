@@ -1,122 +1,57 @@
 'use client'
 
-import type { ExpensesFormData, ExpenseFilters } from '@/features/expenses/expenses.types'
+import { useMemo } from 'react'
+import { createExpensesApi } from './expenses.api'
+import { paginatedExpensesResponseSchema } from './expenses.schema'
+import type {
+    CreateExpenseCommand,
+    ExpenseFilters,
+    PaginatedExpenses,
+    UpdateExpenseCommand,
+} from './expenses.types'
 import { useApi } from '@/hooks/useApi'
-import { useToast } from '@/hooks/useToast'
-import { toast } from 'sonner'
+import { ensureFeatureError } from '@/lib/feature-error'
 
 export function useExpensesService() {
     const api = useApi()
-    const appToast = useToast()
+    const expensesApi = useMemo(() => createExpensesApi(api), [api])
 
     return {
-        async getPaginated(limit: number, offset: number, filters?: ExpenseFilters) {
+        async getPaginated(
+            limit: number,
+            offset: number,
+            filters?: ExpenseFilters,
+        ): Promise<PaginatedExpenses> {
             try {
-                const params = new URLSearchParams({
-                    limit: String(limit),
-                    offset: String(offset)
-                })
-
-                if (filters?.searchKey) params.append('searchKey', filters.searchKey);
-                if (filters?.category) params.append('category', filters.category);
-                if (filters?.paymentMethod) params.append('paymentMethod', filters.paymentMethod);
-                if (filters?.timePeriod) params.append('timePeriod', filters.timePeriod);
-
-                return await api.get(`/expenses/paginated?${params.toString()}`)
+                const response = await expensesApi.getPaginated(limit, offset, filters)
+                return paginatedExpensesResponseSchema.parse(response).data
             } catch (error) {
-                console.log(error)
-                appToast.error({
-                    title: "Failed to fetch expenses data",
-                    description: "Please try again."
-                }) 
+                throw ensureFeatureError('expense', error instanceof Error ? error : null)
             }
         },
 
-        async getAll() {
+        async create(expense: CreateExpenseCommand): Promise<void> {
             try {
-                await api.get('/expenses')
+                await expensesApi.create(expense)
             } catch (error) {
-                console.log(error)
-                appToast.error({
-                    title: "Failed to fetch expenses data",
-                    description: "Please try again."
-                }) 
+                throw ensureFeatureError('expense', error instanceof Error ? error : null)
             }
         },
 
-        async create(form: ExpensesFormData) {
-            const toastId = appToast.loading({
-                title: 'Adding expense\'s details',
-                description: 'Please wait...'
-            })
-
+        async update(expense: UpdateExpenseCommand): Promise<void> {
             try {
-                await api.post('/expenses', form)
-
-                toast.dismiss(toastId)
-                appToast.success({
-                    title: "Expenses created",
-                    description: "The expenses has been added on the list."
-                })
+                await expensesApi.update(expense)
             } catch (error) {
-                console.log(error)
-                toast.dismiss(toastId)
-
-                appToast.error({
-                    title: "Failed to create expenses",
-                    description: "Please try again."
-                }) 
+                throw ensureFeatureError('expense', error instanceof Error ? error : null)
             }
         },
 
-        async update(form: ExpensesFormData) {
-            const toastId = appToast.loading({
-                title: 'Updating expense\'s details',
-                description: 'Please wait...'
-            })
-
+        async delete(expenseId: number): Promise<void> {
             try {
-                await api.patch(`/expenses/${form.id}`, form)
-
-                toast.dismiss(toastId)
-                appToast.success({
-                    title: "Expenses updated",
-                    description: "The expense's details has been updated."
-                })
+                await expensesApi.delete(expenseId)
             } catch (error) {
-                console.log(error)
-                toast.dismiss(toastId)
-
-                appToast.error({
-                    title: "Failed to update expenses",
-                    description: "Please try again."
-                }) 
+                throw ensureFeatureError('expense', error instanceof Error ? error : null)
             }
         },
-
-        async delete(id: number) {
-            const toastId = appToast.loading({
-                title: 'Deleting expense\'s record',
-                description: 'Please wait...'
-            })
-
-            try {
-                await api.delete(`/expenses/${id}`)
-
-                toast.dismiss(toastId)
-                appToast.success({
-                    title: "Expenses deleted",
-                    description: "The expenses has been deleted on the list."
-                })
-            } catch (error) {
-                console.log(error)
-                toast.dismiss(toastId)
-
-                appToast.error({
-                    title: "Failed to delete expenses",
-                    description: "Please try again."
-                }) 
-            }
-        }
     }
 }

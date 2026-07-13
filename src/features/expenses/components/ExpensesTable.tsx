@@ -32,8 +32,8 @@ export default function ExpensesTable({ onView, onUpdate, onDelete, offset, onOf
     const [limit, setLimit] = useState(10)
 
     const { data, isLoading, isPending, isError } = usePaginatedExpensesQuery({ limit, offset, filters })
-    const expenses = data?.data?.data?.results ?? []
-    const hasNext = data?.data?.data?.hasNext ?? false
+    const expenses = data?.results ?? []
+    const hasNext = data?.hasNext ?? false
 
     useEffect(() => {
         onOffsetChange((currentPage * limit) - limit )

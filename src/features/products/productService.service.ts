@@ -1,136 +1,76 @@
 'use client'
 
-import type { Product } from './products.types'
+import { useMemo } from 'react'
+import { createProductsApi } from './products.api'
+import { productImageUploadResponseSchema, productsResponseSchema } from './products.schema'
+import type {
+  CreateProductCommand,
+  Product,
+  ProductImageSelection,
+  UpdateProductCommand,
+} from './products.types'
 import { useApi } from '@/hooks/useApi'
-import { useToast } from '@/hooks/useToast'
-import { toast } from 'sonner'
-
-type UploadProductImageResponse = {
-  data: {
-    data: {
-      publicUrl: string
-      imageName: string
-    };
-  };
-};
+import { ensureFeatureError } from '@/lib/feature-error'
 
 export function useProductService() {
   const api = useApi()
-  const appToast = useToast()
-
-  async function uploadProductImage(file: File): Promise<UploadProductImageResponse> {
-    const buffer = await file.arrayBuffer();
-   
-    return await api.post(`files/upload/product-image`, buffer, {
-      headers: { 
-        'Content-Type': file.type,
-        'X-Filename': file.name,
-       }
-    });
-  }
+  const productsApi = useMemo(() => createProductsApi(api), [api])
 
   return {
-    async getAll() {
+    async getAll(): Promise<Product[]> {
       try {
-        const result = await api.get('/products')
-        console.log(result.data.data)
-        return result?.data.data ?? []
-      } catch (err) {
-        console.log(err)
-        return []
+        const response = await productsApi.getAll()
+        return productsResponseSchema.parse(response).data
+      } catch (error) {
+        throw ensureFeatureError('product', error instanceof Error ? error : null)
       }
     },
 
-    async create(form: Product, file: any) {
+    async create(
+      product: CreateProductCommand,
+      imageSelection: ProductImageSelection | null,
+    ): Promise<void> {
       try {
-        const toastId = appToast.loading({
-          title: "Adding product...",
-          description: "Please wait."
-        })
+        const command: CreateProductCommand = { ...product }
 
-        if (file && !form.imageUrl) {
-          const productImage = await uploadProductImage(file.file)
-          form.imageUrl = productImage.data.data.publicUrl
-          form.image = productImage.data.data.imageName
-          form.imageSource = 'upload'
-        } else if (form.imageUrl) {
-          form.imageSource = 'url'
+        if (imageSelection && !command.imageUrl) {
+          const response = await productsApi.uploadImage(imageSelection.file)
+          const uploadedImage = productImageUploadResponseSchema.parse(response).data
+          command.imageUrl = uploadedImage.publicUrl
+          command.image = uploadedImage.imageName
+          command.imageSource = 'upload'
+        } else if (command.imageUrl) {
+          command.imageSource = 'url'
         }
 
-        await api.post('/products', form)
-      
-        toast.dismiss(toastId)
-        appToast.success({
-          title: "Product added",
-          description: "The new product has been saved."
-        })
-      } catch (err) {
-        console.log(err)
-
-        appToast.error({
-          title: "Failed to create product",
-          description: "Please try again."
-        })
-      }
-    },
-
-    async update(id: number, data: Product) {
-      try {
-        const toastId = appToast.loading({
-          title: "Updating customer...",
-          description: "Please wait."
-        })
-
-        await api.patch(`/products/${id}`, data)
-
-        toast.dismiss(toastId)
-        appToast.success({
-          title: "Product updated",
-          description: "The product has been updated."
-        })
-      } catch (err) {
-        console.log(err)
-
-        appToast.error({
-          title: "Failed to update product details",
-          description: "Please try again."
-        })
-      }
-    },
-
-    async delete(id: number) {
-      try {
-        const toastId = appToast.loading({
-          title: "Deleting customer...",
-          description: "Please wait."
-        })
-
-        await api.delete(`/products/${id}`)
-      
-        toast.dismiss(toastId)
-        appToast.success({
-          title: "Product deleted",
-          description: "The product has been deleted."
-        })
-      } catch (err) {
-        console.log(err)
-        appToast.error({
-          title: "Failed to delete product",
-          description: "Please try again."
-        })
-      }
-    },
-
-    async deleteImage(image: string) {
-      try {
-        await api.delete(`files/delete/product-image/${image}`)
+        await productsApi.create(command)
       } catch (error) {
-        console.log(error)
-        appToast.error({
-          title: "Failed to delete product image",
-          description: "Please try again."
-        })
+        throw ensureFeatureError('product', error instanceof Error ? error : null)
       }
-    }
+    },
+
+    async update(productId: number, product: UpdateProductCommand): Promise<void> {
+      try {
+        await productsApi.update(productId, product)
+      } catch (error) {
+        throw ensureFeatureError('product', error instanceof Error ? error : null)
+      }
+    },
+
+    async delete(productId: number): Promise<void> {
+      try {
+        await productsApi.delete(productId)
+      } catch (error) {
+        throw ensureFeatureError('product', error instanceof Error ? error : null)
+      }
+    },
+
+    async deleteImage(imageName: string): Promise<void> {
+      try {
+        await productsApi.deleteImage(imageName)
+      } catch (error) {
+        throw ensureFeatureError('product image', error instanceof Error ? error : null)
+      }
+    },
   }
 }

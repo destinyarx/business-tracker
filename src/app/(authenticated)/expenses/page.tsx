@@ -118,21 +118,53 @@ export default function Index() {
         const confirm = await confirmation('Are you sure?', 'You want to delete this record.')
         if (!confirm) return
 
-        await deleteExpense.mutateAsync(id)
-        setExpensesForm(formDefault)
+        try {
+            await appToast.loadingPromise(deleteExpense.mutateAsync(id), {
+                loadingTitle: 'Deleting expense...',
+                successTitle: 'Expense deleted',
+                errorTitle: 'Failed to delete expense',
+                errorDescription: 'Please try again.',
+            })
+            setExpensesForm(formDefault)
+        } catch {
+            return
+        }
     }
 
     const updateExpenses = async (data: ExpensesData) => {
-        await updateExpense.mutateAsync(data)
+        const expenseId = data.id ?? updateId.current
+        if (!expenseId) return
 
-        setExpensesForm(formDefault)
-        setShowForm(false)
+        try {
+            await appToast.loadingPromise(
+                updateExpense.mutateAsync({ ...data, id: expenseId }),
+                {
+                    loadingTitle: 'Updating expense...',
+                    successTitle: 'Expense updated',
+                    errorTitle: 'Failed to update expense',
+                    errorDescription: 'Please check the form and try again.',
+                },
+            )
+            setExpensesForm(formDefault)
+            setShowForm(false)
+        } catch {
+            return
+        }
     }
 
     const createExpenses = async (data: ExpensesFormData) => {
-        await createExpense.mutateAsync(data)
-        setExpensesForm(formDefault)
-        setShowForm(false)
+        try {
+            await appToast.loadingPromise(createExpense.mutateAsync(data), {
+                loadingTitle: 'Adding expense...',
+                successTitle: 'Expense created',
+                errorTitle: 'Failed to create expense',
+                errorDescription: 'Please check the form and try again.',
+            })
+            setExpensesForm(formDefault)
+            setShowForm(false)
+        } catch {
+            return
+        }
     }
 
     return (
@@ -304,4 +336,3 @@ export default function Index() {
         </>
     );
 }
-  

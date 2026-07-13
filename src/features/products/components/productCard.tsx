@@ -7,6 +7,7 @@ import { useProductFormStore } from '@/features/products/store/useProductFormSto
 import { useProducts } from '@/features/products/hooks/useProducts'
 import { PRODUCT_CATEGORY } from '@/constants'
 import { useConfirmation } from '@/app/provider/ConfirmationProvider'
+import { useToast } from '@/hooks/useToast'
 
 interface ProductProps {
     product: Product
@@ -16,20 +17,30 @@ export default function ProductCard({ product }: ProductProps ) {
     const { deleteProduct, deleteProductImage } = useProducts()
     const { editForm, viewForm, closeForm } = useProductFormStore()
     const confirmation = useConfirmation()
+    const appToast = useToast()
 
-    const handleDelete = async (id: number|undefined, image: string | undefined) => {
+    const handleDelete = async (id: number | undefined, image: string | null | undefined) => {
         if(!id) return
 
         const confirm = await confirmation('Are you sure?', 'You want to delete this product.')
         if (!confirm) return
         
         try {
-            if (image) await deleteProductImage.mutateAsync(image)
-            
-            const request = await deleteProduct.mutateAsync(id)
+            await appToast.loadingPromise(
+                (async () => {
+                    if (image) await deleteProductImage.mutateAsync(image)
+                    await deleteProduct.mutateAsync(id)
+                })(),
+                {
+                    loadingTitle: 'Deleting product...',
+                    successTitle: 'Product deleted',
+                    errorTitle: 'Failed to delete product',
+                    errorDescription: 'Please try again.',
+                },
+            )
             closeForm()
-        } catch (error) {
-            console.log(error)
+        } catch {
+            return
         }
     }
 

@@ -9,21 +9,31 @@
 //     image?: string
 // }
 
-export interface Product {
-    id?: number
+export interface ProductInput {
     title: string
-    description: string | null;
-    sku?: string
-    barcode?: string
-    supplier?: string
+    description: string | null
+    sku?: string | null
+    barcode?: string | null
+    supplier?: string | null
     price: number
     stock: number
-    profitPercentage?: number
-    profit?: number
+    profitPercentage?: number | null
+    profit?: number | null
     category?: string
-    image?: string,
-    imageUrl?: string,
-    imageSource?: 'url' | 'upload' | undefined
+    image?: string | null
+    imageUrl?: string | null
+    imageSource?: 'url' | 'upload'
+}
+
+export interface Product extends ProductInput {
+    id?: number
+}
+
+export type CreateProductCommand = ProductInput
+export type UpdateProductCommand = ProductInput
+
+export type ProductImageSelection = {
+    file: File
 }
 
 export enum FormState {

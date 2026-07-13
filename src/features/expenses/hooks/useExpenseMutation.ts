@@ -1,20 +1,20 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useExpensesService } from '@/features/expenses/expenses.service'
-import type { ExpensesFormData } from '@/features/expenses/expenses.types'
+import type { CreateExpenseCommand, UpdateExpenseCommand } from '@/features/expenses/expenses.types'
 
 export function useExpenseMutation(){
     const qc = useQueryClient()
     const expensesService = useExpensesService()
 
     const createExpense = useMutation({
-        mutationFn: (form: ExpensesFormData) => expensesService.create(form),
+        mutationFn: (expense: CreateExpenseCommand) => expensesService.create(expense),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['expenses']})
         }
     })
 
     const updateExpense = useMutation({
-        mutationFn: (form: ExpensesFormData) => expensesService.update(form),
+        mutationFn: (expense: UpdateExpenseCommand) => expensesService.update(expense),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['expenses'] })
         }

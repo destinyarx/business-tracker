@@ -1,168 +1,70 @@
 'use client'
 
-import type { OrderData, OrderForm, OrderStatus } from './order.type'
+import { useMemo } from 'react'
+import { createOrdersApi } from './order.api'
+import { paginatedOrdersResponseSchema } from './order.schema'
+import type {
+  CreateOrderCommand,
+  OrderData,
+  OrderParams,
+  OrderStatus,
+  PaginatedOrders,
+  UpdateOrderCommand,
+} from './order.type'
 import { useApi } from '@/hooks/useApi'
-import { useToast } from '@/hooks/useToast'
-import { toast } from 'sonner'
-import { useOrderStore } from '@/features/orders/useOrderStore'
-
-type Params = {
-    searchKey?: string,
-    filter?: string,
-    timePeriod?: string,
-    offset?: number,
-    limit?: number,
-    sort?: 'asc' | 'desc',
-    sortByStatus?: 'asc' | 'desc',
-}
+import { ensureFeatureError } from '@/lib/feature-error'
 
 export function useOrderService() {
-    const api = useApi()
-    const appToast = useToast()
-    const { orderState, setOrderState } = useOrderStore()
+  const api = useApi()
+  const ordersApi = useMemo(() => createOrdersApi(api), [api])
 
-    return {
-        async getAll(params?: Params) {
-            try {
-                const orderParams = new URLSearchParams()
+  return {
+    async getAll(params?: OrderParams): Promise<PaginatedOrders> {
+      try {
+        const response = await ordersApi.getAll(params)
+        return paginatedOrdersResponseSchema.parse(response).data
+      } catch (error) {
+        throw ensureFeatureError('order', error instanceof Error ? error : null)
+      }
+    },
 
-                if (typeof params?.limit === 'number') 
-                    orderParams.set('limit', String(params.limit))
-                
-                if (typeof params?.offset === 'number') 
-                    orderParams.set('offset', String(params.offset))
-                
-                if (params?.filter)   
-                    orderParams.set('filter', params.filter)
+    async create(order: CreateOrderCommand): Promise<void> {
+      try {
+        await ordersApi.create(order)
+      } catch (error) {
+        throw ensureFeatureError('order', error instanceof Error ? error : null)
+      }
+    },
 
-                if (params?.searchKey)   
-                    orderParams.set('searchKey', params.searchKey)
+    async update(orderId: number, order: UpdateOrderCommand): Promise<void> {
+      try {
+        await ordersApi.update(orderId, order)
+      } catch (error) {
+        throw ensureFeatureError('order', error instanceof Error ? error : null)
+      }
+    },
 
-                if (params?.timePeriod)   
-                    orderParams.set('timePeriod', params.timePeriod)
+    async delete(orderId: number): Promise<void> {
+      try {
+        await ordersApi.delete(orderId)
+      } catch (error) {
+        throw ensureFeatureError('order', error instanceof Error ? error : null)
+      }
+    },
 
-                if (params?.sort)   
-                    orderParams.set('sort', params.sort)
+    async updateOrderStatus(order: OrderData, status: OrderStatus): Promise<void> {
+      if (!order.id) {
+        throw ensureFeatureError('order', new Error('Order ID is required.'))
+      }
 
-                if (params?.sortByStatus)   
-                    orderParams.set('sortByStatus', params.sortByStatus)
-                
-                const result = await api.get('/orders', { params: orderParams }) 
-                return result?.data.data ?? []
-            } catch (error) {
-                console.log(error)
-
-                appToast.error({
-                    title: "Failed to create product",
-                    description: "Please try again."
-                })
-            }
-        },
-
-        async create(data: OrderForm) {
-            const toastId = appToast.loading({
-                title: 'Creating Order',
-                description: 'Please wait...'
-            })
-
-            try {
-                await api.post('/orders', data)
-                
-                toast.dismiss(toastId)
-                appToast.success({
-                    title: "Orders created",
-                    description: "The order has been placed."
-                })
-            } catch (error) {
-                console.log(error)
-
-                toast.dismiss(toastId)
-                appToast.error({
-                    title: "Failed to create new order",
-                    description: "Please try again."
-                })
-            }
-        },
-
-        async update(id: number, data: any) {
-            const toastId = appToast.loading({
-                title: 'Updating Order',
-                description: 'Please wait...'
-            })
-
-            try {
-                await api.put(`orders/${id}`, data) 
-                
-                setOrderState('show_orders')
-                toast.dismiss(toastId)
-                appToast.success({
-                    title: "Order updated",
-                    description: "The order details has been updated."
-                })
-            } catch (error) {
-                console.log(error)
-
-                toast.dismiss(toastId)
-                appToast.error({
-                    title: "Failed to update order",
-                    description: "Please try again."
-                })
-            }
-        },
-
-        async delete(id: number) {
-            const toastId = appToast.loading({
-                title: 'Deleting Order',
-                description: 'Please wait...'
-            })
-
-            try {
-                await api.delete(`orders/${id}`) 
-                
-                setOrderState('show_orders')
-                toast.dismiss(toastId)
-                appToast.success({
-                    title: "Order deleted",
-                    description: "The order details has been deleted."
-                })
-            } catch (error) {
-                console.log(error)
-
-                toast.dismiss(toastId)
-                appToast.error({
-                    title: "Failed to delete order",
-                    description: "Please try again."
-                })
-            }
-        },
-
-        async updateOrderStatus(orderDetails: OrderData, status: OrderStatus) {
-            const toastId = appToast.loading({
-                title: 'Updating Order Status',
-                description: 'Please wait...'
-            })
-
-            const { id, items } = orderDetails
-
-            const payload = {
-                orderItems: items,
-                status
-            }
-
-            try {
-                await api.patch(`/orders/${id}/status`, payload)
-                toast.dismiss(toastId)
-            } catch (error) {
-                console.log(error)
-
-                toast.dismiss(toastId)
-                appToast.error({
-                    title: "Failed to update order status",
-                    description: "Please try again."
-                })
-            }
-        }
-    }
+      try {
+        await ordersApi.updateStatus(order.id, {
+          orderItems: order.items,
+          status,
+        })
+      } catch (error) {
+        throw ensureFeatureError('order', error instanceof Error ? error : null)
+      }
+    },
+  }
 }
-
-

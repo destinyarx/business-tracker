@@ -25,6 +25,18 @@ export type ExpensesData = Omit<ExpensesFormData, 'id'> & {
     createdAt?: Date | string
 }
 
+export type CreateExpenseCommand = Omit<ExpensesFormData, 'id'>
+
+export type UpdateExpenseCommand = CreateExpenseCommand & {
+    id: number
+}
+
+export type PaginatedExpenses = {
+    results: ExpensesData[]
+    hasNext: boolean
+    hasPrev?: boolean
+}
+
 export type ExpenseFilters = {
     searchKey?: string,
     category?: string,

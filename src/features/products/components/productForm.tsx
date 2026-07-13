@@ -46,7 +46,7 @@ const schema = z.object({
 type ProductFormValues = z.infer<typeof schema>
 
 export default function ProductForm() {
-  const { formState, product } = useProductFormStore()
+  const { formState, product, closeForm } = useProductFormStore()
   const { createProduct, updateProduct } = useProducts()
   const confirmation = useConfirmation()
   const appToast = useToast()
@@ -80,7 +80,7 @@ export default function ProductForm() {
   const amount = Number(form.watch('profit'))
   const percentage = Number(form.watch('profitPercentage'))
 
-  const handleAddProduct = async (values: ProductFormValues) => {
+  const handleAddProduct = async (values: ProductFormValues): Promise<boolean> => {
     const file = dropzone.fileStatuses.length ? dropzone.fileStatuses[0] : null  
 
     if (file) {
@@ -93,30 +93,51 @@ export default function ProductForm() {
           description: "Please upload an image smaller than 2 MB."
         })
 
-        return
+        return false
       }
     }
 
     if (!amount) {
       const confirm = await confirmation('Profit not set', 'Without a profit amount, this product won’t be included correctly in profit calculations')
-      if (!confirm) return
+      if (!confirm) return false
     }
 
-    setIsLoading(true)
-    await createProduct.mutateAsync({ values, file })
+    await appToast.loadingPromise(createProduct.mutateAsync({ values, file }), {
+      loadingTitle: 'Adding product...',
+      successTitle: 'Product added',
+      successDescription: 'The new product has been saved.',
+      errorTitle: 'Failed to create product',
+      errorDescription: 'Please check the form and try again.',
+    })
+
+    return true
   }
 
   const onSubmit = async (values: ProductFormValues) => {
     const updateId = values.id ?? product?.id
 
-    if (formState === FormState.ADD) {
-      await handleAddProduct(values)
-    } else if (formState === FormState.EDIT && updateId) {
-      setIsLoading(true)
-      await updateProduct.mutateAsync({ id, values })
-    } 
+    setIsLoading(true)
 
-    setIsLoading(false)
+    try {
+      if (formState === FormState.ADD) {
+        const wasCreated = await handleAddProduct(values)
+        if (!wasCreated) return
+      } else if (formState === FormState.EDIT && updateId) {
+        await appToast.loadingPromise(updateProduct.mutateAsync({ id: updateId, values }), {
+          loadingTitle: 'Updating product...',
+          successTitle: 'Product updated',
+          successDescription: 'The product details have been updated.',
+          errorTitle: 'Failed to update product',
+          errorDescription: 'Please check the form and try again.',
+        })
+      }
+
+      closeForm()
+    } catch {
+      return
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   // product image

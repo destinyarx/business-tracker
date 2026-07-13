@@ -77,7 +77,7 @@ export const useOrderStore = create<OrderStore>((set) => ({
             orderForm: {
                 customerId: null,
                 orderName: undefined,
-                status: undefined,
+                status: 'pending',
                 notes: undefined
             }
         }

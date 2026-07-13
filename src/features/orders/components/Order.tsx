@@ -9,13 +9,14 @@ import OrderForm from '@/features/orders/components/OrderForm'
 
 import { useProducts } from '@/features/products/hooks/useProducts'
 import type { Product } from '@/features/products/products.types'
+import type { OrderForm as OrderFormValues } from '@/features/orders/order.type'
 import { useOrderStore } from '@/features/orders/useOrderStore'
 import { useApi } from '@/hooks/useApi'
 import { useCustomers } from '@/features/customers/hooks/useCustomers'
 
 interface Props {
     products: Product[]
-    triggerCheckout: (data: any) => void
+    triggerCheckout: (data: OrderFormValues) => void
 }
 
 export default function Order({ products, triggerCheckout }: Props) {
@@ -81,7 +82,7 @@ export default function Order({ products, triggerCheckout }: Props) {
             >
                 <OrderForm 
                     onSubmit={triggerCheckout}
-                    customers={customerQuery.isLoading ? [] : customerQuery.data} 
+                    customers={customerQuery.isLoading ? [] : (customerQuery.data ?? [])}
                 />
             </Modal>
         </div> 

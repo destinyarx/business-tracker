@@ -1,12 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useProductService } from '../productService.service'
-import type { Product } from '../products.types'
-import { useProductFormStore} from '@/features/products/store/useProductFormStore'
+import type { CreateProductCommand, ProductImageSelection, UpdateProductCommand } from '../products.types'
 
 export function useProducts() {
     const qc = useQueryClient()
     const productService = useProductService()
-    const { closeForm } = useProductFormStore()
 
     const productsQuery = useQuery({
         queryKey: ['products'],
@@ -16,18 +14,16 @@ export function useProducts() {
     })
 
     const createProduct = useMutation({
-        mutationFn: ({values, file}: { values: Product|any, file: any }) => productService.create(values, file),
+        mutationFn: ({ values, file }: { values: CreateProductCommand, file: ProductImageSelection | null }) => productService.create(values, file),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['products'] })
-            closeForm()
         }
     })
 
     const updateProduct = useMutation({
-        mutationFn: ({id, values}: { id: number, values: Product | any }) => productService.update(id, values),
+        mutationFn: ({ id, values }: { id: number, values: UpdateProductCommand }) => productService.update(id, values),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['products'] })
-            closeForm()
         }
     })
 
@@ -35,7 +31,6 @@ export function useProducts() {
         mutationFn: (id: number) => productService.delete(id),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['products'] })
-            closeForm()
         }
     })
 

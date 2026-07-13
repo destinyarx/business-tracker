@@ -1,97 +1,48 @@
 'use client'
 
-import type { Customer } from './customers.types'
+import { useMemo } from 'react'
+import { createCustomersApi } from './customers.api'
+import { customersResponseSchema } from './customers.schema'
+import type { CreateCustomerCommand, Customer, UpdateCustomerCommand } from './customers.types'
 import { useApi } from '@/hooks/useApi'
-import { useToast } from '@/hooks/useToast'
-import { toast } from 'sonner'
+import { ensureFeatureError } from '@/lib/feature-error'
 
 export function useCustomerService() {
   const api = useApi()
-  const appToast = useToast()
+  const customersApi = useMemo(() => createCustomersApi(api), [api])
 
   return {
-    async getAll() {
+    async getAll(): Promise<Customer[]> {
       try {
-        const result = await api.get('/customers')
-        console.log(result.data.data)
-        return result?.data.data ?? []
-      } catch (err) {
-        console.log(err)
-        return []
+        const response = await customersApi.getAll()
+        return customersResponseSchema.parse(response).data
+      } catch (error) {
+        throw ensureFeatureError('customer', error instanceof Error ? error : null)
       }
     },
 
-    async create(data: Customer) {
+    async create(customer: CreateCustomerCommand): Promise<void> {
       try {
-        const id = appToast.loading({
-          title: "Saving customer...",
-          description: "Please wait."
-        })
-        
-        await api.post('/customers', data)
-
-        toast.dismiss(id)
-        appToast.success({
-          title: "Customer added",
-          description: "The new record has been saved."
-        })
-
-      } catch (err) {
-        console.log(err)
-
-        appToast.error({
-          title: "Failed to save",
-          description: "Please try again."
-        })
+        await customersApi.create(customer)
+      } catch (error) {
+        throw ensureFeatureError('customer', error instanceof Error ? error : null)
       }
     },
 
-    async update(id: number, data: Customer) {
+    async update(customerId: number, customer: UpdateCustomerCommand): Promise<void> {
       try {
-        const toastId = appToast.loading({
-          title: "Updating customer...",
-          description: "Please wait."
-        })
-
-        await api.patch(`/customers/${id}`, data)
-
-        toast.dismiss(toastId)
-        appToast.success({
-          title: "Customer added",
-          description: "The new record has been saved."
-        })
-      } catch (err) {
-        console.log(err)
-
-        appToast.error({
-          title: "Failed to update customer record",
-          description: "Please try again."
-        })
+        await customersApi.update(customerId, customer)
+      } catch (error) {
+        throw ensureFeatureError('customer', error instanceof Error ? error : null)
       }
     },
 
-    async delete(id: number) {
+    async delete(customerId: number): Promise<void> {
       try {
-        const toastId = appToast.loading({
-          title: "Deleting customer...",
-          description: "Please wait."
-        })
-
-        await api.delete(`/customers/${id}`)
-
-        toast.dismiss(toastId)
-        appToast.success({
-          title: "Customer added",
-          description: "The new record has been deleted."
-        })
-      } catch (err) {
-        console.log(err)
-
-        appToast.error({
-          title: "Failed to delete customer record",
-          description: "Please try again."
-        })
+        await customersApi.delete(customerId)
+      } catch (error) {
+        throw ensureFeatureError('customer', error instanceof Error ? error : null)
       }
-    }
+    },
   }
 }

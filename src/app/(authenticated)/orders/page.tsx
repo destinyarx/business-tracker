@@ -11,7 +11,7 @@ import { useConfirmation } from '@/app/provider/ConfirmationProvider'
 import { useOrderMutation } from '@/features/orders/hooks/useOrderMutation'
 import { useOrderQuery } from '@/features/orders/hooks/useOrderQuery'
 import { ORDER_STATUS } from '@/constants'
-import type { OrderStatus, OrderData } from '@/features/orders/order.type'
+import type { CreateOrderCommand, OrderStatus, OrderData, OrderForm } from '@/features/orders/order.type'
 import type { Product } from '@/features/products/products.types'
 
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -101,7 +101,7 @@ export default function index() {
   }
 
   // TODO: add update function
-  const handleUpdate = async (data: any) => {
+  const handleUpdate = async (data: OrderData) => {
     console.log('Update: ')
     console.log(data)
   }
@@ -110,7 +110,16 @@ export default function index() {
     const confirm = await confirmation('Are you sure?', 'Delete this order?')
     if (!confirm) return
 
-    await deleteOrder.mutateAsync(id)
+    try {
+      await appToast.loadingPromise(deleteOrder.mutateAsync(id), {
+        loadingTitle: 'Deleting order...',
+        successTitle: 'Order deleted',
+        errorTitle: 'Failed to delete order',
+        errorDescription: 'Please try again.',
+      })
+    } catch {
+      return
+    }
   }
 
   const handleUpdateStatus = async (data: OrderData, status: OrderStatus) => {
@@ -119,9 +128,17 @@ export default function index() {
     const confirm = await confirmation('Are you sure', `You want to update the order status to ${statusName}`)
     if (!confirm) return
 
-    await updateOrderStatus.mutateAsync({data, status})
-
-    setFilter(status)
+    try {
+      await appToast.loadingPromise(updateOrderStatus.mutateAsync({ data, status }), {
+        loadingTitle: 'Updating order status...',
+        successTitle: 'Order status updated',
+        errorTitle: 'Failed to update order status',
+        errorDescription: 'Please try again.',
+      })
+      setFilter(status)
+    } catch {
+      return
+    }
   }
 
   const returnToMainPage = async () => {
@@ -135,13 +152,13 @@ export default function index() {
     return {
       id: item.id,
       price: item.price,
-      quantity: item.quantity,
+      quantity: item.quantity ?? 0,
       profit: item.profit
     }
   })
 
-  const checkout = async (data: any) => {
-    const form = {
+  const checkout = async (data: OrderForm) => {
+    const form: CreateOrderCommand = {
       orderName: data.orderName ?? null,
       customerId: data.customerId ?? null,
       notes: data.notes ?? null,
@@ -159,7 +176,7 @@ export default function index() {
     })
 
     try {
-      addOrder.mutateAsync(form)
+      await addOrder.mutateAsync(form)
 
       resetOrderForm()
       setShowForm(false)
@@ -328,4 +345,3 @@ export default function index() {
     </>
   );
 }
-  

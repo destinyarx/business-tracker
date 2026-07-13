@@ -10,13 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Customer } from '@/features/customers/customers.types'
 import { useToast } from '@/hooks/useToast'
 
-interface Props {
-    customers: Customer[],
-    onSubmit: (data: any) => void
-}
-
 const orderFormSchema = z.object({
-    customerId: z.coerce.number().int().nullable(),
+    customerId: z.number().int().nullable(),
     orderName: z.string().optional(),
     status: z.enum(['pending', 'in_progress', 'failed', 'completed', 'cancelled']),
     notes: z.string().optional()
@@ -24,11 +19,16 @@ const orderFormSchema = z.object({
 
 type OrderForm = z.infer<typeof orderFormSchema>
 
+interface Props {
+    customers: Customer[],
+    onSubmit: (data: OrderForm) => void
+}
+
 export default function OrderForm({ customers, onSubmit }: Props ) {
     const { error } = useToast()
     const { orderForm, showForm } = useOrderStore()
 
-    const form = useForm({
+    const form = useForm<OrderForm>({
         resolver: zodResolver(orderFormSchema),
         defaultValues: {
             customerId: orderForm?.customerId ?? null,

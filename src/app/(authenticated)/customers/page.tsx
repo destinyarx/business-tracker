@@ -12,10 +12,12 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel,AlertDialogContent, A
 import { Plus, Search, RefreshCw } from 'lucide-react';
 import { useInvalidateQuery } from '@/hooks/useInvalidateQuery';
 import Loading from '@/components/organisms/Loading'
+import { useToast } from '@/hooks/useToast'
 
 export default function Customers() {
     const { customerQuery, createCustomer, updateCustomer, deleteCustomer } = useCustomers()
     const { invalidateKey } = useInvalidateQuery()
+    const appToast = useToast()
 
     const [searchQuery, setSearchQuery] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);
@@ -23,24 +25,56 @@ export default function Customers() {
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
     const handleAddCustomer = async (data: Customer) => {
-        setIsFormOpen(false);
-        await createCustomer.mutateAsync(data)
+        try {
+            await appToast.loadingPromise(createCustomer.mutateAsync(data), {
+                loadingTitle: 'Saving customer...',
+                successTitle: 'Customer added',
+                successDescription: 'The new record has been saved.',
+                errorTitle: 'Failed to save customer',
+                errorDescription: 'Please check your connection and try again.',
+            })
+            setIsFormOpen(false)
+        } catch {
+            return
+        }
     };
 
     const handleUpdateCustomer = async (data: Customer) => {
         if (!selectedCustomer?.id) return;
 
-        setIsFormOpen(false);
-        await updateCustomer.mutateAsync({ id: selectedCustomer.id, values: data })
-        setSelectedCustomer(null);
+        try {
+            await appToast.loadingPromise(
+                updateCustomer.mutateAsync({ id: selectedCustomer.id, values: data }),
+                {
+                    loadingTitle: 'Updating customer...',
+                    successTitle: 'Customer updated',
+                    successDescription: 'The customer record has been updated.',
+                    errorTitle: 'Failed to update customer',
+                    errorDescription: 'Please check your changes and try again.',
+                },
+            )
+            setIsFormOpen(false)
+            setSelectedCustomer(null)
+        } catch {
+            return
+        }
     };
 
     const handleDeleteCustomer = async () => {
         if (!selectedCustomer?.id) return;
 
-        await deleteCustomer.mutateAsync(selectedCustomer.id)
-        setIsDeleteDialogOpen(false);
-        setSelectedCustomer(null);
+        try {
+            await appToast.loadingPromise(deleteCustomer.mutateAsync(selectedCustomer.id), {
+                loadingTitle: 'Deleting customer...',
+                successTitle: 'Customer deleted',
+                errorTitle: 'Failed to delete customer',
+                errorDescription: 'Please try again.',
+            })
+            setIsDeleteDialogOpen(false)
+            setSelectedCustomer(null)
+        } catch {
+            return
+        }
     };
 
     const openEditDialog = (customer: Customer) => {
@@ -60,6 +94,10 @@ export default function Customers() {
 
     if (customerQuery.isLoading) {
         return <Loading />
+    }
+
+    if (customerQuery.isError) {
+        return <div className="p-4">Something went wrong loading customers.</div>
     }
 
     return (

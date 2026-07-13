@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Separator } from "@/components/ui/separator"
 import { Button } from '@/components/ui/button'
 import { Pencil, Trash, CircleUserRound } from 'lucide-react'
-import { CartItem } from '@/features/orders/order.type'
+import { OrderLineItem } from '@/features/orders/order.type'
 
 type Props = {
     order: OrderData,
@@ -18,7 +18,7 @@ type Props = {
 }
 
 export default function OrderCard({ order, orderNumber, onDelete, onUpdate, updateStatus }: Props) {
-    const computeSubTotal = (orderItems: CartItem[]) => {
+    const computeSubTotal = (orderItems: OrderLineItem[]) => {
         return orderItems.reduce((sum, item) => sum + ((item.priceAtPurchase ?? 0) * (item.quantity ?? 0)), 0)
     }
 
@@ -94,7 +94,7 @@ export default function OrderCard({ order, orderNumber, onDelete, onUpdate, upda
                             </tr>
                         </thead>
                         <tbody>
-                            {order.items.map((item: CartItem, index) => (
+                            {order.items.map((item: OrderLineItem, index) => (
                                 <tr key={index} className='border-b last:border-0 [&_td]:px-3 [&_td]:py-2'>
                                     <td className="w-[5%]">{item.quantity}</td>
                                     <td>{item?.product?.title}</td>

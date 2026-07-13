@@ -112,6 +112,10 @@ export default function SalesPage() {
 
   if (ordersQuery.isLoading) return <Loading />
 
+  if (ordersQuery.isError) {
+    return <div className="p-4">Something went wrong loading sales data.</div>
+  }
+
   return (
     <div className="space-y-6 p-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -16,6 +16,8 @@ export default function Products() {
         <div className="m-5">
           {productsQuery.isLoading ? (
             <Loading  message="Fetching products, please wait..." />
+          ) : productsQuery.isError ? (
+            <div className="p-4">Something went wrong loading products.</div>
           ) : (
             <ProductTable products={productsQuery.data ?? []} />
           )}
@@ -32,4 +34,3 @@ export default function Products() {
     </div>
   );
 }
-  
