@@ -3,10 +3,12 @@
 import { useQuery  } from "@tanstack/react-query"
 import { useOrderService } from '@/features/orders/orderService.service'
 import { OrderParams } from '@/features/orders/order.type'
+import { businessKeys, useBusinessScope } from '@/lib/business-scope'
 
 export function useOrderQuery({ filter, searchKey, timePeriod, offset, limit, sort, sortByStatus }: OrderParams) {
     const orderService = useOrderService()
-    
+    const { ready, userId } = useBusinessScope()
+
     const params = {
         ...(filter ? { filter } : {}),
         ...(searchKey ? { searchKey } : {}),
@@ -18,8 +20,9 @@ export function useOrderQuery({ filter, searchKey, timePeriod, offset, limit, so
     }
 
     const ordersQuery = useQuery({
-        queryKey: ['orders', params],
-        queryFn: () => orderService.getAll(params)
+        queryKey: businessKeys.orders(userId, params),
+        queryFn: () => orderService.getAll(params),
+        enabled: ready,
     })
 
     return { ordersQuery }

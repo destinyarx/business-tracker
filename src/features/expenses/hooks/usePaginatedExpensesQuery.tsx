@@ -1,6 +1,6 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import { useExpensesService } from '@/features/expenses/expenses.service'
-import { useAuth } from '@clerk/nextjs'
+import { businessKeys, useBusinessScope } from '@/lib/business-scope'
 import { ExpenseFilters } from '@/features/expenses/expenses.types'
 
 type Props = {
@@ -11,13 +11,13 @@ type Props = {
 
 export function usePaginatedExpensesQuery({ limit, offset, filters }: Props) {
     const { getPaginated } = useExpensesService()
-    const { isLoaded } = useAuth()
+    const { ready, userId } = useBusinessScope()
 
     return useQuery({
-        queryKey: ['expenses', limit, offset, filters],
+        queryKey: businessKeys.expenses(userId, limit, offset, filters),
         queryFn: () => getPaginated(limit, offset, filters),
         staleTime: 1000 * 60 * 5,
-        enabled: isLoaded,
+        enabled: ready,
         placeholderData: keepPreviousData,
     })
 }

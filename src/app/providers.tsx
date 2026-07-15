@@ -17,8 +17,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       },
     })
 
-    // 🔎 fingerprint
-    ;(globalThis as any).__QUERY_CLIENT__ = qc
+    // 🔎 dev-only fingerprint (kept out of production builds)
+    if (process.env.NODE_ENV === 'development') {
+      ;(globalThis as typeof globalThis & { __QUERY_CLIENT__?: QueryClient }).__QUERY_CLIENT__ = qc
+    }
 
     return qc
   })

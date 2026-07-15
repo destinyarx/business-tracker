@@ -4,6 +4,7 @@ import { ClerkLoaded, ClerkLoading, RedirectToSignIn } from '@clerk/nextjs'
 import Loading from '@/components/organisms/Loading'
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from '@/components/organisms/AppSidebar'
+import { CacheScopeGuard } from '@/components/organisms/CacheScopeGuard'
 import {
   ClerkProvider,
   SignInButton,
@@ -35,6 +36,8 @@ export default async function RootLayout({
 
   return (
     <ClerkProvider>
+      <CacheScopeGuard />
+
       <ClerkLoading>
         <Loading/>
       </ClerkLoading>

@@ -191,11 +191,6 @@ export default function ProductForm() {
     }
   }, [product])
 
-  useEffect(() => {
-    console.log('FORM ERRORS:', form.formState.errors)
-    console.log(form.getValues())
-  }, [form.formState.errors])
-
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 w-full'>
       <div className='grid gap-1'>

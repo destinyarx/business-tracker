@@ -57,8 +57,6 @@ export default function index() {
         searchKey: debouncedSearch || undefined
       }))
     }
-
-    console.log(params)
   }, [currentPage, filter, debouncedSearch])
 
   useEffect(() => {
@@ -68,11 +66,6 @@ export default function index() {
 
     return () => clearTimeout(timer)
   }, [searchQuery])
-
-  useEffect(() => {
-    console.log("params updated:", params);
-    console.log()
-  }, [params]);
 
   // order list pagination
   const { ordersQuery } = useOrderQuery(params)
@@ -101,10 +94,7 @@ export default function index() {
   }
 
   // TODO: add update function
-  const handleUpdate = async (data: OrderData) => {
-    console.log('Update: ')
-    console.log(data)
-  }
+  const handleUpdate = async (_data: OrderData) => {}
 
   const handleDelete = async (id: number) => {
     const confirm = await confirmation('Are you sure?', 'Delete this order?')

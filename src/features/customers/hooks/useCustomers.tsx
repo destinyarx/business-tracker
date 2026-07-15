@@ -1,18 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useCustomerService } from '../customers.service'
 import type { Customer } from '../customers.types'
-import { useAuth } from '@clerk/nextjs'
+import { businessKeys, useBusinessScope } from '@/lib/business-scope'
 
 export function useCustomers() {
     const qc = useQueryClient()
     const customerService = useCustomerService()
-    const { isLoaded } = useAuth()
+    const { ready, userId } = useBusinessScope()
 
     const customerQuery = useQuery({
-        queryKey: ['customers'],
+        queryKey: businessKeys.customers(userId),
         queryFn: () => customerService.getAll(),
         staleTime: 1000 * 60 * 5,
-        enabled: isLoaded,
+        enabled: ready,
     })
 
     const createCustomer = useMutation({

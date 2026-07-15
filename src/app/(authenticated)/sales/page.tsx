@@ -105,11 +105,6 @@ export default function SalesPage() {
 
   }, [currentPage, debouncedSearch, timePeriod])
 
-  useEffect(() => {
-    console.log("params updated:", params);
-    console.log()
-  }, [params]);
-
   if (ordersQuery.isLoading) return <Loading />
 
   if (ordersQuery.isError) {

@@ -523,8 +523,6 @@ export default function DashboardCMS() {
                         className="cursor-pointer hover:bg-teal-50/40"
                         onClick={() => {
                           // hook this to your sales details modal later
-                          // eslint-disable-next-line no-console
-                          console.log('clicked', o)
                         }}
                       >
                         <TableCell className="font-medium">{o.orderName}</TableCell>
