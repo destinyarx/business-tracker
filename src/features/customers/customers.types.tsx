@@ -3,7 +3,7 @@ export type CustomerType = 'normal' | 'loyal' | 'deluxe' | 'premium' | 'VIP'
 export interface Customer {
   id?: number
   name: string
-  status?: number
+  status?: string
   customerType: CustomerType
   phone?: string
   email?: string

@@ -25,6 +25,22 @@ test('customer response parsing rejects a malformed successful payload', () => {
   assert.equal(result.success, false)
 })
 
+test('customer response parsing accepts backend status codes', () => {
+  const result = customersResponseSchema.safeParse({
+    statusCode: 200,
+    message: 'Success',
+    data: [{
+      ...validCustomer,
+      status: 'A',
+      createdAt: '2026-07-17 07:02:16.91523',
+    }],
+    timestamp: '2026-07-17T07:06:38.869Z',
+    path: '/customers',
+  })
+
+  assert.equal(result.success, true)
+})
+
 test('product response parsing rejects a missing required field', () => {
   const malformedProduct = { ...validProduct, stock: undefined }
   const result = productsResponseSchema.safeParse({ data: [malformedProduct] })
