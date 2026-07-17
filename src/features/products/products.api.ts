@@ -9,13 +9,10 @@ export function createProductsApi(api: AxiosInstance) {
     },
 
     async uploadImage(file: File): Promise<object> {
-      const buffer = await file.arrayBuffer()
-      const response = await api.post<object>('/files/upload/product-image', buffer, {
-        headers: {
-          'Content-Type': file.type,
-          'X-Filename': file.name,
-        },
-      })
+      const formData = new FormData()
+      formData.append('image', file)
+
+      const response = await api.post<object>('/files/upload/product-image', formData)
       return response.data
     },
 

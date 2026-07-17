@@ -1,7 +1,8 @@
 import type { Product } from '@/features/products/products.types'
 import type { Customer } from '@/features/customers/customers.types'
 
-export type OrderProductSummary = Pick<Product, 'id' | 'title' | 'price' | 'profit'>
+export type OrderProductSummary = Required<Pick<Product, 'id'>> &
+  Pick<Product, 'title' | 'price' | 'profit'>
 export type OrderCustomerSummary = Pick<Customer, 'name'>
 
 export interface CartItem extends Product {
@@ -62,8 +63,15 @@ export type CreateOrderCommand = {
 export type UpdateOrderCommand = Pick<OrderData, 'orderName' | 'customerId' | 'notes'>
 
 export type UpdateOrderStatusCommand = {
-  orderItems: OrderLineItem[]
+  orderItems: UpdateOrderStatusItemCommand[]
   status: OrderStatus
+}
+
+export type UpdateOrderStatusItemCommand = {
+  priceAtPurchase: string
+  quantity: number
+  subtotal: string
+  product: Pick<OrderProductSummary, 'id' | 'title' | 'price'>
 }
 
 export type PaginatedOrders = {

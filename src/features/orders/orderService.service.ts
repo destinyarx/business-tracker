@@ -1,6 +1,7 @@
 'use client'
 
 import { createOrdersApi } from './order.api'
+import { toUpdateOrderStatusCommand } from './order.mapper'
 import { paginatedOrdersResponseSchema } from './order.schema'
 import type {
   CreateOrderCommand,
@@ -57,10 +58,7 @@ export function useOrderService() {
       }
 
       try {
-        await ordersApi.updateStatus(order.id, {
-          orderItems: order.items,
-          status,
-        })
+        await ordersApi.updateStatus(order.id, toUpdateOrderStatusCommand(order, status))
       } catch (error) {
         throw ensureFeatureError('order', error instanceof Error ? error : null)
       }

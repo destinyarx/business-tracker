@@ -3,6 +3,8 @@ import test from 'node:test'
 import { customersResponseSchema } from '../src/features/customers/customers.schema.ts'
 import { paginatedExpensesResponseSchema } from '../src/features/expenses/expenses.schema.ts'
 import { paginatedOrdersResponseSchema } from '../src/features/orders/order.schema.ts'
+import { toUpdateOrderStatusCommand } from '../src/features/orders/order.mapper.ts'
+import { createProductsApi } from '../src/features/products/products.api.ts'
 import { productsResponseSchema } from '../src/features/products/products.schema.ts'
 import { toFeatureError } from '../src/lib/feature-error.ts'
 
@@ -108,6 +110,67 @@ test('order response parsing accepts nested API summaries', () => {
   })
 
   assert.equal(result.success, true)
+})
+
+test('order status command matches the backend update DTO', () => {
+  const order = paginatedOrdersResponseSchema.parse({
+    data: {
+      orders: [{
+        id: 1,
+        customerId: 3,
+        orderName: 'Sample order',
+        status: 'pending',
+        notes: null,
+        customer: { name: 'Luigi Santos' },
+        items: [{
+          quantity: 2,
+          priceAtPurchase: '100.00',
+          subtotal: '200.00',
+          product: {
+            id: 2,
+            title: 'Sample Product',
+            price: '100.00',
+            profit: '20.00',
+          },
+        }],
+        createdAt: '2026-07-17T07:02:16.915Z',
+      }],
+      hasNext: false,
+    },
+  }).data.orders[0]
+
+  assert.deepEqual(toUpdateOrderStatusCommand(order, 'in_progress'), {
+    orderItems: [{
+      priceAtPurchase: '100',
+      quantity: 2,
+      subtotal: '200',
+      product: {
+        id: 2,
+        title: 'Sample Product',
+        price: 100,
+      },
+    }],
+    status: 'in_progress',
+  })
+})
+
+test('product image upload uses the backend multipart image field', async () => {
+  let requestBody
+  let requestConfig
+  const productsApi = createProductsApi({
+    post: async (_path, body, config) => {
+      requestBody = body
+      requestConfig = config
+      return { data: {} }
+    },
+  })
+  const image = new File(['image bytes'], 'sample.png', { type: 'image/png' })
+
+  await productsApi.uploadImage(image)
+
+  assert.ok(requestBody instanceof FormData)
+  assert.equal(requestBody.get('image'), image)
+  assert.equal(requestConfig, undefined)
 })
 
 for (const [status, expectedKind] of [
