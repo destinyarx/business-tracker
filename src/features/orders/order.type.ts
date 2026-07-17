@@ -1,6 +1,9 @@
 import type { Product } from '@/features/products/products.types'
 import type { Customer } from '@/features/customers/customers.types'
 
+export type OrderProductSummary = Pick<Product, 'id' | 'title' | 'price' | 'profit'>
+export type OrderCustomerSummary = Pick<Customer, 'name'>
+
 export interface CartItem extends Product {
   quantity?: number
 }
@@ -9,7 +12,7 @@ export type OrderLineItem = {
   id?: number
   quantity: number
   priceAtPurchase: number
-  product?: Product
+  product?: OrderProductSummary
   profit?: number
 }
 
@@ -34,7 +37,7 @@ export type OrderData = OrderForm & {
   items: OrderLineItem[],
   quantity?: number
   priceAtPurchase?: number,
-  customer?: Customer,
+  customer?: OrderCustomerSummary,
   createdAt: string,
   statusUpdatedAt?: string,
   profitInaccurate?: boolean

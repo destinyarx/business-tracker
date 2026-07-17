@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { customersResponseSchema } from '../src/features/customers/customers.schema.ts'
 import { paginatedExpensesResponseSchema } from '../src/features/expenses/expenses.schema.ts'
+import { paginatedOrdersResponseSchema } from '../src/features/orders/order.schema.ts'
 import { productsResponseSchema } from '../src/features/products/products.schema.ts'
 import { toFeatureError } from '../src/lib/feature-error.ts'
 
@@ -73,6 +74,40 @@ test('expense response parsing normalizes dates and numbers', () => {
 
   assert.equal(result.data.results[0].amount, 5000)
   assert.ok(result.data.results[0].dateIncurred instanceof Date)
+})
+
+test('order response parsing accepts nested API summaries', () => {
+  const result = paginatedOrdersResponseSchema.safeParse({
+    data: {
+      orders: [{
+        id: 1,
+        customerId: 3,
+        orderName: 'Sample order',
+        status: 'pending',
+        notes: null,
+        totalAmount: '100.00',
+        totalProfit: '20.00',
+        customer: { name: 'Luigi Santos' },
+        items: [{
+          quantity: 1,
+          priceAtPurchase: '100.00',
+          subtotal: '100.00',
+          product: {
+            id: 2,
+            title: 'Sample Product',
+            price: '100.00',
+            profit: '20.00',
+          },
+        }],
+        createdAt: '2026-07-17T07:02:16.915Z',
+        statusUpdatedAt: null,
+        profitInaccurate: false,
+      }],
+      hasNext: false,
+    },
+  })
+
+  assert.equal(result.success, true)
 })
 
 for (const [status, expectedKind] of [

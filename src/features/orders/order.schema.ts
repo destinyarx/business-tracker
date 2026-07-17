@@ -1,14 +1,23 @@
 import { z } from 'zod'
-import { customerResponseSchema } from '@/features/customers/customers.schema'
-import { productResponseSchema } from '@/features/products/products.schema'
 
 const orderStatusSchema = z.enum(['pending', 'in_progress', 'completed', 'cancelled', 'failed'])
+
+const orderProductSummaryResponseSchema = z.object({
+  id: z.number().int().positive(),
+  title: z.string(),
+  price: z.coerce.number().nonnegative(),
+  profit: z.coerce.number().nullish().transform((profit) => profit ?? undefined),
+})
+
+const orderCustomerSummaryResponseSchema = z.object({
+  name: z.string(),
+})
 
 export const orderLineItemResponseSchema = z.object({
   id: z.number().int().positive().optional(),
   quantity: z.coerce.number().int().nonnegative(),
   priceAtPurchase: z.coerce.number().nonnegative(),
-  product: productResponseSchema.optional(),
+  product: orderProductSummaryResponseSchema.nullish().transform((product) => product ?? undefined),
   profit: z.coerce.number().nullish().transform((profit) => profit ?? undefined),
 })
 
@@ -22,9 +31,9 @@ export const orderResponseSchema = z.object({
   items: z.array(orderLineItemResponseSchema),
   totalAmount: z.coerce.number().optional(),
   totalProfit: z.coerce.number().optional(),
-  customer: customerResponseSchema.nullish().transform((customer) => customer ?? undefined),
+  customer: orderCustomerSummaryResponseSchema.nullish().transform((customer) => customer ?? undefined),
   createdAt: z.string().min(1),
-  statusUpdatedAt: z.string().optional(),
+  statusUpdatedAt: z.string().nullish().transform((statusUpdatedAt) => statusUpdatedAt ?? undefined),
   profitInaccurate: z.boolean().optional(),
 })
 
