@@ -5,14 +5,7 @@ import Loading from '@/components/organisms/Loading'
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from '@/components/organisms/AppSidebar'
 import { CacheScopeGuard } from '@/components/organisms/CacheScopeGuard'
-import {
-  ClerkProvider,
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from '@clerk/nextjs'
+import { SignedIn, UserButton } from '@clerk/nextjs'
 import { Geist, Geist_Mono } from 'next/font/google'
 import Image from 'next/image'
 import { useSidebarStore } from '@/stores/sidebarStore'
@@ -35,7 +28,7 @@ export default async function RootLayout({
   // }))
 
   return (
-    <ClerkProvider>
+    <>
       <CacheScopeGuard />
 
       <ClerkLoading>
@@ -71,6 +64,6 @@ export default async function RootLayout({
             </div>
           </SidebarProvider>
       </ClerkLoaded>
-    </ClerkProvider>
+    </>
   );
 }

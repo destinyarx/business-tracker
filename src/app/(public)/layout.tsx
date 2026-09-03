@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import Image from 'next/image'
 import {
-    ClerkProvider,
     SignInButton,
     SignUpButton,
     SignedIn,
@@ -11,7 +10,7 @@ import {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <ClerkProvider>
+    <>
         <header className="fixed top-0 left-0 w-full bg-white shadow-sm z-50 h-16 flex items-center px-4">
             <SignedOut>
             <div className="flex justify-between w-full">
@@ -48,6 +47,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             {children}
             </div>
         </div>
-    </ClerkProvider>
+    </>
   );
 }

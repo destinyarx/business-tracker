@@ -1,6 +1,15 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
-const PUBLIC_URL: string[] = ['/', '/dev(.*)', '/login', '/register', '/waitlist', '/about-us']
+const PUBLIC_URL: string[] = [
+  '/',
+  '/dev(.*)',
+  '/login',
+  '/register',
+  '/waitlist',
+  '/about-us',
+  '/sign-in(.*)',
+  '/sign-up(.*)',
+]
 const isPublicRoute = createRouteMatcher(PUBLIC_URL)
 
 export default clerkMiddleware(async (auth, req) => {
@@ -13,5 +22,6 @@ export const config = {
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
     // Always run for API routes
     '/(api|trpc)(.*)',
+    '/__clerk/:path*',
   ],
 }

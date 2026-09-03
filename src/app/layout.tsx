@@ -1,30 +1,35 @@
-'use client'
-
+import { ClerkProvider } from '@clerk/nextjs'
+import { shadcn } from '@clerk/ui/themes'
 import { Inter } from 'next/font/google'
-import './globals.css';
-import type { ReactNode } from 'react';
+import type { Metadata } from 'next'
+import type { ReactNode } from 'react'
+import './globals.css'
 import { Providers } from './providers'
 import { Toaster } from '@/components/ui/sonner'
 
 const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"], 
-  variable: "--font-roboto",
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-roboto',
 })
+
+export const metadata: Metadata = {
+  title: 'NegosyoTracker | Business management for growing shops',
+  description:
+    'Track customers, orders, products, inventory, sales and expenses from one business workspace.',
+}
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={inter.variable}>
-      <body  className="font-sans" suppressHydrationWarning>
-        <Providers>
-          {children}
-          <Toaster 
-            position="top-right"
-            richColors
-            closeButton
-          />
-        </Providers>
+      <body className="font-sans" suppressHydrationWarning>
+        <ClerkProvider appearance={{ theme: shadcn }}>
+          <Providers>
+            {children}
+            <Toaster position="top-right" richColors closeButton />
+          </Providers>
+        </ClerkProvider>
       </body>
     </html>
-  );
+  )
 }

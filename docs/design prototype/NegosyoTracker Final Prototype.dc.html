@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; font-family: Poppins, system-ui, sans-serif; background: #F4F4F4; color: #203233; -webkit-font-smoothing: antialiased; }
+  a { color: #007F78; text-decoration: none; }
+  a:hover { color: #00BEAA; }
+  input, select, textarea, button { font-family: inherit; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes shimmer { 0% { opacity: .45; } 50% { opacity: 1; } 100% { opacity: .45; } }
+  @keyframes slidein { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; background: #F4F4F4;">
+
+  <div style="position: sticky; top: 0; z-index: 60; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding: 10px 20px; background: #203233; color: #ffffff;">
+    <div style="display: flex; align-items: center; gap: 9px; margin-right: 4px;">
+      <div style="width: 22px; height: 22px; border-radius: 7px; background: #00BEAA;"></div>
+      <span style="font-size: 13px; font-weight: 600; letter-spacing: -0.01em;">NegosyoTracker — redesign mockups</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #8FA3A3; margin-right: 4px;">Marketing</span>
+      <sc-for list="{{ navMarketing }}" as="tab" hint-placeholder-count="2">
+        <button onClick="{{ tab.go }}" style="border: 0; cursor: pointer; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; background: transparent; color: #C9D6D6;" style-hover="background: rgba(255,255,255,.1); color: #ffffff;">{{ tab.label }}</button>
+      </sc-for>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #8FA3A3; margin: 0 4px 0 10px;">App</span>
+      <sc-for list="{{ navApp }}" as="tab" hint-placeholder-count="7">
+        <button onClick="{{ tab.go }}" style="border: 0; cursor: pointer; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; background: transparent; color: #C9D6D6;" style-hover="background: rgba(255,255,255,.1); color: #ffffff;">{{ tab.label }}</button>
+      </sc-for>
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #8FA3A3; margin: 0 4px 0 10px;">Reference</span>
+      <sc-for list="{{ navRef }}" as="tab" hint-placeholder-count="2">
+        <button onClick="{{ tab.go }}" style="border: 0; cursor: pointer; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; background: transparent; color: #C9D6D6;" style-hover="background: rgba(255,255,255,.1); color: #ffffff;">{{ tab.label }}</button>
+      </sc-for>
+    </div>
+    <div style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #00BEAA;">{{ currentLabel }}</div>
+  </div>
+
+  <sc-if value="{{ isLanding }}" hint-placeholder-val="{{ true }}">
+    <div data-screen-label="Landing" style="background: #ffffff;">
+      <header style="position: sticky; top: 44px; z-index: 40; display: flex; align-items: center; gap: 32px; padding: 18px 48px; background: rgba(255,255,255,.92); backdrop-filter: blur(10px); border-bottom: 1px solid #E6E9E9;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 30px; height: 30px; border-radius: 9px; background: #007F78; display: flex; align-items: center; justify-content: center;">
+            <div style="width: 12px; height: 12px; border-radius: 4px; background: #FFDE68;"></div>
+          </div>
+          <span style="font-size: 17px; font-weight: 600; letter-spacing: -0.02em;">NegosyoTracker</span>
+        </div>
+        <nav style="display: flex; gap: 26px; font-size: 14px; font-weight: 500; color: #5A6B6B;">
+          <a href="#features" style="color: #5A6B6B;">Features</a>
+          <a href="#how" style="color: #5A6B6B;">How it works</a>
+          <a href="#pricing" style="color: #5A6B6B;">Pricing</a>
+          <a href="#faq" style="color: #5A6B6B;">FAQ</a>
+        </nav>
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 10px;">
+          <button onClick="{{ goSignin }}" style="cursor: pointer; padding: 9px 18px; border-radius: 999px; border: 1px solid #D3DADA; background: #ffffff; font-size: 13px; font-weight: 500; color: #203233;" style-hover="border-color: #00BEAA; color: #007F78;">Log in</button>
+          <button onClick="{{ goSignin }}" style="cursor: pointer; padding: 9px 20px; border-radius: 999px; border: 0; background: #00BEAA; font-size: 13px; font-weight: 600; color: #ffffff;" style-hover="background: #007F78;">Start free</button>
+        </div>
+      </header>
+
+      <section style="display: grid; grid-template-columns: minmax(320px, 1fr) minmax(340px, 1.05fr); gap: 56px; align-items: center; padding: 84px 48px 72px; max-width: 1400px; margin: 0 auto;">
+        <div>
+          <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; background: #F4F4F4; font-size: 12px; font-weight: 500; color: #007F78; margin-bottom: 22px;">
+            <span style="width: 6px; height: 6px; border-radius: 999px; background: #00BEAA;"></span>
+            Free tier — no credit card
+          </div>
+          <h1 style="margin: 0 0 20px; font-size: 60px; line-height: 1.03; letter-spacing: -0.035em; font-weight: 600; text-wrap: balance;">Your all-in-one business companion</h1>
+          <p style="margin: 0 0 32px; font-size: 18px; line-height: 1.55; color: #5A6B6B; max-width: 46ch; text-wrap: pretty;">Track customers, orders, products, inventory and expenses in one place — built for small and medium businesses that outgrew the notebook.</p>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 36px;">
+            <button onClick="{{ goSignin }}" style="cursor: pointer; padding: 15px 30px; border-radius: 999px; border: 0; background: #00BEAA; color: #ffffff; font-size: 15px; font-weight: 600;" style-hover="background: #007F78;">Get started free</button>
+            <button onClick="{{ goCustomers }}" style="cursor: pointer; padding: 15px 30px; border-radius: 999px; border: 1px solid #D3DADA; background: #ffffff; color: #203233; font-size: 15px; font-weight: 500;" style-hover="border-color: #203233;">See the app</button>
+          </div>
+          <div style="display: flex; gap: 28px; flex-wrap: wrap; font-size: 13px; color: #6B7A7A;">
+            <span>Orders &amp; queue flow</span>
+            <span>Expense reports</span>
+            <span>Stock visibility</span>
+          </div>
+        </div>
+        <div style="position: relative;">
+          <div style="position: absolute; inset: -24px -24px 40px; border-radius: 32px; background: linear-gradient(140deg, #FFDE68 0%, #00BEAA 55%, #007F78 100%); opacity: .5;"></div>
+          <div style="position: relative; border-radius: 20px; overflow: hidden; border: 1px solid #E6E9E9; background: #ffffff; box-shadow: 0 30px 70px -30px rgba(32,50,51,.45);">
+            <div style="display: flex; align-items: center; gap: 6px; padding: 11px 14px; background: #F4F4F4; border-bottom: 1px solid #E6E9E9;">
+              <span style="width: 9px; height: 9px; border-radius: 999px; background: #DC2626;"></span>
+              <span style="width: 9px; height: 9px; border-radius: 999px; background: #FFB018;"></span>
+              <span style="width: 9px; height: 9px; border-radius: 999px; background: #16A34A;"></span>
+              <span style="margin-left: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6B7A7A;">app.negosyotracker.ph/orders</span>
+            </div>
+            <svg viewBox="0 0 600 360" style="display: block; width: 100%; height: auto; background: #ffffff;">
+              <defs>
+                <pattern id="hstripe" width="8" height="8" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+                  <rect width="8" height="8" fill="#F4F4F4"></rect>
+                  <rect width="4" height="8" fill="#EAEDED"></rect>
+                </pattern>
+              </defs>
+              <rect width="600" height="360" fill="url(#hstripe)"></rect>
+              <rect x="0" y="0" width="56" height="360" fill="#007F78"></rect>
+              <text x="328" y="176" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" fill="#6B7A7A">orders screen screenshot</text>
+              <text x="328" y="196" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#8FA3A3">1600 × 960 · drop image here</text>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" style="padding: 72px 48px; background: #F4F4F4;">
+        <div style="max-width: 1400px; margin: 0 auto;">
+          <h2 style="margin: 0 0 10px; font-size: 34px; letter-spacing: -0.03em; font-weight: 600;">Six modules, one workspace</h2>
+          <p style="margin: 0 0 40px; font-size: 16px; color: #5A6B6B;">Every module writes to the same records, so nothing gets typed twice.</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; max-width: 1160px;">
+            <sc-for list="{{ modules }}" as="mod" hint-placeholder-count="6">
+              <div style="position: relative; overflow: hidden; background: #ffffff; border: 1px solid #E6E9E9; border-radius: 20px; padding: 28px 26px 30px; transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease;" style-hover="border-color: #C9E8E4; box-shadow: 0 22px 40px -28px rgba(32,50,51,.55); transform: translateY(-3px);">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px;">
+                  <span style="width: 46px; height: 46px; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; flex: none;">{{ mod.tile }}</span>
+                  <h3 style="margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.02em;">{{ mod.title }}</h3>
+                </div>
+                <p style="margin: 0 0 18px; font-size: 13.5px; line-height: 1.62; color: #6B7A7A; text-wrap: pretty;">{{ mod.body }}</p>
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 500; color: #007F78;">
+                  <span>{{ mod.meta }}</span>
+                  <span style="height: 1px; flex: 1; background: #EFF2F2;"></span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+
+      <section id="how" style="padding: 76px 48px; background: #203233; color: #ffffff;">
+        <div style="max-width: 1400px; margin: 0 auto;">
+          <h2 style="margin: 0 0 44px; font-size: 34px; letter-spacing: -0.03em; font-weight: 600;">Up and running in three steps</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px;">
+            <sc-for list="{{ steps }}" as="step" hint-placeholder-count="3">
+              <div style="border-top: 2px solid #00BEAA; padding-top: 20px;">
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #00BEAA; margin-bottom: 12px;">{{ step.no }}</div>
+                <h3 style="margin: 0 0 10px; font-size: 20px; font-weight: 600;">{{ step.title }}</h3>
+                <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #A9BABA;">{{ step.body }}</p>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+
+      <section id="pricing" style="padding: 76px 48px; background: #ffffff;">
+        <div style="max-width: 1120px; margin: 0 auto;">
+          <h2 style="margin: 0 0 10px; font-size: 34px; letter-spacing: -0.03em; font-weight: 600;">Pricing</h2>
+          <p style="margin: 0 0 40px; font-size: 16px; color: #5A6B6B;">Start free. Upgrade when you want AI insights and automated receipts.</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; align-items: start;">
+            <div style="border: 1px solid #E6E9E9; border-radius: 20px; padding: 30px; background: #ffffff;">
+              <div style="font-size: 13px; font-weight: 600; color: #6B7A7A; letter-spacing: .04em; text-transform: uppercase;">Starter</div>
+              <div style="display: flex; align-items: baseline; gap: 6px; margin: 14px 0 6px;"><span style="font-size: 40px; font-weight: 600; letter-spacing: -0.03em;">₱0</span><span style="font-size: 14px; color: #6B7A7A;">/month</span></div>
+              <p style="margin: 0 0 22px; font-size: 13.5px; color: #6B7A7A;">One shop, one user. Everything you need to stop using a notebook.</p>
+              <sc-for list="{{ planStarter }}" as="f" hint-placeholder-count="4">
+                <div style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 11px;">
+                  <span style="margin-top: 6px; width: 6px; height: 6px; border-radius: 999px; background: #00BEAA; flex: none;"></span>
+                  <span style="font-size: 13.5px; color: #47585A;">{{ f }}</span>
+                </div>
+              </sc-for>
+              <button onClick="{{ goSignin }}" style="margin-top: 22px; width: 100%; cursor: pointer; padding: 13px; border-radius: 999px; border: 1px solid #D3DADA; background: #ffffff; font-size: 14px; font-weight: 600; color: #203233;" style-hover="border-color: #203233;">Create account</button>
+            </div>
+            <div style="border: 1px solid #00BEAA; border-radius: 20px; padding: 30px; background: #F4F4F4; position: relative;">
+              <div style="position: absolute; top: 22px; right: 22px; padding: 5px 12px; border-radius: 999px; background: #00BEAA; color: #ffffff; font-size: 11px; font-weight: 600;">Most popular</div>
+              <div style="font-size: 13px; font-weight: 600; color: #007F78; letter-spacing: .04em; text-transform: uppercase;">Growth</div>
+              <div style="display: flex; align-items: baseline; gap: 6px; margin: 14px 0 6px;"><span style="font-size: 40px; font-weight: 600; letter-spacing: -0.03em;">₱499</span><span style="font-size: 14px; color: #6B7A7A;">/month</span></div>
+              <p style="margin: 0 0 22px; font-size: 13.5px; color: #6B7A7A;">For shops with staff, suppliers and real reporting needs.</p>
+              <sc-for list="{{ planGrowth }}" as="f" hint-placeholder-count="4">
+                <div style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 11px;">
+                  <span style="margin-top: 6px; width: 6px; height: 6px; border-radius: 999px; background: #007F78; flex: none;"></span>
+                  <span style="font-size: 13.5px; color: #47585A;">{{ f }}</span>
+                </div>
+              </sc-for>
+              <button onClick="{{ goSignin }}" style="margin-top: 22px; width: 100%; cursor: pointer; padding: 13px; border-radius: 999px; border: 0; background: #00BEAA; font-size: 14px; font-weight: 600; color: #ffffff;" style-hover="background: #007F78;">Start 14-day trial</button>
+            </div>
+            <div style="border: 1px solid #E6E9E9; border-radius: 20px; padding: 30px; background: #ffffff;">
+              <div style="font-size: 13px; font-weight: 600; color: #6B7A7A; letter-spacing: .04em; text-transform: uppercase;">Premium</div>
+              <div style="display: flex; align-items: baseline; gap: 6px; margin: 14px 0 6px;"><span style="font-size: 40px; font-weight: 600; letter-spacing: -0.03em;">₱999</span><span style="font-size: 14px; color: #6B7A7A;">/month</span></div>
+              <p style="margin: 0 0 22px; font-size: 13.5px; color: #6B7A7A;">NegosyoAI insights, automated receipts and queue management.</p>
+              <sc-for list="{{ planPremium }}" as="f" hint-placeholder-count="4">
+                <div style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 11px;">
+                  <span style="margin-top: 6px; width: 6px; height: 6px; border-radius: 999px; background: #FFB018; flex: none;"></span>
+                  <span style="font-size: 13.5px; color: #47585A;">{{ f }}</span>
+                </div>
+              </sc-for>
+              <button style="margin-top: 22px; width: 100%; cursor: pointer; padding: 13px; border-radius: 999px; border: 1px solid #D3DADA; background: #ffffff; font-size: 14px; font-weight: 600; color: #6B7A7A;">Join the waitlist</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" style="padding: 72px 48px; background: #F4F4F4;">
+        <div style="max-width: 900px; margin: 0 auto;">
+          <h2 style="margin: 0 0 36px; font-size: 34px; letter-spacing: -0.03em; font-weight: 600;">Frequent questions</h2>
+          <sc-for list="{{ faqs }}" as="q" hint-placeholder-count="5">
+            <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 16px; margin-bottom: 12px; overflow: hidden;" style-hover="border-color: #C9E8E4;">
+              <button onClick="{{ q.toggle }}" style="width: 100%; cursor: pointer; border: 0; background: transparent; display: flex; align-items: center; gap: 16px; padding: 20px 24px; text-align: left;">
+                <span style="flex: 1; font-size: 16px; font-weight: 600; color: #203233;">{{ q.q }}</span>
+                <span style="flex: none; width: 28px; height: 28px; border-radius: 999px; background: #F4F4F4; display: inline-flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 500; color: #007F78;">{{ q.sign }}</span>
+              </button>
+              <sc-if value="{{ q.open }}">
+                <p style="margin: 0; padding: 0 24px 22px; font-size: 14px; line-height: 1.62; color: #6B7A7A; text-wrap: pretty; max-width: 68ch;">{{ q.a }}</p>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section style="padding: 52px 48px; background: #007F78; color: #ffffff;">
+        <div style="max-width: 1160px; margin: 0 auto; display: flex; align-items: center; gap: 40px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 280px;">
+            <h2 style="margin: 0 0 10px; font-size: 32px; letter-spacing: -0.03em; font-weight: 600; line-height: 1.12;">Start tracking today</h2>
+            <p style="margin: 0; font-size: 15.5px; line-height: 1.5; color: #BFE7E4; max-width: 52ch;">Free forever on the Starter plan — your first order takes under a minute to record.</p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+            <button onClick="{{ goSignin }}" style="cursor: pointer; white-space: nowrap; padding: 15px 30px; border-radius: 999px; border: 0; background: #FFDE68; color: #203233; font-size: 15px; font-weight: 600;" style-hover="background: #FFB018;">Create your free account</button>
+            <span style="font-size: 12.5px; color: #9FD8D3;">No card required</span>
+          </div>
+        </div>
+      </section>
+
+      <footer style="padding: 34px 48px 28px; background: #203233; color: #8FA3A3;">
+        <div style="max-width: 1160px; margin: 0 auto;">
+          <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,.1);">
+            <div style="display: flex; align-items: center; gap: 9px; color: #ffffff;">
+              <div style="width: 22px; height: 22px; border-radius: 7px; background: #00BEAA;"></div>
+              <span style="font-size: 14px; font-weight: 600;">NegosyoTracker</span>
+            </div>
+            <div style="display: flex; gap: 22px; font-size: 13px; margin-left: auto; flex-wrap: wrap;">
+              <a href="#features" style="color: #8FA3A3;">Features</a>
+              <a href="#how" style="color: #8FA3A3;">How it works</a>
+              <a href="#pricing" style="color: #8FA3A3;">Pricing</a>
+              <a href="#faq" style="color: #8FA3A3;">FAQ</a>
+            </div>
+          </div>
+          <div style="padding-top: 18px; font-size: 12px;">© 2026 NegosyoTracker. Built for Philippine small business.</div>
+        </div>
+      </footer>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isSignin }}">
+    <div data-screen-label="Sign in" style="min-height: calc(100vh - 44px); display: grid; grid-template-columns: 1.05fr .95fr;">
+      <div style="background: #ffffff; display: flex; align-items: center; justify-content: center; padding: 60px 40px;">
+        <div style="width: 100%; max-width: 380px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 40px;">
+            <div style="width: 30px; height: 30px; border-radius: 9px; background: #007F78; display: flex; align-items: center; justify-content: center;">
+              <div style="width: 12px; height: 12px; border-radius: 4px; background: #FFDE68;"></div>
+            </div>
+            <span style="font-size: 16px; font-weight: 600;">NegosyoTracker</span>
+          </div>
+          <h1 style="margin: 0 0 8px; font-size: 30px; letter-spacing: -0.03em; font-weight: 600;">Welcome back</h1>
+          <p style="margin: 0 0 30px; font-size: 14px; color: #6B7A7A;">Sign in to your workspace.</p>
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px;">
+            <button style="cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: 12px; border: 1px solid #D3DADA; background: #ffffff; font-size: 14px; font-weight: 500;" style-hover="border-color: #203233;">
+              <span style="width: 16px; height: 16px; border-radius: 999px; background: #FFB018;"></span>Continue with Google
+            </button>
+            <button style="cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border-radius: 12px; border: 1px solid #D3DADA; background: #ffffff; font-size: 14px; font-weight: 500;" style-hover="border-color: #203233;">
+              <span style="width: 16px; height: 16px; border-radius: 4px; background: #203233;"></span>Continue with Apple
+            </button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 22px;">
+            <span style="height: 1px; flex: 1; background: #E6E9E9;"></span>
+            <span style="font-size: 11px; color: #8FA3A3; letter-spacing: .08em;">OR</span>
+            <span style="height: 1px; flex: 1; background: #E6E9E9;"></span>
+          </div>
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Email address</label>
+          <input value="juan@sarisari.ph" style="width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid #D3DADA; font-size: 14px; margin-bottom: 16px; color: #203233;" />
+          <label style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px;">Password</label>
+          <input type="password" value="password123" style="width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid #D3DADA; font-size: 14px; margin-bottom: 8px;" />
+          <div style="display: flex; justify-content: flex-end; margin-bottom: 22px;"><a href="#reset" style="font-size: 12.5px;">Forgot password?</a></div>
+          <button onClick="{{ goCustomers }}" style="width: 100%; cursor: pointer; padding: 14px; border-radius: 12px; border: 0; background: #00BEAA; color: #ffffff; font-size: 15px; font-weight: 600;" style-hover="background: #007F78;">Sign in</button>
+          <p style="margin: 22px 0 0; font-size: 13px; color: #6B7A7A; text-align: center;">New here? <a href="#register">Create an account</a></p>
+          <p style="margin: 34px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #A3B0B0; text-align: center;">Clerk-hosted — layout only, fields owned by Clerk</p>
+        </div>
+      </div>
+      <div style="background: linear-gradient(160deg, #007F78 0%, #00BEAA 60%, #FFDE68 140%); padding: 60px 48px; display: flex; flex-direction: column; justify-content: flex-end; color: #ffffff;">
+        <div style="font-size: 30px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.2; max-width: 22ch; margin-bottom: 18px;">Everything your shop did yesterday, in one screen today.</div>
+        <p style="margin: 0; font-size: 14.5px; color: rgba(255,255,255,.82); max-width: 40ch;">Orders, stock, customers and expenses stay in sync — no double entry, no lost receipts.</p>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isApp }}">
+    <div data-screen-label="App shell" style="display: flex; min-height: calc(100vh - 44px); background: #F4F4F4;">
+
+      <aside style="width: 76px; flex: none; background: #007F78; display: flex; flex-direction: column; align-items: center; padding: 18px 0 24px; gap: 6px; position: sticky; top: 44px; height: calc(100vh - 44px);">
+        <sc-if value="{{ isCustomers }}">
+          <div style="position: absolute; inset: 0; z-index: -1; background: linear-gradient(165deg, #00BEAA 0%, #009C92 46%, #00655F 100%);"></div>
+        </sc-if>
+        <div style="width: 46px; height: 46px; border-radius: 14px; background: rgba(255,255,255,.14); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; border: 1px solid rgba(255,255,255,.18);">
+          <div style="width: 24px; height: 24px; border-radius: 8px; background: #ffffff; color: #007F78; display: grid; place-items: center; font-size: 14px; font-weight: 700;">N</div>
+        </div>
+        <sc-for list="{{ rail }}" as="item" hint-placeholder-count="10">
+          <button onClick="{{ item.go }}" title="{{ item.label }}" style="position: relative; cursor: pointer; border: 0; width: 54px; height: 50px; border-radius: 15px; background: transparent; display: flex; align-items: center; justify-content: center; color: #ffffff;" style-hover="background: rgba(255,255,255,.14);">
+            {{ item.icon }}
+          </button>
+        </sc-for>
+        <div style="margin-top: auto; width: 34px; height: 34px; border-radius: 999px; background: rgba(255,255,255,.2);"></div>
+      </aside>
+
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+        <header style="display: flex; align-items: center; gap: 20px; padding: 14px 28px; background: #ffffff; border-bottom: 1px solid #E6E9E9; position: sticky; top: 44px; z-index: 30;">
+          <div style="display: flex; align-items: center; gap: 9px;">
+            <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.02em;">NegosyoTracker</span>
+          </div>
+          <div style="flex: 1; max-width: 460px; position: relative;">
+            <input placeholder="Search customers, orders, products…" style="width: 100%; padding: 10px 14px 10px 38px; border-radius: 999px; border: 1px solid #E6E9E9; background: #F4F4F4; font-size: 13.5px;" />
+            <span style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); width: 11px; height: 11px; border: 2px solid #8FA3A3; border-radius: 999px;"></span>
+          </div>
+          <div style="margin-left: auto; display: flex; align-items: center; gap: 16px;">
+            <div style="position: relative; width: 34px; height: 34px; border-radius: 999px; background: #F4F4F4; display: flex; align-items: center; justify-content: center;">
+              <span style="width: 12px; height: 12px; border: 2px solid #47585A; border-radius: 4px 4px 6px 6px;"></span>
+              <span style="position: absolute; top: 7px; right: 8px; width: 7px; height: 7px; border-radius: 999px; background: #FFB018; border: 1.5px solid #ffffff;"></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; padding-left: 16px; border-left: 1px solid #E6E9E9;">
+              <div style="width: 34px; height: 34px; border-radius: 999px; background: #007F78; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600;">JD</div>
+              <div style="line-height: 1.25;">
+                <div style="font-size: 13px; font-weight: 600;">Juan Dela Cruz</div>
+                <div style="font-size: 11px; color: #8FA3A3;">Sari-sari owner</div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main style="flex: 1; padding: 26px 28px 60px;">
+
+          <sc-if value="{{ isCustomers }}">
+            <div data-screen-label="Customers">
+              <div style="display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 22px;">
+                <div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8FA3A3; margin-bottom: 8px;">Workspace / Customers</div>
+                  <h1 style="margin: 0; font-size: 30px; letter-spacing: -0.03em; font-weight: 600;">Customers</h1>
+                </div>
+                <button onClick="{{ openCustomerForm }}" style="margin-left: auto; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 12px; border: 0; background: #00BEAA; color: #ffffff; font-size: 14px; font-weight: 600;" style-hover="background: #007F78;">
+                  <span style="font-size: 16px; line-height: 1;">+</span>Add customer
+                </button>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 22px;">
+                <sc-for list="{{ customerKpis }}" as="k" hint-placeholder-count="4">
+                  <div style="position: relative; overflow: hidden; background: #ffffff; border: 1px solid #E6E9E9; border-radius: 16px; padding: 18px 20px 16px; transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease;" style-hover="border-color: #C9E8E4; box-shadow: 0 14px 28px -20px rgba(32,50,51,.5); transform: translateY(-2px);">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px;">{{ k.accentBar }}</div>
+                    <div style="display: flex; align-items: center; gap: 9px; margin-bottom: 14px;">
+                      <span style="width: 26px; height: 26px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center;">{{ k.tile }}</span>
+                      <span style="font-size: 12px; font-weight: 500; color: #6B7A7A;">{{ k.label }}</span>
+                    </div>
+                    <div style="display: flex; align-items: flex-end; gap: 9px;">
+                      <div style="font-size: 30px; font-weight: 600; letter-spacing: -0.03em; line-height: 1;">{{ k.value }}</div>
+                      <div style="padding-bottom: 2px;">{{ k.deltaChip }}</div>
+                    </div>
+                    <div style="font-size: 11.5px; color: #A3B0B0; margin-top: 9px;">{{ k.hint }}</div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 18px; overflow: hidden;">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 16px 20px; border-bottom: 1px solid #E6E9E9;">
+                  <div style="position: relative; flex: 1; min-width: 220px; max-width: 320px;">
+                    <input placeholder="Search name, type or notes…" style="width: 100%; padding: 9px 12px 9px 34px; border-radius: 10px; border: 1px solid #E6E9E9; background: #F4F4F4; font-size: 13px;" />
+                    <span style="position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border: 2px solid #8FA3A3; border-radius: 999px;"></span>
+                  </div>
+                  <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <sc-for list="{{ customerTypes }}" as="t" hint-placeholder-count="6">
+                      <button style="cursor: pointer; padding: 8px 14px; border-radius: 999px; border: 1px solid #E6E9E9; background: #ffffff; font-size: 12.5px; font-weight: 500; color: #47585A;" style-hover="border-color: #00BEAA; color: #007F78;">{{ t }}</button>
+                    </sc-for>
+                  </div>
+                  <div style="margin-left: auto; font-size: 12px; color: #8FA3A3;">6 records</div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                  <table style="width: 100%; border-collapse: collapse; min-width: 880px;">
+                    <thead>
+                      <tr style="background: #FAFBFB;">
+                        <th style="text-align: left; padding: 13px 20px; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Name</th>
+                        <th style="text-align: left; padding: 13px 20px; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Date added</th>
+                        <th style="text-align: left; padding: 13px 20px; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Contact number</th>
+                        <th style="text-align: left; padding: 13px 20px; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Type</th>
+                        <th style="text-align: left; padding: 13px 20px; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Notes</th>
+                        <th style="text-align: right; padding: 13px 20px; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <sc-for list="{{ customers }}" as="c" hint-placeholder-count="6">
+                        <tr onClick="{{ c.open }}" style="cursor: pointer; border-bottom: 1px solid #F0F2F2;" style-hover="background: #F7FAFA;">
+                          <td style="padding: 16px 20px; font-size: 14px; font-weight: 500;">{{ c.name }}</td>
+                          <td style="padding: 16px 20px; font-size: 13px; color: #6B7A7A;">{{ c.createdAt }}</td>
+                          <td style="padding: 16px 20px; font-size: 13px; color: #47585A; font-family: 'IBM Plex Mono', monospace;">{{ c.phone }}</td>
+                          <td style="padding: 16px 20px;">{{ c.badge }}</td>
+                          <td style="padding: 16px 20px; font-size: 12.5px; color: #8FA3A3; font-style: italic; max-width: 280px;">{{ c.notes }}</td>
+                          <td style="padding: 16px 20px; text-align: right;">
+                            <div style="display: inline-flex; gap: 6px;">
+                              <span style="width: 30px; height: 30px; border-radius: 9px; background: #F4F4F4; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; color: #47585A;">✎</span>
+                              <span style="width: 30px; height: 30px; border-radius: 9px; background: #FDECEC; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; color: #DC2626;">✕</span>
+                            </div>
+                          </td>
+                        </tr>
+                      </sc-for>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; border-top: 1px solid #E6E9E9; background: #FAFBFB;">
+                  <div style="font-size: 12.5px; color: #6B7A7A;">Showing 1 to 6 of 6 customers</div>
+                  <div style="display: flex; gap: 8px;">
+                    <button style="cursor: not-allowed; padding: 8px 14px; border-radius: 10px; border: 1px solid #E6E9E9; background: #ffffff; font-size: 12.5px; color: #B4C0C0;">Previous</button>
+                    <button style="cursor: pointer; padding: 8px 14px; border-radius: 10px; border: 0; background: #203233; color: #ffffff; font-size: 12.5px; font-weight: 500;" style-hover="background: #007F78;">Next</button>
+                  </div>
+                </div>
+              </div>
+              <p style="margin: 14px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #A3B0B0;">Columns match CustomerTable.tsx exactly: name · createdAt · phone · customerType · notes · actions</p>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isOrders }}">
+            <div data-screen-label="Orders">
+              <div style="display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 22px;">
+                <div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8FA3A3; margin-bottom: 8px;">Workspace / Orders</div>
+                  <h1 style="margin: 0; font-size: 30px; letter-spacing: -0.03em; font-weight: 600;">Orders</h1>
+                </div>
+                <button onClick="{{ goOrderNew }}" style="margin-left: auto; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 12px; border: 0; background: #00BEAA; color: #ffffff; font-size: 14px; font-weight: 600;" style-hover="background: #007F78;">
+                  <span style="font-size: 16px; line-height: 1;">+</span>Create order
+                </button>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 18px;">
+                <div style="position: relative; min-width: 240px;">
+                  <input placeholder="Search orders…" style="width: 100%; padding: 10px 12px 10px 34px; border-radius: 10px; border: 1px solid #E6E9E9; background: #ffffff; font-size: 13px;" />
+                  <span style="position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border: 2px solid #8FA3A3; border-radius: 999px;"></span>
+                </div>
+                <div style="display: flex; gap: 6px; padding: 4px; background: #ffffff; border: 1px solid #E6E9E9; border-radius: 12px;">
+                  <sc-for list="{{ orderStatusTabs }}" as="s" hint-placeholder-count="5">
+                    <button style="cursor: pointer; padding: 8px 14px; border-radius: 9px; border: 0; background: transparent; font-size: 12.5px; font-weight: 500; color: #47585A;" style-hover="background: #F4F4F4;">{{ s.label }}</button>
+                  </sc-for>
+                </div>
+                <button style="cursor: pointer; padding: 10px 14px; border-radius: 10px; border: 1px solid #E6E9E9; background: #ffffff; font-size: 12.5px; color: #47585A;">Newest first</button>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px;">
+                <sc-for list="{{ orders }}" as="o" hint-placeholder-count="6">
+                  <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 18px; overflow: hidden; display: flex; flex-direction: column;">
+                    <div style="padding: 18px 20px 14px; border-bottom: 1px solid #F0F2F2;">
+                      <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px;">
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 8px; border-radius: 7px; background: #F4F4F4; color: #47585A;">{{ o.ref }}</span>
+                        <div style="font-size: 15px; font-weight: 600; line-height: 1.3;">{{ o.orderName }}</div>
+                        <div style="margin-left: auto;">{{ o.statusBadge }}</div>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #6B7A7A;">
+                        <span style="width: 18px; height: 18px; border-radius: 999px; background: #E8F7F5; display: inline-block;"></span>
+                        <span>{{ o.customer }}</span>
+                        <span style="margin-left: auto; font-size: 11.5px; color: #A3B0B0;">{{ o.createdAt }}</span>
+                      </div>
+                    </div>
+                    <div style="padding: 12px 20px; flex: 1; max-height: 172px; overflow-y: auto;">
+                      <sc-for list="{{ o.items }}" as="li" hint-placeholder-count="2">
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: 13px; border-bottom: 1px dashed #F0F2F2;">
+                          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #007F78; min-width: 26px;">{{ li.qty }}</span>
+                          <span style="flex: 1; color: #203233;">{{ li.title }}</span>
+                          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B7A7A;">{{ li.price }}</span>
+                          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; font-weight: 500; min-width: 72px; text-align: right;">{{ li.total }}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <div style="padding: 14px 20px; background: #FAFBFB; border-top: 1px solid #F0F2F2;">
+                      <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px;">
+                        <span style="font-size: 12.5px; color: #6B7A7A;">Total amount</span>
+                        <span style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">{{ o.total }}</span>
+                      </div>
+                      <div style="display: flex; gap: 8px;">
+                        <button style="flex: 1; cursor: pointer; padding: 9px; border-radius: 10px; border: 1px solid #E6E9E9; background: #ffffff; font-size: 12.5px; font-weight: 500; color: #47585A;" style-hover="border-color: #203233;">Edit</button>
+                        <button style="flex: 1.4; cursor: pointer; padding: 9px; border-radius: 10px; border: 0; background: #203233; color: #ffffff; font-size: 12.5px; font-weight: 500;" style-hover="background: #007F78;">Update status</button>
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <p style="margin: 16px 0 0; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #A3B0B0;">Status enum: pending · in_progress · completed · cancelled · failed — colors kept from constants.tsx</p>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isOrderNew }}">
+            <div data-screen-label="Order builder">
+              <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 22px;">
+                <button onClick="{{ goOrders }}" style="cursor: pointer; width: 38px; height: 38px; border-radius: 11px; border: 1px solid #E6E9E9; background: #ffffff; font-size: 15px; color: #47585A;" style-hover="border-color: #203233;">←</button>
+                <div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8FA3A3; margin-bottom: 6px;">Orders / New order</div>
+                  <h1 style="margin: 0; font-size: 28px; letter-spacing: -0.03em; font-weight: 600;">Build an order</h1>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(320px, .95fr); gap: 20px; align-items: start;">
+                <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 18px; padding: 20px;">
+                  <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;">
+                    <div style="position: relative; flex: 1; min-width: 200px;">
+                      <input placeholder="Search products in stock…" style="width: 100%; padding: 10px 12px 10px 34px; border-radius: 10px; border: 1px solid #E6E9E9; background: #F4F4F4; font-size: 13px;" />
+                      <span style="position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border: 2px solid #8FA3A3; border-radius: 999px;"></span>
+                    </div>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                      <sc-for list="{{ pickerCategories }}" as="cat" hint-placeholder-count="4">
+                        <button style="cursor: pointer; padding: 8px 13px; border-radius: 999px; border: 1px solid #E6E9E9; background: #ffffff; font-size: 12px; color: #47585A;" style-hover="border-color: #00BEAA; color: #007F78;">{{ cat }}</button>
+                      </sc-for>
+                    </div>
+                  </div>
+                  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px;">
+                    <sc-for list="{{ pickerProducts }}" as="p" hint-placeholder-count="8">
+                      <button onClick="{{ p.add }}" style="text-align: left; cursor: pointer; border: 1px solid #E6E9E9; background: #ffffff; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 9px;" style-hover="border-color: #00BEAA; background: #F7FDFC;">
+                        <svg viewBox="0 0 120 68" style="width: 100%; height: auto; border-radius: 9px; display: block;">
+                          <rect width="120" height="68" fill="#F4F4F4"></rect>
+                          <rect x="0" y="0" width="120" height="68" fill="url(#hstripe2)"></rect>
+                          <defs>
+                            <pattern id="hstripe2" width="6" height="6" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+                              <rect width="6" height="6" fill="#F4F4F4"></rect>
+                              <rect width="3" height="6" fill="#EAEDED"></rect>
+                            </pattern>
+                          </defs>
+                          <text x="60" y="38" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="7" fill="#98A5A5">product photo</text>
+                        </svg>
+                        <span style="font-size: 13px; font-weight: 500; line-height: 1.3;">{{ p.title }}</span>
+                        <span style="display: flex; align-items: center; gap: 8px;">
+                          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #007F78; font-weight: 500;">{{ p.price }}</span>
+                          <span style="font-size: 11px; color: #8FA3A3; margin-left: auto;">{{ p.stockLabel }}</span>
+                        </span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </div>
+
+                <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 18px; overflow: hidden; position: sticky; top: 118px;">
+                  <div style="padding: 18px 20px; border-bottom: 1px solid #E6E9E9;">
+                    <h2 style="margin: 0 0 4px; font-size: 16px; font-weight: 600;">Order details</h2>
+                    <p style="margin: 0; font-size: 12px; color: #8FA3A3;">Order name or customer is required.</p>
+                  </div>
+                  <div style="padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; border-bottom: 1px solid #E6E9E9;">
+                    <div>
+                      <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Order name</label>
+                      <input placeholder="e.g. Aling Nena — Friday delivery" style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13px;" />
+                    </div>
+                    <div>
+                      <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Customer <span style="color: #8FA3A3; font-weight: 400;">— optional (guest allowed)</span></label>
+                      <select style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13px; background: #ffffff;">
+                        <option>Select customer</option>
+                        <option>Nena Ramirez</option>
+                        <option>Mario Bautista</option>
+                        <option>Grace Villanueva</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Notes</label>
+                      <textarea rows="2" placeholder="Add notes or remarks here…" style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13px; resize: none;"></textarea>
+                    </div>
+                  </div>
+                  <div style="padding: 14px 20px; max-height: 260px; overflow-y: auto;">
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #8FA3A3; margin-bottom: 10px;">Cart</div>
+                    <sc-for list="{{ cart }}" as="c" hint-placeholder-count="3">
+                      <div style="display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid #F4F4F4;">
+                        <div style="flex: 1; min-width: 0;">
+                          <div style="font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ c.title }}</div>
+                          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #8FA3A3;">{{ c.price }}</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                          <button onClick="{{ c.dec }}" style="cursor: pointer; width: 26px; height: 26px; border-radius: 8px; border: 1px solid #E6E9E9; background: #ffffff; font-size: 13px;" style-hover="border-color: #203233;">−</button>
+                          <span style="min-width: 22px; text-align: center; font-size: 13px; font-weight: 600;">{{ c.qty }}</span>
+                          <button onClick="{{ c.inc }}" style="cursor: pointer; width: 26px; height: 26px; border-radius: 8px; border: 1px solid #E6E9E9; background: #ffffff; font-size: 13px;" style-hover="border-color: #203233;">+</button>
+                        </div>
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; font-weight: 500; min-width: 68px; text-align: right;">{{ c.lineTotal }}</span>
+                      </div>
+                    </sc-for>
+                    <sc-if value="{{ cartEmpty }}">
+                      <div style="padding: 20px 0; text-align: center; font-size: 12.5px; color: #A3B0B0;">Tap a product to add it here.</div>
+                    </sc-if>
+                  </div>
+                  <div style="padding: 16px 20px; background: #FAFBFB; border-top: 1px solid #E6E9E9;">
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; color: #6B7A7A; margin-bottom: 6px;"><span>Items</span><span>{{ cartCount }}</span></div>
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px;"><span style="font-size: 13px; color: #6B7A7A;">Total amount</span><span style="font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">{{ cartTotal }}</span></div>
+                    <button onClick="{{ placeOrder }}" style="width: 100%; cursor: pointer; padding: 13px; border-radius: 12px; border: 0; background: #00BEAA; color: #ffffff; font-size: 14px; font-weight: 600;" style-hover="background: #007F78;">Place order — status pending</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isProducts }}">
+            <div data-screen-label="Products">
+              <div style="display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 22px;">
+                <div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8FA3A3; margin-bottom: 8px;">Workspace / Products</div>
+                  <h1 style="margin: 0; font-size: 30px; letter-spacing: -0.03em; font-weight: 600;">Products</h1>
+                </div>
+                <button onClick="{{ goProductForm }}" style="margin-left: auto; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 12px; border: 0; background: #00BEAA; color: #ffffff; font-size: 14px; font-weight: 600;" style-hover="background: #007F78;">
+                  <span style="font-size: 16px; line-height: 1;">+</span>Add product
+                </button>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px;">
+                <sc-for list="{{ products }}" as="p" hint-placeholder-count="8">
+                  <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 18px; overflow: hidden; display: flex; flex-direction: column;">
+                    <svg viewBox="0 0 240 140" style="width: 100%; height: auto; display: block;">
+                      <rect width="240" height="140" fill="#F4F4F4"></rect>
+                      <rect width="240" height="140" fill="url(#pstripe)"></rect>
+                      <defs>
+                        <pattern id="pstripe" width="8" height="8" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+                          <rect width="8" height="8" fill="#F4F4F4"></rect>
+                          <rect width="4" height="8" fill="#EAEDED"></rect>
+                        </pattern>
+                      </defs>
+                      <text x="120" y="74" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" fill="#98A5A5">product photo · 4:3</text>
+                    </svg>
+                    <div style="padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 10px; flex: 1;">
+                      <div style="display: flex; align-items: flex-start; gap: 8px;">
+                        <span style="font-size: 14.5px; font-weight: 600; line-height: 1.3;">{{ p.title }}</span>
+                        <span style="margin-left: auto;">{{ p.stockBadge }}</span>
+                      </div>
+                      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #A3B0B0;">{{ p.sku }}</div>
+                      <div style="display: flex; align-items: baseline; gap: 8px;">
+                        <span style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">{{ p.price }}</span>
+                        <span style="font-size: 11.5px; color: #007F78;">{{ p.margin }}</span>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: #6B7A7A; margin-top: auto;">
+                        <span style="padding: 4px 9px; border-radius: 999px; background: #F4F4F4;">{{ p.category }}</span>
+                        <span>{{ p.supplier }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isProductForm }}">
+            <div data-screen-label="Product form" style="position: fixed; inset: 0; z-index: 70; display: flex; justify-content: flex-end; background: rgba(32,50,51,.35);">
+              <div onClick="{{ closeProductForm }}" style="flex: 1;"></div>
+              <div style="width: min(680px, 96vw); height: 100%; overflow-y: auto; background: #F4F4F4; border-left: 1px solid #E6E9E9; animation: slidein .22s ease-out;">
+                <div style="position: sticky; top: 0; z-index: 2; display: flex; align-items: flex-start; gap: 12px; padding: 20px 24px; background: #ffffff; border-bottom: 1px solid #E6E9E9;">
+                  <div>
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8FA3A3; margin-bottom: 6px;">Products / New product</div>
+                    <h1 style="margin: 0; font-size: 22px; letter-spacing: -0.02em; font-weight: 600;">Add product</h1>
+                  </div>
+                  <button onClick="{{ closeProductForm }}" style="margin-left: auto; cursor: pointer; width: 34px; height: 34px; border-radius: 10px; border: 1px solid #E6E9E9; background: #ffffff; font-size: 14px; color: #47585A;" style-hover="border-color: #203233;">✕</button>
+                </div>
+                <div style="padding: 20px 24px 32px;">
+                  <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 18px; padding: 24px;">
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #8FA3A3; margin-bottom: 16px;">Basics</div>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 22px;">
+                    <div style="grid-column: 1 / -1;">
+                      <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Title <span style="color: #DC2626;">*</span></label>
+                      <input value="Kopiko Black 3-in-1 (10s)" style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px;" />
+                    </div>
+                    <div style="grid-column: 1 / -1;">
+                      <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Description</label>
+                      <textarea rows="3" style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px; resize: vertical;">Instant coffee sachets, retail pack of 10.</textarea>
+                    </div>
+                    <div>
+                      <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">SKU</label>
+                      <input value="KOP-BLK-10" style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px; font-family: 'IBM Plex Mono', monospace;" />
+                    </div>
+                    <div>
+                      <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Barcode</label>
+                      <input value="4800016641107" style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px; font-family: 'IBM Plex Mono', monospace;" />
+                    </div>
+                    <div>
+                      <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Category</label>
+                      <select style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px; background: #ffffff;">
+                        <option>Beverages</option>
+                        <option>Groceries</option>
+                        <option>Snacks</option>
+                        <option>Packaged Food</option>
+                        <option>Others</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Supplier</label>
+                      <input value="Puregold Wholesale" style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px;" />
+                    </div>
+                  </div>
+
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #8FA3A3; margin-bottom: 16px;">Pricing &amp; stock</div>
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px;">
+                    <div>
+                      <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Price <span style="color: #DC2626;">*</span></label>
+                      <div style="display: flex; align-items: center; border: 1px solid #D3DADA; border-radius: 10px; overflow: hidden;">
+                        <span style="padding: 11px 12px; background: #F4F4F4; font-size: 13px; color: #6B7A7A;">₱</span>
+                        <input value="78.00" style="flex: 1; min-width: 0; padding: 11px 12px; border: 0; font-size: 13.5px; font-family: 'IBM Plex Mono', monospace;" />
+                      </div>
+                    </div>
+                    <div>
+                      <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Stock <span style="color: #DC2626;">*</span></label>
+                      <input value="48" style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px; font-family: 'IBM Plex Mono', monospace;" />
+                    </div>
+                    <div>
+                      <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Profit %</label>
+                      <input value="22" style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px; font-family: 'IBM Plex Mono', monospace;" />
+                    </div>
+                    <div>
+                      <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Profit <span style="color: #8FA3A3; font-weight: 400;">— computed</span></label>
+                      <input value="₱ 17.16" readonly="readonly" style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #E6E9E9; background: #F4F4F4; font-size: 13.5px; font-family: 'IBM Plex Mono', monospace; color: #6B7A7A;" />
+                    </div>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 12px; margin: 28px 0 16px;">
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #8FA3A3;">Image</span>
+                    <span style="height: 1px; flex: 1; background: #F0F2F2;"></span>
+                    <div style="display: flex; gap: 6px; padding: 4px; background: #F4F4F4; border-radius: 11px;">
+                      <button style="cursor: pointer; padding: 7px 16px; border-radius: 8px; border: 0; background: #ffffff; font-size: 12.5px; font-weight: 600; color: #203233; white-space: nowrap;">Upload</button>
+                      <button style="cursor: pointer; padding: 7px 16px; border-radius: 8px; border: 0; background: transparent; font-size: 12.5px; font-weight: 500; color: #6B7A7A; white-space: nowrap;">From URL</button>
+                    </div>
+                  </div>
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; align-items: stretch;">
+                    <div style="border: 1.5px dashed #C3D0D0; border-radius: 14px; padding: 22px 18px; text-align: center; background: #FAFBFB;">
+                      <div style="width: 38px; height: 38px; border-radius: 11px; background: #E8F7F5; margin: 0 auto 12px;"></div>
+                      <div style="font-size: 13px; font-weight: 500; margin-bottom: 4px;">Drop an image here</div>
+                      <div style="font-size: 11.5px; color: #8FA3A3;">PNG or JPG · up to 2 MB</div>
+                    </div>
+                    <div style="padding: 16px 18px; border-radius: 14px; background: #FFF9E6;">
+                      <div style="font-size: 12px; font-weight: 600; color: #8A6100; margin-bottom: 5px;">imageSource stays intact</div>
+                      <div style="font-size: 11.5px; color: #8A6100; line-height: 1.55;">Upload sets <span style="font-family: 'IBM Plex Mono', monospace;">imageSource: 'upload'</span> + imageUrl from Supabase; URL mode sets <span style="font-family: 'IBM Plex Mono', monospace;">'url'</span>. No new fields.</div>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 26px; padding-top: 20px; border-top: 1px solid #F0F2F2;">
+                    <button onClick="{{ goProducts }}" style="cursor: pointer; padding: 12px 22px; border-radius: 11px; border: 1px solid #D3DADA; background: #ffffff; font-size: 13.5px; font-weight: 500;" style-hover="border-color: #203233;">Cancel</button>
+                    <button onClick="{{ fireToast }}" style="cursor: pointer; padding: 12px 26px; border-radius: 11px; border: 0; background: #00BEAA; color: #ffffff; font-size: 13.5px; font-weight: 600;" style-hover="background: #007F78;">Save product</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isInventory }}">
+            <div data-screen-label="Inventory">
+              <div style="margin-bottom: 22px;">
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8FA3A3; margin-bottom: 8px;">Workspace / Inventory</div>
+                <h1 style="margin: 0 0 8px; font-size: 30px; letter-spacing: -0.03em; font-weight: 600;">Inventory</h1>
+                <p style="margin: 0; font-size: 13.5px; color: #6B7A7A;">Derived view — reads <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">product.stock</span> and completed order items. No new persisted fields.</p>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 22px;">
+                <sc-for list="{{ inventoryKpis }}" as="k" hint-placeholder-count="4">
+                  <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 16px; padding: 18px 20px;">
+                    <div style="font-size: 12px; color: #6B7A7A; margin-bottom: 10px;">{{ k.label }}</div>
+                    <div style="font-size: 26px; font-weight: 600; letter-spacing: -0.02em;">{{ k.value }}</div>
+                    <div style="font-size: 11.5px; color: #8FA3A3; margin-top: 4px;">{{ k.hint }}</div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr); gap: 20px; align-items: start;">
+                <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 18px; overflow: hidden;">
+                  <div style="padding: 16px 20px; border-bottom: 1px solid #E6E9E9; font-size: 15px; font-weight: 600;">Stock on hand</div>
+                  <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; min-width: 620px;">
+                      <thead>
+                        <tr style="background: #FAFBFB;">
+                          <th style="text-align: left; padding: 12px 20px; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Product</th>
+                          <th style="text-align: left; padding: 12px 20px; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">SKU</th>
+                          <th style="text-align: left; padding: 12px 20px; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Supplier</th>
+                          <th style="text-align: right; padding: 12px 20px; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Stock</th>
+                          <th style="text-align: right; padding: 12px 20px; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Stock value</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <sc-for list="{{ inventoryRows }}" as="r" hint-placeholder-count="8">
+                          <tr style="border-bottom: 1px solid #F0F2F2;" style-hover="background: #F7FAFA;">
+                            <td style="padding: 14px 20px; font-size: 13.5px; font-weight: 500;">{{ r.title }}</td>
+                            <td style="padding: 14px 20px; font-size: 12px; color: #8FA3A3; font-family: 'IBM Plex Mono', monospace;">{{ r.sku }}</td>
+                            <td style="padding: 14px 20px; font-size: 12.5px; color: #6B7A7A;">{{ r.supplier }}</td>
+                            <td style="padding: 14px 20px; text-align: right;">{{ r.stockBadge }}</td>
+                            <td style="padding: 14px 20px; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 13px;">{{ r.value }}</td>
+                          </tr>
+                        </sc-for>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 18px; overflow: hidden;">
+                  <div style="padding: 16px 20px; border-bottom: 1px solid #E6E9E9; font-size: 15px; font-weight: 600;">Stock movement</div>
+                  <div style="padding: 8px 20px 18px;">
+                    <sc-for list="{{ movements }}" as="m" hint-placeholder-count="6">
+                      <div style="display: flex; gap: 12px; padding: 13px 0; border-bottom: 1px solid #F4F4F4;">
+                        <span style="margin-top: 5px; width: 8px; height: 8px; border-radius: 999px; background: #00BEAA; flex: none;"></span>
+                        <div style="flex: 1; min-width: 0;">
+                          <div style="font-size: 13px; font-weight: 500;">{{ m.title }}</div>
+                          <div style="font-size: 11.5px; color: #8FA3A3;">{{ m.meta }}</div>
+                        </div>
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500;">{{ m.delta }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isExpenses }}">
+            <div data-screen-label="Expenses">
+              <div style="display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 22px;">
+                <div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8FA3A3; margin-bottom: 8px;">Workspace / Expenses</div>
+                  <h1 style="margin: 0; font-size: 30px; letter-spacing: -0.03em; font-weight: 600;">Expenses</h1>
+                </div>
+                <button onClick="{{ goExpenseForm }}" style="margin-left: auto; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 12px; border: 0; background: #00BEAA; color: #ffffff; font-size: 14px; font-weight: 600;" style-hover="background: #007F78;">
+                  <span style="font-size: 16px; line-height: 1;">+</span>Add expense
+                </button>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 22px;">
+                <sc-for list="{{ expenseKpis }}" as="k" hint-placeholder-count="4">
+                  <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 16px; padding: 18px 20px;">
+                    <div style="font-size: 12px; color: #6B7A7A; margin-bottom: 10px;">{{ k.label }}</div>
+                    <div style="font-size: 26px; font-weight: 600; letter-spacing: -0.02em;">{{ k.value }}</div>
+                    <div style="font-size: 11.5px; color: #8FA3A3; margin-top: 4px;">{{ k.hint }}</div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 18px; overflow: hidden;">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 16px 20px; border-bottom: 1px solid #E6E9E9;">
+                  <div style="position: relative; flex: 1; min-width: 200px; max-width: 280px;">
+                    <input placeholder="Search expenses…" style="width: 100%; padding: 9px 12px 9px 34px; border-radius: 10px; border: 1px solid #E6E9E9; background: #F4F4F4; font-size: 13px;" />
+                    <span style="position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; border: 2px solid #8FA3A3; border-radius: 999px;"></span>
+                  </div>
+                  <select style="padding: 9px 12px; border-radius: 10px; border: 1px solid #E6E9E9; background: #ffffff; font-size: 12.5px;">
+                    <option>Category</option>
+                    <option>Rent</option>
+                    <option>Utilities</option>
+                    <option>Supplies</option>
+                    <option>Inventory</option>
+                    <option>Shipping</option>
+                    <option>Marketing</option>
+                    <option>Other</option>
+                  </select>
+                  <select style="padding: 9px 12px; border-radius: 10px; border: 1px solid #E6E9E9; background: #ffffff; font-size: 12.5px;">
+                    <option>Payment method</option>
+                    <option>Cash</option>
+                    <option>Gcash</option>
+                    <option>Maya</option>
+                    <option>Bank Transfer</option>
+                    <option>Credit Card</option>
+                    <option>Loan</option>
+                  </select>
+                  <select style="padding: 9px 12px; border-radius: 10px; border: 1px solid #E6E9E9; background: #ffffff; font-size: 12.5px;">
+                    <option>Time period</option>
+                    <option>Today</option>
+                    <option>Yesterday</option>
+                    <option>Last 7 days</option>
+                    <option>This Month</option>
+                  </select>
+                  <button style="cursor: pointer; width: 36px; height: 36px; border-radius: 10px; border: 1px solid #E6E9E9; background: #ffffff; color: #47585A; font-size: 14px;" style-hover="border-color: #00BEAA; color: #007F78;">↻</button>
+                </div>
+
+                <div style="overflow-x: auto;">
+                  <table style="width: 100%; border-collapse: collapse; min-width: 900px;">
+                    <thead>
+                      <tr style="background: #FAFBFB;">
+                        <th style="text-align: left; padding: 13px 20px; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Name</th>
+                        <th style="text-align: left; padding: 13px 20px; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Date</th>
+                        <th style="text-align: left; padding: 13px 20px; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Category</th>
+                        <th style="text-align: right; padding: 13px 20px; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Amount</th>
+                        <th style="text-align: left; padding: 13px 20px; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Method</th>
+                        <th style="text-align: left; padding: 13px 20px; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Description</th>
+                        <th style="text-align: right; padding: 13px 20px; font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <sc-for list="{{ expenses }}" as="e" hint-placeholder-count="7">
+                        <tr style="border-bottom: 1px solid #F0F2F2;" style-hover="background: #F7FAFA;">
+                          <td style="padding: 15px 20px; font-size: 13.5px; font-weight: 500;">{{ e.title }}</td>
+                          <td style="padding: 15px 20px; font-size: 12.5px; color: #6B7A7A;">{{ e.date }}</td>
+                          <td style="padding: 15px 20px;">{{ e.categoryChip }}</td>
+                          <td style="padding: 15px 20px; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; font-weight: 500;">{{ e.amount }}</td>
+                          <td style="padding: 15px 20px; font-size: 12.5px; color: #6B7A7A;">{{ e.method }}</td>
+                          <td style="padding: 15px 20px; font-size: 12.5px; color: #8FA3A3; font-style: italic; max-width: 260px;">{{ e.description }}</td>
+                          <td style="padding: 15px 20px; text-align: right;">
+                            <div style="display: inline-flex; gap: 6px;">
+                              <span style="width: 30px; height: 30px; border-radius: 9px; background: #F4F4F4; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; color: #47585A;">◉</span>
+                              <span style="width: 30px; height: 30px; border-radius: 9px; background: #F4F4F4; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; color: #47585A;">✎</span>
+                              <span style="width: 30px; height: 30px; border-radius: 9px; background: #FDECEC; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; color: #DC2626;">✕</span>
+                            </div>
+                          </td>
+                        </tr>
+                      </sc-for>
+                    </tbody>
+                  </table>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid #E6E9E9; background: #FAFBFB;">
+                  <div style="font-size: 12.5px; color: #6B7A7A;">Page 1 · server-paginated (limit 10)</div>
+                  <div style="display: flex; gap: 8px;">
+                    <button style="cursor: not-allowed; padding: 8px 14px; border-radius: 10px; border: 1px solid #E6E9E9; background: #ffffff; font-size: 12.5px; color: #B4C0C0;">Previous</button>
+                    <button style="cursor: pointer; padding: 8px 14px; border-radius: 10px; border: 0; background: #203233; color: #ffffff; font-size: 12.5px; font-weight: 500;" style-hover="background: #007F78;">Next</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isExpenseForm }}">
+            <div data-screen-label="Expense form">
+              <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 22px;">
+                <button onClick="{{ goExpenses }}" style="cursor: pointer; width: 38px; height: 38px; border-radius: 11px; border: 1px solid #E6E9E9; background: #ffffff; font-size: 15px; color: #47585A;" style-hover="border-color: #203233;">←</button>
+                <div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #8FA3A3; margin-bottom: 6px;">Expenses / New expense</div>
+                  <h1 style="margin: 0; font-size: 28px; letter-spacing: -0.03em; font-weight: 600;">Record an expense</h1>
+                </div>
+              </div>
+              <div style="max-width: 760px; background: #ffffff; border: 1px solid #E6E9E9; border-radius: 18px; padding: 26px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;">
+                  <div style="grid-column: 1 / -1;">
+                    <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Expense name <span style="color: #DC2626;">*</span></label>
+                    <input value="August electricity" style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px;" />
+                    <div style="font-size: 11px; color: #8FA3A3; margin-top: 5px;">Required · max 50 characters</div>
+                  </div>
+                  <div>
+                    <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Date incurred <span style="color: #DC2626;">*</span></label>
+                    <input value="2026-08-28" style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px; font-family: 'IBM Plex Mono', monospace;" />
+                  </div>
+                  <div>
+                    <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Amount <span style="color: #DC2626;">*</span></label>
+                    <div style="display: flex; align-items: center; border: 1.5px solid #DC2626; border-radius: 10px; overflow: hidden;">
+                      <span style="padding: 11px 12px; background: #FDECEC; font-size: 13px; color: #DC2626;">₱</span>
+                      <input value="0" style="flex: 1; min-width: 0; padding: 11px 12px; border: 0; font-size: 13.5px; font-family: 'IBM Plex Mono', monospace;" />
+                    </div>
+                    <div style="font-size: 11.5px; color: #DC2626; margin-top: 5px;">Amount must be greater than 0</div>
+                  </div>
+                  <div>
+                    <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Category <span style="color: #DC2626;">*</span></label>
+                    <select style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px; background: #ffffff;">
+                      <option>Utilities</option>
+                      <option>Rent</option>
+                      <option>Supplies</option>
+                      <option>Inventory</option>
+                      <option>Shipping</option>
+                      <option>Marketing</option>
+                      <option>Fees</option>
+                      <option>Salary</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Payment method <span style="color: #DC2626;">*</span></label>
+                    <select style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px; background: #ffffff;">
+                      <option>Gcash</option>
+                      <option>Cash</option>
+                      <option>Maya</option>
+                      <option>Bank Transfer</option>
+                      <option>Credit Card</option>
+                      <option>Loan</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Reference number</label>
+                    <input placeholder="e.g. MER-8821-4410" style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px; font-family: 'IBM Plex Mono', monospace;" />
+                  </div>
+                  <div>
+                    <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Category — other</label>
+                    <input placeholder="Only when category is Other" disabled="disabled" style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #E6E9E9; background: #F4F4F4; font-size: 13.5px; color: #A3B0B0;" />
+                  </div>
+                  <div style="grid-column: 1 / -1;">
+                    <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Description</label>
+                    <textarea rows="3" placeholder="What was this for?" style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px; resize: vertical;"></textarea>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 24px; padding-top: 20px; border-top: 1px solid #F0F2F2;">
+                  <div style="font-size: 11.5px; color: #8FA3A3;">Fields map 1:1 to expensesSchema — no additions.</div>
+                  <button onClick="{{ goExpenses }}" style="margin-left: auto; cursor: pointer; padding: 12px 22px; border-radius: 11px; border: 1px solid #D3DADA; background: #ffffff; font-size: 13.5px; font-weight: 500;" style-hover="border-color: #203233;">Cancel</button>
+                  <button onClick="{{ fireToast }}" style="cursor: pointer; padding: 12px 26px; border-radius: 11px; border: 0; background: #00BEAA; color: #ffffff; font-size: 13.5px; font-weight: 600;" style-hover="background: #007F78;">Save expense</button>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isStates }}">
+            <div data-screen-label="States">
+              <h1 style="margin: 0 0 6px; font-size: 30px; letter-spacing: -0.03em; font-weight: 600;">Empty, loading, error &amp; feedback</h1>
+              <p style="margin: 0 0 24px; font-size: 13.5px; color: #6B7A7A;">Copy lifted from NoItemFound and useToast so nothing changes in behaviour.</p>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px;">
+                <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 18px; padding: 34px 26px; text-align: center;">
+                  <div style="width: 52px; height: 52px; border-radius: 16px; background: #F4F4F4; margin: 0 auto 16px;"></div>
+                  <div style="font-size: 16px; font-weight: 600; margin-bottom: 6px;">No customer records found</div>
+                  <div style="font-size: 13px; color: #8FA3A3; margin-bottom: 18px;">Start building your customer list today.</div>
+                  <button style="cursor: pointer; padding: 10px 20px; border-radius: 11px; border: 0; background: #00BEAA; color: #ffffff; font-size: 13px; font-weight: 600;">Add customer</button>
+                </div>
+                <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 18px; padding: 26px;">
+                  <div style="font-size: 13px; font-weight: 600; margin-bottom: 18px; color: #6B7A7A;">Loading expenses…</div>
+                  <sc-for list="{{ skeletons }}" as="s" hint-placeholder-count="5">
+                    <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 14px; animation: shimmer 1.4s ease-in-out infinite;">
+                      <div style="width: 34px; height: 34px; border-radius: 10px; background: #EFF2F2;"></div>
+                      <div style="flex: 1;">
+                        <div style="height: 10px; border-radius: 6px; background: #EFF2F2; margin-bottom: 7px;"></div>
+                        <div style="height: 8px; width: 55%; border-radius: 6px; background: #F4F6F6;"></div>
+                      </div>
+                      <div style="width: 64px; height: 12px; border-radius: 6px; background: #EFF2F2;"></div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 18px; padding: 34px 26px; text-align: center;">
+                  <div style="width: 52px; height: 52px; border-radius: 999px; background: #FDECEC; margin: 0 auto 16px;"></div>
+                  <div style="font-size: 16px; font-weight: 600; margin-bottom: 6px;">Error encountered while fetching data</div>
+                  <div style="font-size: 13px; color: #8FA3A3; margin-bottom: 18px;">Check your connection and try again.</div>
+                  <button style="cursor: pointer; padding: 10px 20px; border-radius: 11px; border: 1px solid #D3DADA; background: #ffffff; font-size: 13px; font-weight: 500;">Retry</button>
+                </div>
+                <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 18px; padding: 26px; display: flex; flex-direction: column; gap: 12px;">
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #8FA3A3;">Toasts</div>
+                  <sc-for list="{{ toasts }}" as="t" hint-placeholder-count="3">
+                    <div style="display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: 13px; background: #FAFBFB; border: 1px solid #EFF2F2;">
+                      <span style="margin-top: 4px; width: 9px; height: 9px; border-radius: 999px; flex: none;">{{ t.dot }}</span>
+                      <div>
+                        <div style="font-size: 13px; font-weight: 600;">{{ t.title }}</div>
+                        <div style="font-size: 12px; color: #8FA3A3;">{{ t.body }}</div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isSpec }}">
+            <div data-screen-label="Tokens and field map">
+              <h1 style="margin: 0 0 6px; font-size: 30px; letter-spacing: -0.03em; font-weight: 600;">Tokens &amp; field mapping</h1>
+              <p style="margin: 0 0 26px; font-size: 13.5px; color: #6B7A7A;">Design tokens plus every field this redesign touches, traced to its schema. Nothing added, nothing renamed.</p>
+
+              <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 18px; padding: 24px; margin-bottom: 18px;">
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #8FA3A3; margin-bottom: 16px;">Palette — Upstream</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px;">
+                  <sc-for list="{{ palette }}" as="sw" hint-placeholder-count="8">
+                    <div style="border: 1px solid #EFF2F2; border-radius: 13px; overflow: hidden;">
+                      <div style="height: 54px;">{{ sw.chip }}</div>
+                      <div style="padding: 10px 12px;">
+                        <div style="font-size: 12.5px; font-weight: 600;">{{ sw.name }}</div>
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8FA3A3;">{{ sw.hex }}</div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 18px;">
+                <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 18px; padding: 24px;">
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #8FA3A3; margin-bottom: 16px;">Type — Poppins</div>
+                  <div style="font-size: 34px; font-weight: 600; letter-spacing: -0.03em; margin-bottom: 6px;">Display 34/600</div>
+                  <div style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 6px;">Heading 22/600</div>
+                  <div style="font-size: 15px; font-weight: 500; margin-bottom: 6px;">Subhead 15/500</div>
+                  <div style="font-size: 13.5px; color: #47585A; margin-bottom: 6px;">Body 13.5/400</div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8FA3A3;">Mono 11 — ids, SKUs, amounts</div>
+                </div>
+                <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 18px; padding: 24px;">
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #8FA3A3; margin-bottom: 16px;">Status colors — unchanged</div>
+                  <sc-for list="{{ statusLegend }}" as="s" hint-placeholder-count="5">
+                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #F4F4F4;">
+                      <span style="width: 10px; height: 10px; border-radius: 999px;">{{ s.dot }}</span>
+                      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">{{ s.value }}</span>
+                      <span style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #8FA3A3;">{{ s.hex }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <sc-for list="{{ fieldMap }}" as="entity" hint-placeholder-count="4">
+                <div style="background: #ffffff; border: 1px solid #E6E9E9; border-radius: 18px; overflow: hidden; margin-bottom: 18px;">
+                  <div style="padding: 18px 22px; border-bottom: 1px solid #E6E9E9;">
+                    <div style="font-size: 16px; font-weight: 600;">{{ entity.name }}</div>
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8FA3A3; margin-top: 4px;">{{ entity.source }}</div>
+                  </div>
+                  <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; min-width: 760px;">
+                      <thead>
+                        <tr style="background: #FAFBFB;">
+                          <th style="text-align: left; padding: 11px 22px; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Field</th>
+                          <th style="text-align: left; padding: 11px 22px; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Type / rule</th>
+                          <th style="text-align: left; padding: 11px 22px; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #6B7A7A; border-bottom: 1px solid #E6E9E9;">Shown as</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <sc-for list="{{ entity.rows }}" as="f" hint-placeholder-count="6">
+                          <tr style="border-bottom: 1px solid #F4F4F4;">
+                            <td style="padding: 11px 22px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #007F78;">{{ f.field }}</td>
+                            <td style="padding: 11px 22px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #6B7A7A;">{{ f.rule }}</td>
+                            <td style="padding: 11px 22px; font-size: 12.5px; color: #47585A;">{{ f.shown }}</td>
+                          </tr>
+                        </sc-for>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </sc-for>
+
+              <div style="background: #203233; color: #ffffff; border-radius: 18px; padding: 24px;">
+                <div style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Compatibility notes</div>
+                <sc-for list="{{ notes }}" as="n" hint-placeholder-count="4">
+                  <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <span style="margin-top: 7px; width: 6px; height: 6px; border-radius: 999px; background: #FFDE68; flex: none;"></span>
+                    <span style="font-size: 13.5px; line-height: 1.6; color: #C9D6D6;">{{ n }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+        </main>
+      </div>
+
+      <sc-if value="{{ drawerOpen }}">
+        <div style="position: fixed; inset: 0; z-index: 70; display: flex; justify-content: flex-end; background: rgba(32,50,51,.35);">
+          <div onClick="{{ closeDrawer }}" style="flex: 1;"></div>
+          <div style="width: min(460px, 92vw); background: #ffffff; height: 100%; overflow-y: auto; animation: slidein .22s ease-out; border-left: 1px solid #E6E9E9;">
+            <div style="padding: 22px 24px; border-bottom: 1px solid #E6E9E9; display: flex; align-items: flex-start; gap: 12px;">
+              <div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #8FA3A3; margin-bottom: 7px;">Customer</div>
+                <div style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">{{ drawerName }}</div>
+                <div style="margin-top: 8px;">{{ drawerBadge }}</div>
+              </div>
+              <button onClick="{{ closeDrawer }}" style="margin-left: auto; cursor: pointer; width: 34px; height: 34px; border-radius: 10px; border: 1px solid #E6E9E9; background: #ffffff; font-size: 14px; color: #47585A;" style-hover="border-color: #203233;">✕</button>
+            </div>
+            <div style="padding: 22px 24px; border-bottom: 1px solid #E6E9E9;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                  <div style="font-size: 11.5px; color: #8FA3A3; margin-bottom: 5px;">Contact number</div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13.5px;">{{ drawerPhone }}</div>
+                </div>
+                <div>
+                  <div style="font-size: 11.5px; color: #8FA3A3; margin-bottom: 5px;">Email</div>
+                  <div style="font-size: 13.5px; overflow-wrap: anywhere;">{{ drawerEmail }}</div>
+                </div>
+                <div>
+                  <div style="font-size: 11.5px; color: #8FA3A3; margin-bottom: 5px;">Date added</div>
+                  <div style="font-size: 13.5px;">{{ drawerCreated }}</div>
+                </div>
+                <div>
+                  <div style="font-size: 11.5px; color: #8FA3A3; margin-bottom: 5px;">Status</div>
+                  <div style="font-size: 13.5px;">{{ drawerStatus }}</div>
+                </div>
+              </div>
+              <div style="margin-top: 16px;">
+                <div style="font-size: 11.5px; color: #8FA3A3; margin-bottom: 5px;">Notes</div>
+                <div style="font-size: 13px; color: #47585A; line-height: 1.6; font-style: italic;">{{ drawerNotes }}</div>
+              </div>
+            </div>
+            <div style="padding: 22px 24px;">
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #8FA3A3; margin-bottom: 14px;">Recent orders</div>
+              <sc-for list="{{ drawerOrders }}" as="o" hint-placeholder-count="3">
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #F4F4F4;">
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 8px; border-radius: 7px; background: #F4F4F4; color: #47585A;">{{ o.ref }}</span>
+                  <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ o.orderName }}</div>
+                    <div style="font-size: 11px; color: #8FA3A3;">{{ o.createdAt }}</div>
+                  </div>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500;">{{ o.total }}</span>
+                </div>
+              </sc-for>
+              <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button style="flex: 1; cursor: pointer; padding: 11px; border-radius: 11px; border: 1px solid #D3DADA; background: #ffffff; font-size: 13px; font-weight: 500;" style-hover="border-color: #203233;">Edit customer</button>
+                <button onClick="{{ goOrderNew }}" style="flex: 1; cursor: pointer; padding: 11px; border-radius: 11px; border: 0; background: #00BEAA; color: #ffffff; font-size: 13px; font-weight: 600;" style-hover="background: #007F78;">New order</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ modalOpen }}">
+        <div style="position: fixed; inset: 0; z-index: 80; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(32,50,51,.4);">
+          <div onClick="{{ closeModal }}" style="position: absolute; inset: 0;"></div>
+          <div style="position: relative; width: min(560px, 100%); max-height: 88vh; overflow-y: auto; background: #ffffff; border-radius: 20px; padding: 26px;">
+            <div style="display: flex; align-items: flex-start; margin-bottom: 22px;">
+              <div>
+                <h2 style="margin: 0 0 4px; font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">Add customer</h2>
+                <p style="margin: 0; font-size: 12.5px; color: #8FA3A3;">Five fields — same as CustomerForm.tsx.</p>
+              </div>
+              <button onClick="{{ closeModal }}" style="margin-left: auto; cursor: pointer; width: 32px; height: 32px; border-radius: 10px; border: 1px solid #E6E9E9; background: #ffffff; font-size: 13px; color: #47585A;">✕</button>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div style="grid-column: 1 / -1;">
+                <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Name <span style="color: #DC2626;">*</span></label>
+                <input placeholder="Enter customer name" style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px;" />
+                <div style="font-size: 11px; color: #8FA3A3; margin-top: 5px;">Required · max 100 characters</div>
+              </div>
+              <div>
+                <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Contact number</label>
+                <input placeholder="0948123456" style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px; font-family: 'IBM Plex Mono', monospace;" />
+                <div style="font-size: 11px; color: #8FA3A3; margin-top: 5px;">Max 11 digits</div>
+              </div>
+              <div>
+                <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Type</label>
+                <select style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px; background: #ffffff;">
+                  <option>Normal</option>
+                  <option>Loyal</option>
+                  <option>Deluxe</option>
+                  <option>Premium</option>
+                  <option>VIP</option>
+                </select>
+              </div>
+              <div style="grid-column: 1 / -1;">
+                <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Email</label>
+                <input placeholder="sample@gmail.com" style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px;" />
+              </div>
+              <div style="grid-column: 1 / -1;">
+                <label style="display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;">Notes</label>
+                <textarea rows="4" placeholder="Add any additional notes…" style="width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid #D3DADA; font-size: 13.5px; resize: none;"></textarea>
+                <div style="font-size: 11px; color: #8FA3A3; margin-top: 5px;">Max 500 characters</div>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
+              <button onClick="{{ closeModal }}" style="cursor: pointer; padding: 12px 22px; border-radius: 11px; border: 1px solid #D3DADA; background: #ffffff; font-size: 13.5px; font-weight: 500;" style-hover="border-color: #203233;">Cancel</button>
+              <button onClick="{{ submitModal }}" style="cursor: pointer; padding: 12px 26px; border-radius: 11px; border: 0; background: #00BEAA; color: #ffffff; font-size: 13.5px; font-weight: 600;" style-hover="background: #007F78;">Submit</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ toastVisible }}">
+        <div style="position: fixed; right: 24px; bottom: 24px; z-index: 90; display: flex; gap: 12px; align-items: flex-start; padding: 15px 18px; border-radius: 14px; background: #203233; color: #ffffff; box-shadow: 0 20px 40px -20px rgba(32,50,51,.6); animation: slidein .2s ease-out;">
+          <span style="margin-top: 4px; width: 9px; height: 9px; border-radius: 999px; background: #00BEAA; flex: none;"></span>
+          <div>
+            <div style="font-size: 13.5px; font-weight: 600;">Record saved</div>
+            <div style="font-size: 12px; color: #A9BABA;">The new record has been saved.</div>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1440, &quot;height&quot;: 900}}">
+const P = (n) => '₱ ' + n.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+const TYPE_STYLE = {
+  normal: ['#F4F4F4', '#47585A'],
+  loyal: ['#E8F7F5', '#007F78'],
+  deluxe: ['#FFF9E6', '#8A6100'],
+  premium: ['#FFF1D6', '#8A4B00'],
+  VIP: ['#203233', '#FFDE68'],
+};
+
+const STATUS_STYLE = {
+  pending: ['#FFF4DB', '#8A6100', '#F59E0B'],
+  in_progress: ['#E6F0FE', '#1D4ED8', '#3B82F6'],
+  completed: ['#E7F7EC', '#166534', '#16A34A'],
+  cancelled: ['#FDECEC', '#B01C1C', '#DC2626'],
+  failed: ['#F4F4F4', '#47585A', '#6B7A7A'],
+};
+
+const CUSTOMERS = [
+  { id: 1, name: 'Nena Ramirez', createdAt: 'Aug. 04, 2026 9:12 AM', phone: '09481234561', email: 'nena.ramirez@gmail.com', customerType: 'VIP', status: 'active', notes: 'Buys in bulk every Friday for her canteen.' },
+  { id: 2, name: 'Mario Bautista', createdAt: 'Jul. 28, 2026 4:40 PM', phone: '09173344551', email: 'mario.b@yahoo.com', customerType: 'loyal', status: 'active', notes: 'Prefers Gcash. Picks up orders himself.' },
+  { id: 3, name: 'Grace Villanueva', createdAt: 'Jul. 19, 2026 11:05 AM', phone: '09996612340', email: 'grace.v@gmail.com', customerType: 'premium', status: 'active', notes: 'Delivery to Barangay Talon, gate 3.' },
+  { id: 4, name: 'Aling Bebang Store', createdAt: 'Jul. 02, 2026 8:30 AM', phone: '09221100987', email: '', customerType: 'deluxe', status: 'active', notes: 'Reseller — asks for 5% off on 10+ packs.' },
+  { id: 5, name: 'Rodel Santos', createdAt: 'Jun. 21, 2026 2:15 PM', phone: '', email: 'rodel.santos@gmail.com', customerType: 'normal', status: 'active', notes: '' },
+  { id: 6, name: 'Kim Dela Peña', createdAt: 'Jun. 09, 2026 10:48 AM', phone: '09088877665', email: 'kim.dp@gmail.com', customerType: 'loyal', status: 'active', notes: 'Pays weekly, keeps a running tab.' },
+];
+
+const PRODUCTS = [
+  { id: 1, title: 'Kopiko Black 3-in-1 (10s)', sku: 'KOP-BLK-10', price: 78, stock: 48, category: 'Beverages', supplier: 'Puregold Wholesale', profitPercentage: 22 },
+  { id: 2, title: 'Lucky Me Pancit Canton', sku: 'LM-PC-24', price: 15, stock: 120, category: 'Packaged Food', supplier: 'Monde Nissin', profitPercentage: 18 },
+  { id: 3, title: 'Datu Puti Vinegar 1L', sku: 'DP-VIN-1L', price: 42, stock: 9, category: 'Condiments & Sauces', supplier: 'NutriAsia', profitPercentage: 16 },
+  { id: 4, title: 'Alaska Evaporada 370ml', sku: 'ALK-EVP-370', price: 39, stock: 64, category: 'Dairy & Eggs', supplier: 'Puregold Wholesale', profitPercentage: 14 },
+  { id: 5, title: 'Safeguard Soap 130g', sku: 'SG-SOAP-130', price: 55, stock: 0, category: 'Beauty & Personal Care', supplier: 'P&G Distributor', profitPercentage: 20 },
+  { id: 6, title: 'Tide Powder 66g', sku: 'TIDE-66', price: 12, stock: 210, category: 'Cleaning Supplies', supplier: 'P&G Distributor', profitPercentage: 24 },
+  { id: 7, title: 'Coke Mismo 300ml', sku: 'COKE-MSM-300', price: 22, stock: 36, category: 'Beverages', supplier: 'Coca-Cola FEMSA', profitPercentage: 15 },
+  { id: 8, title: 'Sky Flakes 10s', sku: 'SKY-FLK-10', price: 68, stock: 6, category: 'Snacks', supplier: 'Monde Nissin', profitPercentage: 19 },
+];
+
+const ORDERS = [
+  { id: 118, orderName: 'Friday canteen restock', customer: 'Nena Ramirez', status: 'pending', createdAt: 'Sep 1, 2026 · 08:14 AM', items: [{ q: 6, t: 'Kopiko Black 3-in-1 (10s)', p: 78 }, { q: 12, t: 'Lucky Me Pancit Canton', p: 15 }] },
+  { id: 117, orderName: 'Walk-in — merienda', customer: 'Guest customer', status: 'in_progress', createdAt: 'Sep 1, 2026 · 07:52 AM', items: [{ q: 2, t: 'Sky Flakes 10s', p: 68 }, { q: 4, t: 'Coke Mismo 300ml', p: 22 }] },
+  { id: 116, orderName: 'Bebang reseller pack', customer: 'Aling Bebang Store', status: 'completed', createdAt: 'Aug 31, 2026 · 05:20 PM', items: [{ q: 10, t: 'Tide Powder 66g', p: 12 }, { q: 5, t: 'Alaska Evaporada 370ml', p: 39 }] },
+  { id: 115, orderName: 'Talon delivery', customer: 'Grace Villanueva', status: 'completed', createdAt: 'Aug 31, 2026 · 01:02 PM', items: [{ q: 3, t: 'Datu Puti Vinegar 1L', p: 42 }] },
+  { id: 114, orderName: 'Mario pickup', customer: 'Mario Bautista', status: 'cancelled', createdAt: 'Aug 30, 2026 · 04:35 PM', items: [{ q: 2, t: 'Safeguard Soap 130g', p: 55 }] },
+  { id: 113, orderName: 'Weekly tab — Kim', customer: 'Kim Dela Peña', status: 'pending', createdAt: 'Aug 30, 2026 · 09:11 AM', items: [{ q: 8, t: 'Lucky Me Pancit Canton', p: 15 }, { q: 2, t: 'Kopiko Black 3-in-1 (10s)', p: 78 }] },
+];
+
+const EXPENSES = [
+  { id: 41, title: 'August electricity', date: 'Aug. 28, 2026', category: 'utilities', amount: 4820.5, method: 'Gcash', description: 'Meralco bill, store meter.' },
+  { id: 40, title: 'Stall rent — September', date: 'Aug. 27, 2026', category: 'rent', amount: 12000, method: 'Bank Transfer', description: '' },
+  { id: 39, title: 'Restock — Monde Nissin', date: 'Aug. 25, 2026', category: 'inventory', amount: 8740, method: 'Cash', description: 'Pancit canton + Sky Flakes.' },
+  { id: 38, title: 'Tricycle delivery fees', date: 'Aug. 24, 2026', category: 'shipping', amount: 460, method: 'Cash', description: 'Three deliveries to Talon.' },
+  { id: 37, title: 'Tarpaulin signage', date: 'Aug. 21, 2026', category: 'marketing', amount: 950, method: 'Maya', description: '3x2 ft, printed in Alabang.' },
+  { id: 36, title: 'Weighing scale repair', date: 'Aug. 18, 2026', category: 'maintenance', amount: 700, method: 'Cash', description: '' },
+  { id: 35, title: 'Store helper — 2 weeks', date: 'Aug. 15, 2026', category: 'salary', amount: 6000, method: 'Cash', description: 'Half-month pay for Ate Vi.' },
+];
+
+class Component extends DCLogic {
+  state = { screen: 'landing', drawer: null, modal: false, toast: false, faq: 0, cart: [{ id: 1, qty: 6 }, { id: 2, qty: 12 }] };
+
+  go(screen) {
+    return () => this.setState({ screen, drawer: null, modal: false });
+  }
+
+  badge(type) {
+    const [bg, fg] = TYPE_STYLE[type] || TYPE_STYLE.normal;
+    return React.createElement('span', { style: { display: 'inline-block', padding: '4px 11px', borderRadius: 999, background: bg, color: fg, fontSize: 11.5, fontWeight: 600, letterSpacing: '.01em' } }, type === 'VIP' ? 'VIP' : type.charAt(0).toUpperCase() + type.slice(1));
+  }
+
+  statusBadge(status) {
+    const [bg, fg] = STATUS_STYLE[status];
+    const label = { pending: 'Pending', in_progress: 'In progress', completed: 'Completed', cancelled: 'Cancelled', failed: 'Failed' }[status];
+    return React.createElement('span', { style: { display: 'inline-block', padding: '4px 11px', borderRadius: 8, background: bg, color: fg, fontSize: 11.5, fontWeight: 600, whiteSpace: 'nowrap' } }, label);
+  }
+
+  stockBadge(stock) {
+    const cfg = stock === 0 ? ['#FDECEC', '#B01C1C', 'Out of stock'] : stock < 10 ? ['#FFF4DB', '#8A6100', stock + ' left'] : ['#E7F7EC', '#166534', stock + ' in stock'];
+    return React.createElement('span', { style: { display: 'inline-block', padding: '4px 10px', borderRadius: 999, background: cfg[0], color: cfg[1], fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' } }, cfg[2]);
+  }
+
+  icon(name, color = '#FFFFFF') {
+    const svg = (children) => React.createElement('svg', { viewBox: '0 0 24 24', width: 26, height: 26, fill: 'none', stroke: color, strokeWidth: 1.75, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true }, ...children);
+    const path = (d, key) => React.createElement('path', { d, key });
+    const circle = (cx, cy, r, key) => React.createElement('circle', { cx, cy, r, key });
+    const line = (x1, y1, x2, y2, key) => React.createElement('line', { x1, y1, x2, y2, key });
+    const icons = {
+      Dashboard: [path('M4 13h6V4H4v9Z', 'a'), path('M14 20h6v-9h-6v9Z', 'b'), path('M14 7h6V4h-6v3Z', 'c'), path('M4 20h6v-3H4v3Z', 'd')],
+      Products: [path('m12 3 8 4.5-8 4.5-8-4.5L12 3Z', 'a'), path('m4 7.5 8 4.5 8-4.5', 'b'), path('M4 7.5V17l8 4 8-4V7.5', 'c'), line(12, 12, 12, 21, 'd')],
+      Orders: [path('M6 3h12l2 4-2 14H6L4 7l2-4Z', 'a'), line(4.5, 7, 19.5, 7, 'b'), path('M9 11a3 3 0 0 0 6 0', 'c')],
+      Sales: [path('M4 19V9', 'a'), path('M10 19V5', 'b'), path('M16 19v-7', 'c'), path('M22 19H2', 'd')],
+      Services: [path('M12 3a4 4 0 0 0-4 4v2l-4 4 3 3 4-4h2l4-4-5-5Z', 'a'), path('m14 14 7 7', 'b'), path('m17 17-3 3', 'c')],
+      Expenses: [circle(12, 12, 9, 'a'), path('M15.5 8.5c-.8-.7-1.8-1-3-1-1.7 0-3 .8-3 2s1.1 1.8 3 2 3 1 3 2.4-1.3 2.3-3 2.3c-1.3 0-2.5-.4-3.3-1.1', 'b'), line(12, 5.5, 12, 18.5, 'c')],
+      Schedule: [path('M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2Z', 'a'), line(3, 9, 21, 9, 'b'), line(8, 2, 8, 6, 'c'), line(16, 2, 16, 6, 'd'), path('m8 14 2 2 5-5', 'e')],
+      Customers: [circle(9, 9, 3, 'a'), path('M3 20c.4-4 2.4-6 6-6s5.6 2 6 6', 'b'), circle(17, 8, 2.5, 'c'), path('M15.5 14c3.2 0 5 1.8 5.5 5', 'd')],
+      Settings: [circle(12, 12, 3, 'a'), path('M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21h-4v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H3v-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3V3h4v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1H21v4h-.1a1.7 1.7 0 0 0-1.5 1Z', 'b')],
+      NegosyoAI: [path('M12 3 9.8 8.8 4 11l5.8 2.2L12 19l2.2-5.8L20 11l-5.8-2.2L12 3Z', 'a'), path('m5 3 .8 2.2L8 6l-2.2.8L5 9l-.8-2.2L2 6l2.2-.8L5 3Z', 'b')]
+    };
+    return svg(icons[name] || icons.Dashboard);
+  }
+
+  bar(color) {
+    return React.createElement('div', { style: { width: '100%', height: '100%', background: color } });
+  }
+
+  tile(bg, fg, iconName) {
+    return React.createElement('span', { style: { width: 26, height: 26, borderRadius: 8, background: bg, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' } }, React.createElement('span', { style: { display: 'flex', transform: 'scale(.66)' } }, this.icon(iconName, fg)));
+  }
+
+  tileLg(bg, fg, iconName) {
+    return React.createElement('span', { style: { width: 46, height: 46, borderRadius: 14, background: bg, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' } }, this.icon(iconName, fg));
+  }
+
+  delta(text, up) {
+    const cfg = up === null ? ['#F4F4F4', '#6B7A7A'] : up ? ['#E7F7EC', '#166534'] : ['#FDECEC', '#B01C1C'];
+    return React.createElement('span', { style: { display: 'inline-block', padding: '3px 8px', borderRadius: 999, background: cfg[0], color: cfg[1], fontSize: 11, fontWeight: 600 } }, text);
+  }
+
+  dot(color) {
+    return React.createElement('span', { style: { display: 'block', width: 10, height: 10, borderRadius: 999, background: color } });
+  }
+
+  chip(text, bg, fg) {
+    return React.createElement('span', { style: { display: 'inline-block', padding: '4px 10px', borderRadius: 999, background: bg, color: fg, fontSize: 11.5, fontWeight: 500, textTransform: 'capitalize' } }, text);
+  }
+
+  swatch(hex) {
+    return React.createElement('div', { style: { width: '100%', height: '100%', background: hex } });
+  }
+
+  cartRows() {
+    return this.state.cart.map((c) => {
+      const p = PRODUCTS.find((x) => x.id === c.id);
+      return {
+        title: p.title,
+        price: P(p.price),
+        qty: c.qty,
+        lineTotal: P(p.price * c.qty),
+        inc: () => this.setState((s) => ({ cart: s.cart.map((i) => i.id === c.id ? { ...i, qty: Math.min(i.qty + 1, p.stock) } : i) })),
+        dec: () => this.setState((s) => ({ cart: s.cart.map((i) => i.id === c.id ? { ...i, qty: Math.max(i.qty - 1, 0) } : i).filter((i) => i.qty > 0) })),
+      };
+    });
+  }
+
+  renderVals() {
+    const s = this.state.screen;
+    const cartRows = this.cartRows();
+    const cartTotal = this.state.cart.reduce((sum, c) => sum + (PRODUCTS.find((x) => x.id === c.id).price * c.qty), 0);
+    const drawer = this.state.drawer ? CUSTOMERS.find((c) => c.id === this.state.drawer) : null;
+    const labels = { landing: 'Landing page', signin: 'Sign in', customers: 'Customers', orders: 'Orders', 'order-new': 'Order builder', products: 'Products', 'product-form': 'Product form', inventory: 'Inventory', expenses: 'Expenses', 'expense-form': 'Expense form', states: 'States', spec: 'Tokens & field map' };
+    const totalStockValue = PRODUCTS.reduce((sum, p) => sum + p.price * p.stock, 0);
+
+    return {
+      currentLabel: labels[s],
+      isLanding: s === 'landing',
+      isSignin: s === 'signin',
+      isApp: !['landing', 'signin'].includes(s),
+      isCustomers: s === 'customers',
+      isOrders: s === 'orders',
+      isOrderNew: s === 'order-new',
+      isProducts: s === 'products' || s === 'product-form',
+      isProductForm: s === 'product-form',
+      isInventory: s === 'inventory',
+      isExpenses: s === 'expenses',
+      isExpenseForm: s === 'expense-form',
+      isStates: s === 'states',
+      isSpec: s === 'spec',
+
+      navMarketing: [{ label: 'Landing', go: this.go('landing') }, { label: 'Sign in', go: this.go('signin') }],
+      navApp: [
+        { label: 'Customers', go: this.go('customers') },
+        { label: 'Orders', go: this.go('orders') },
+        { label: 'New order', go: this.go('order-new') },
+        { label: 'Products', go: this.go('products') },
+        { label: 'Product form', go: this.go('product-form') },
+        { label: 'Inventory', go: this.go('inventory') },
+        { label: 'Expenses', go: this.go('expenses') },
+        { label: 'Expense form', go: this.go('expense-form') },
+      ],
+      navRef: [{ label: 'States', go: this.go('states') }, { label: 'Tokens & map', go: this.go('spec') }],
+      rail: ['Dashboard', 'Products', 'Orders', 'Sales', 'Services', 'Expenses', 'Schedule', 'Customers', 'Settings', 'NegosyoAI'].map((label) => ({
+        label,
+        icon: this.icon(label, '#FFFFFF'),
+        go: this.go({ Products: 'products', Orders: 'orders', Expenses: 'expenses', Customers: 'customers' }[label] || 'customers'),
+      })),
+
+      goSignin: this.go('signin'),
+      goCustomers: this.go('customers'),
+      goOrders: this.go('orders'),
+      goOrderNew: this.go('order-new'),
+      goProducts: this.go('products'),
+      goProductForm: this.go('product-form'),
+      closeProductForm: this.go('products'),
+      goExpenses: this.go('expenses'),
+      goExpenseForm: this.go('expense-form'),
+
+      modules: [
+        { title: 'Customers', body: 'Names, contact numbers, tiers and notes — everything an order needs, already on file.', meta: 'Five tiers, from Normal to VIP', tile: this.tileLg('#E8F7F5', '#007F78', 'Customers') },
+        { title: 'Orders', body: 'Build an order from stock, attach a customer or keep it a guest sale, then move it through the queue.', meta: 'Pending → in progress → completed', tile: this.tileLg('#E6F0FE', '#1D4ED8', 'Orders') },
+        { title: 'Products', body: 'Titles, SKUs, barcodes, suppliers, price and margin in one record.', meta: '37 categories out of the box', tile: this.tileLg('#FFF4DB', '#8A6100', 'Products') },
+        { title: 'Inventory', body: 'See what is running low before a customer tells you. Movement follows completed orders.', meta: 'Low-stock and out-of-stock flags', tile: this.tileLg('#F3EEFF', '#5B34C7', 'Schedule') },
+        { title: 'Expenses', body: 'Rent, utilities, restocks and salaries — categorised, with reference numbers kept.', meta: '16 categories, 6 payment methods', tile: this.tileLg('#FDECEC', '#B01C1C', 'Expenses') },
+        { title: 'Sales', body: 'Daily, weekly and monthly performance so you know which weeks actually paid.', meta: 'Today, 7 days, this month', tile: this.tileLg('#E7F7EC', '#166534', 'Sales') },
+      ],
+      steps: [
+        { no: '01', title: 'Add your products', body: 'Import or type your list once — price, stock and supplier. SKUs optional.' },
+        { no: '02', title: 'Record orders as they come', body: 'Tap products into a cart, pick a customer or leave it guest, place the order.' },
+        { no: '03', title: 'Watch the numbers', body: 'Stock drops as orders complete, expenses log against sales, reports write themselves.' },
+      ],
+      planStarter: ['Unlimited customers and products', 'Orders with status queue', 'Expense tracking with categories', 'Stock visibility'],
+      planGrowth: ['Everything in Starter', 'Multi-user with roles', 'Sales reports and exports', 'Supplier and barcode fields'],
+      planPremium: ['Everything in Growth', 'NegosyoAI insights and forecasts', 'Automated PDF receipts by email', 'Queue management'],
+      faqs: [
+        { q: 'Do I need internet all the time?', a: 'You need a connection to save records. The app is built for a browser on a phone, tablet or the store laptop.' },
+        { q: 'Can I record a sale without registering the customer?', a: 'Yes. An order needs either an order name or a customer, so walk-in guest sales work fine.' },
+        { q: 'What happens to stock when an order is cancelled?', a: 'Stock only moves when an order completes, so a cancelled order leaves your inventory untouched.' },
+        { q: 'Can two people use one shop account?', a: 'Multi-user with roles is on the Growth plan. Starter is a single sign-in.' },
+        { q: 'Is my data mine?', a: 'Yes — export your customers, orders and expenses to CSV whenever you want.' },
+      ].map((f, i) => ({
+        q: f.q,
+        a: f.a,
+        open: this.state.faq === i,
+        sign: this.state.faq === i ? '−' : '+',
+        toggle: () => this.setState((st) => ({ faq: st.faq === i ? null : i })),
+      })),
+
+      customers: CUSTOMERS.map((c) => ({
+        name: c.name,
+        createdAt: c.createdAt,
+        phone: c.phone ? c.phone : '—',
+        notes: c.notes ? c.notes : '—',
+        badge: this.badge(c.customerType),
+        open: () => this.setState({ drawer: c.id }),
+      })),
+      customerTypes: ['All types', 'Normal', 'Loyal', 'Deluxe', 'Premium', 'VIP'],
+      customerKpis: [
+        { label: 'Total customers', value: '6', hint: 'All time', accentBar: this.bar('#00BEAA'), tile: this.tile('#E8F7F5', '#007F78', 'Customers'), deltaChip: this.delta('+2', true) },
+        { label: 'VIP + Premium', value: '2', hint: '33% of your book', accentBar: this.bar('#FFB018'), tile: this.tile('#FFF4DB', '#8A6100', 'Sales'), deltaChip: this.delta('+1', true) },
+        { label: 'With contact number', value: '5', hint: '1 record missing a number', accentBar: this.bar('#3B82F6'), tile: this.tile('#E6F0FE', '#1D4ED8', 'NegosyoAI'), deltaChip: this.delta('83%', null) },
+        { label: 'Added this month', value: '2', hint: 'August 2026', accentBar: this.bar('#203233'), tile: this.tile('#F4F4F4', '#47585A', 'Schedule'), deltaChip: this.delta('−1', false) },
+      ],
+
+      orders: ORDERS.map((o) => ({
+        ref: '#' + o.id,
+        orderName: o.orderName,
+        customer: o.customer,
+        createdAt: o.createdAt,
+        statusBadge: this.statusBadge(o.status),
+        total: P(o.items.reduce((sum, i) => sum + i.q * i.p, 0)),
+        items: o.items.map((i) => ({ qty: i.q + '×', title: i.t, price: P(i.p), total: P(i.q * i.p) })),
+      })),
+      orderStatusTabs: [{ label: 'All' }, { label: 'Pending' }, { label: 'In progress' }, { label: 'Completed' }, { label: 'Cancelled' }],
+
+      pickerCategories: ['All', 'Beverages', 'Snacks', 'Packaged Food', 'Cleaning Supplies'],
+      pickerProducts: PRODUCTS.filter((p) => p.stock > 0).map((p) => ({
+        title: p.title,
+        price: P(p.price),
+        stockLabel: p.stock + ' left',
+        add: () => this.setState((st) => st.cart.some((c) => c.id === p.id)
+          ? { cart: st.cart.map((c) => c.id === p.id ? { ...c, qty: Math.min(c.qty + 1, p.stock) } : c) }
+          : { cart: [...st.cart, { id: p.id, qty: 1 }] }),
+      })),
+      cart: cartRows,
+      cartEmpty: cartRows.length === 0,
+      cartCount: this.state.cart.reduce((n, c) => n + c.qty, 0),
+      cartTotal: P(cartTotal),
+      placeOrder: () => { this.setState({ toast: true }); setTimeout(() => this.setState({ toast: false }), 2600); },
+
+      products: PRODUCTS.map((p) => ({
+        title: p.title,
+        sku: p.sku,
+        price: P(p.price),
+        margin: p.profitPercentage + '% margin',
+        category: p.category,
+        supplier: p.supplier,
+        stockBadge: this.stockBadge(p.stock),
+      })),
+
+      inventoryKpis: [
+        { label: 'Stock value', value: P(totalStockValue), hint: 'price × stock' },
+        { label: 'Out of stock', value: '1', hint: 'Safeguard Soap 130g' },
+        { label: 'Low stock (<10)', value: '2', hint: 'Vinegar, Sky Flakes' },
+        { label: 'Units on hand', value: PRODUCTS.reduce((n, p) => n + p.stock, 0).toString(), hint: 'Across 8 products' },
+      ],
+      inventoryRows: PRODUCTS.map((p) => ({
+        title: p.title,
+        sku: p.sku,
+        supplier: p.supplier,
+        stockBadge: this.stockBadge(p.stock),
+        value: P(p.price * p.stock),
+      })),
+      movements: [
+        { title: 'Tide Powder 66g', meta: 'Order #116 completed · Aug 31', delta: '−10' },
+        { title: 'Alaska Evaporada 370ml', meta: 'Order #116 completed · Aug 31', delta: '−5' },
+        { title: 'Datu Puti Vinegar 1L', meta: 'Order #115 completed · Aug 31', delta: '−3' },
+        { title: 'Kopiko Black 3-in-1 (10s)', meta: 'Restock — Monde Nissin · Aug 25', delta: '+24' },
+        { title: 'Sky Flakes 10s', meta: 'Restock — Monde Nissin · Aug 25', delta: '+12' },
+        { title: 'Safeguard Soap 130g', meta: 'Order #109 completed · Aug 22', delta: '−6' },
+      ],
+
+      expenses: EXPENSES.map((e) => ({
+        title: e.title,
+        date: e.date,
+        amount: P(e.amount),
+        method: e.method,
+        description: e.description ? e.description : '—',
+        categoryChip: this.chip(e.category, '#F4F4F4', '#47585A'),
+      })),
+      expenseKpis: [
+        { label: 'This month', value: P(33670.5), hint: '7 records' },
+        { label: 'Biggest category', value: 'Rent', hint: '₱ 12,000.00' },
+        { label: 'Cash out', value: P(13160), hint: '4 cash payments' },
+        { label: 'Digital wallets', value: P(5770.5), hint: 'Gcash + Maya' },
+      ],
+
+      skeletons: [1, 2, 3, 4, 5],
+      toasts: [
+        { dot: this.dot('#00BEAA'), title: 'Expense created', body: 'The new record has been saved.' },
+        { dot: this.dot('#FFB018'), title: 'Updating order status…', body: 'Please wait.' },
+        { dot: this.dot('#DC2626'), title: 'Failed to delete expense', body: 'Please try again.' },
+      ],
+
+      palette: [
+        { name: 'Teal', hex: '#00BEAA', chip: this.swatch('#00BEAA') },
+        { name: 'Dark Teal', hex: '#007F78', chip: this.swatch('#007F78') },
+        { name: 'Dark Forest', hex: '#203233', chip: this.swatch('#203233') },
+        { name: 'Orange', hex: '#FFB018', chip: this.swatch('#FFB018') },
+        { name: 'Yellow', hex: '#FFDE68', chip: this.swatch('#FFDE68') },
+        { name: 'Gray', hex: '#F4F4F4', chip: this.swatch('#F4F4F4') },
+        { name: 'White', hex: '#FFFFFF', chip: this.swatch('#FFFFFF') },
+        { name: 'Black', hex: '#000000', chip: this.swatch('#000000') },
+      ],
+      statusLegend: [
+        { value: 'pending', hex: '#F59E0B', dot: this.dot('#F59E0B') },
+        { value: 'in_progress', hex: '#3B82F6', dot: this.dot('#3B82F6') },
+        { value: 'completed', hex: '#16A34A', dot: this.dot('#16A34A') },
+        { value: 'cancelled', hex: '#DC2626', dot: this.dot('#DC2626') },
+        { value: 'failed', hex: '#6B7A7A', dot: this.dot('#6B7A7A') },
+      ],
+      fieldMap: [
+        {
+          name: 'Customer', source: 'features/customers/customers.schema.ts · customers.types.tsx',
+          rows: [
+            { field: 'id', rule: 'number int positive', shown: 'Not displayed; row key' },
+            { field: 'name', rule: 'string, required, max 100', shown: 'Table col 1 · drawer title · form field 1' },
+            { field: 'createdAt', rule: 'coerce.date', shown: 'Table “Date added” · drawer' },
+            { field: 'phone', rule: 'string optional, max 11', shown: 'Table “Contact number” · form' },
+            { field: 'email', rule: 'string optional, max 50', shown: 'Drawer · form' },
+            { field: 'customerType', rule: "enum normal|loyal|deluxe|premium|VIP", shown: 'Table badge · form select' },
+            { field: 'notes', rule: 'string optional, max 500', shown: 'Table col 5 · drawer · form textarea' },
+            { field: 'status', rule: 'string optional', shown: 'Drawer only' },
+          ],
+        },
+        {
+          name: 'Product', source: 'features/products/products.schema.ts · products.types.tsx',
+          rows: [
+            { field: 'title', rule: 'string, required', shown: 'Card title · form field 1' },
+            { field: 'description', rule: 'string | null', shown: 'Form textarea' },
+            { field: 'sku', rule: 'string optional', shown: 'Card meta · inventory table · form' },
+            { field: 'barcode', rule: 'string optional', shown: 'Form only' },
+            { field: 'supplier', rule: 'string optional', shown: 'Card footer · inventory table' },
+            { field: 'price', rule: 'number', shown: 'Card price · order line item' },
+            { field: 'stock', rule: 'number', shown: 'Stock badge · inventory · picker' },
+            { field: 'profitPercentage', rule: 'number optional', shown: 'Card “margin” · form' },
+            { field: 'profit', rule: 'number optional', shown: 'Form, read-only computed' },
+            { field: 'category', rule: 'string optional (PRODUCT_CATEGORY)', shown: 'Card chip · picker filter · form select' },
+            { field: 'image / imageUrl / imageSource', rule: "url|upload", shown: 'Form image panel; placeholders in cards' },
+          ],
+        },
+        {
+          name: 'Order', source: 'features/orders/order.schema.ts · order.type.ts',
+          rows: [
+            { field: 'id', rule: 'number int positive', shown: 'Card ref #118' },
+            { field: 'orderName', rule: 'string optional', shown: 'Card title · builder field 1' },
+            { field: 'customerId', rule: 'number | null', shown: 'Builder customer select (null = guest)' },
+            { field: 'customer.name', rule: 'string', shown: 'Card subline' },
+            { field: 'status', rule: 'enum pending|in_progress|completed|cancelled|failed', shown: 'Card badge · status tabs' },
+            { field: 'notes', rule: 'string optional', shown: 'Builder notes textarea' },
+            { field: 'items[].quantity', rule: 'int nonnegative', shown: 'Card line qty · cart stepper' },
+            { field: 'items[].priceAtPurchase', rule: 'number nonnegative', shown: 'Card line price' },
+            { field: 'items[].product', rule: '{ id, title, price, profit }', shown: 'Card line title · picker' },
+            { field: 'totalAmount', rule: 'coerce.number', shown: 'Card total · cart total' },
+            { field: 'totalProfit / profitInaccurate', rule: 'number / boolean optional', shown: 'Reserved — not surfaced yet' },
+            { field: 'createdAt / statusUpdatedAt', rule: 'string', shown: 'Card timestamp' },
+          ],
+        },
+        {
+          name: 'Expense', source: 'features/expenses/expenses.schema.ts · expenses.types.ts',
+          rows: [
+            { field: 'title', rule: 'string required, max 50', shown: 'Table “Name” · form field 1' },
+            { field: 'dateIncurred', rule: 'date', shown: 'Table “Date” · form datepicker' },
+            { field: 'amount', rule: 'number > 0', shown: 'Table “Amount” · form (error state shown)' },
+            { field: 'category', rule: 'string max 20 (EXPENSE_CATEGORIES)', shown: 'Table chip · filter · form select' },
+            { field: 'categoryOther', rule: 'string optional, max 30', shown: 'Form, enabled only when category = other' },
+            { field: 'paymentMethod', rule: 'string max 20 (PAYMENT_METHOD)', shown: 'Table “Method” · filter · form select' },
+            { field: 'paymentMethodOther', rule: 'string optional, max 30', shown: 'Form conditional field' },
+            { field: 'referenceNumber', rule: 'string optional', shown: 'Form only' },
+            { field: 'description', rule: 'string optional', shown: 'Table “Description” · form textarea' },
+          ],
+        },
+      ],
+      notes: [
+        'No new fields, renames, or column additions — every table header matches the existing TanStack column definitions.',
+        'Inventory is a derived view over product.stock plus completed order items; it persists nothing new, so it can ship before the backend adds an inventory table.',
+        'Customer detail is a drawer over the existing list query — no new endpoint, it reuses the row object already in cache.',
+        'Order create stays a full page with the same cart-in-Zustand shape (id, price, quantity, profit) that useOrderStore already holds.',
+        'Expense amount error copy is verbatim from the Zod message so validation text needs no change.',
+      ],
+
+      drawerOpen: !!drawer,
+      drawerName: drawer ? drawer.name : '',
+      drawerBadge: drawer ? this.badge(drawer.customerType) : null,
+      drawerPhone: drawer ? (drawer.phone || '—') : '',
+      drawerEmail: drawer ? (drawer.email || '—') : '',
+      drawerCreated: drawer ? drawer.createdAt : '',
+      drawerStatus: drawer ? drawer.status : '',
+      drawerNotes: drawer ? (drawer.notes || 'No notes yet.') : '',
+      drawerOrders: drawer ? ORDERS.filter((o) => o.customer === drawer.name).map((o) => ({ ref: '#' + o.id, orderName: o.orderName, createdAt: o.createdAt, total: P(o.items.reduce((sum, i) => sum + i.q * i.p, 0)) })) : [],
+      closeDrawer: () => this.setState({ drawer: null }),
+
+      modalOpen: this.state.modal,
+      openCustomerForm: () => this.setState({ modal: true }),
+      closeModal: () => this.setState({ modal: false }),
+      submitModal: () => { this.setState({ modal: false, toast: true }); setTimeout(() => this.setState({ toast: false }), 2600); },
+      fireToast: () => { this.setState({ toast: true }); setTimeout(() => this.setState({ toast: false }), 2600); },
+      toastVisible: this.state.toast,
+    };
+  }
+}
+</script>
+</body>
+</html>
