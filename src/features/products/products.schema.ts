@@ -1,5 +1,49 @@
 import { z } from 'zod'
 
+export const productFormSchema = z.object({
+  id: z.preprocess(
+    (productId) =>
+      productId === '' || productId === undefined || productId === null
+        ? undefined
+        : Number(productId),
+    z.number().optional(),
+  ),
+  title: z.string().min(2, 'Title is required'),
+  description: z.string().nullable(),
+  sku: z.string().nullish(),
+  barcode: z.string().nullish(),
+  supplier: z.string().nullish(),
+  price: z.preprocess(
+    (price) => Number(price),
+    z.number().min(1, 'Price must greater than 0'),
+  ),
+  stock: z.preprocess(
+    (stock) => Number(stock),
+    z.number().min(0, 'Stock must be 0 or greater'),
+  ),
+  profitPercentage: z.preprocess(
+    (profitPercentage) =>
+      profitPercentage === '' ||
+      profitPercentage === undefined ||
+      profitPercentage === null
+        ? null
+        : Number(profitPercentage),
+    z.number().max(90, 'Profit must not be more than 90% of the price').nullable(),
+  ),
+  profit: z.preprocess(
+    (profit) =>
+      profit === '' || profit === undefined || profit === null
+        ? null
+        : Number(profit),
+    z.number().nullable(),
+  ),
+  category: z.string().min(1, 'Category is required'),
+  image: z.string().nullish(),
+  imageUrl: z.string().nullish(),
+})
+
+export type ProductFormValues = z.infer<typeof productFormSchema>
+
 export const productResponseSchema = z.object({
   id: z.number().int().positive(),
   title: z.string(),

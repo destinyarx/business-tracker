@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
@@ -20,30 +19,8 @@ import { Dropzone, DropZoneArea, DropzoneTrigger, DropzoneMessage, useDropzone }
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useConfirmation } from '@/app/provider/ConfirmationProvider'
 import { useToast } from '@/hooks/useToast'
-
-const schema = z.object({
-  id: z.preprocess(
-    (val) => val === '' || val === undefined || val === null ? undefined : Number(val),
-    z.number().optional()
-  ),
-  title: z.string().min(2, 'Title is required'),
-  description: z.string().nullable(),
-  sku: z.string().nullable(),
-  barcode: z.string().nullable(),
-  supplier: z.string().nullable(),
-  price: z.preprocess((val) => Number(val), z.number().min(1, 'Price must greater than 0')),
-  stock: z.preprocess((val) => Number(val), z.number().min(0, 'Stock must be 0 or greater')),
-  profitPercentage: z.preprocess(
-    (val) => Number(val),
-    z.number().max(90, 'Profit must not be more than 90% of the price').nullable()
-  ),
-  profit: z.preprocess((val) => Number(val), z.number().nullable()),
-  category: z.string().min(1, 'Category is required'),
-  image: z.string().nullable(),
-  imageUrl: z.string().nullable(),
-})
-
-type ProductFormValues = z.infer<typeof schema>
+import { productFormSchema } from '../products.schema'
+import type { ProductFormValues } from '../products.schema'
 
 export default function ProductForm() {
   const { formState, product, closeForm } = useProductFormStore()
@@ -55,7 +32,7 @@ export default function ProductForm() {
   const [imageMode, setImageMode] = useState<string>('upload')
 
   const form = useForm<ProductFormValues>({
-    resolver: zodResolver(schema) as any,
+    resolver: zodResolver(productFormSchema) as any,
     defaultValues: {
       id: undefined,
       title: '',

@@ -5,7 +5,10 @@ import { paginatedExpensesResponseSchema } from '../src/features/expenses/expens
 import { paginatedOrdersResponseSchema } from '../src/features/orders/order.schema.ts'
 import { toUpdateOrderStatusCommand } from '../src/features/orders/order.mapper.ts'
 import { createProductsApi } from '../src/features/products/products.api.ts'
-import { productsResponseSchema } from '../src/features/products/products.schema.ts'
+import {
+  productFormSchema,
+  productsResponseSchema,
+} from '../src/features/products/products.schema.ts'
 import { toFeatureError } from '../src/lib/feature-error.ts'
 
 const validCustomer = {
@@ -48,6 +51,27 @@ test('product response parsing rejects a missing required field', () => {
   const malformedProduct = { ...validProduct, stock: undefined }
   const result = productsResponseSchema.safeParse({ data: [malformedProduct] })
   assert.equal(result.success, false)
+})
+
+test('an API product with empty optional fields can be resubmitted for update', () => {
+  const product = productsResponseSchema.parse({
+    data: [{
+      ...validProduct,
+      category: 'food-and-beverage',
+      sku: null,
+      barcode: null,
+      supplier: null,
+      profitPercentage: null,
+      profit: null,
+      image: null,
+      imageUrl: null,
+      imageSource: null,
+    }],
+  }).data[0]
+
+  const result = productFormSchema.safeParse(product)
+
+  assert.equal(result.success, true)
 })
 
 test('response validation failures become safe feature errors', () => {
