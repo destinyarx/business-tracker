@@ -9,6 +9,7 @@ const PUBLIC_URL: string[] = [
   '/about-us',
   '/sign-in(.*)',
   '/sign-up(.*)',
+  '/sso-callback',
 ]
 const isPublicRoute = createRouteMatcher(PUBLIC_URL)
 

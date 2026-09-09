@@ -3,14 +3,14 @@ import { LandingBrand } from './LandingBrand'
 
 const footerLinks = [
   { href: '#features', label: 'Features' },
-  { href: '#how-it-works', label: 'How it works' },
+  { href: '#how', label: 'How it works' },
   { href: '#pricing', label: 'Pricing' },
   { href: '#faq', label: 'FAQ' },
 ]
 
 export function LandingFooter() {
   return (
-    <footer className="bg-[#203233] px-5 pb-7 pt-8 text-[#8FA3A3] sm:px-8 lg:px-12">
+    <footer className="bg-[#16292B] px-5 pb-7 pt-8 text-[#8FA3A3] sm:px-8 lg:px-11">
       <div className="mx-auto max-w-[1160px]">
         <div className="flex flex-col gap-6 border-b border-white/10 pb-5 sm:flex-row sm:items-center">
           <LandingBrand compact inverse />

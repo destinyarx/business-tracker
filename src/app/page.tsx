@@ -7,12 +7,14 @@ import { LandingHowItWorks } from '@/features/landing/components/LandingHowItWor
 import { LandingModules } from '@/features/landing/components/LandingModules'
 import { LandingPricing } from '@/features/landing/components/LandingPricing'
 import { landingSans } from '@/features/landing/landing.fonts'
+import { ThemeSync } from '@/components/molecules/ThemeSync'
 
 export default function Home() {
   return (
     <div
-      className={`${landingSans.className} min-h-dvh overflow-x-hidden bg-white text-[#203233] antialiased`}
+      className={`${landingSans.className} min-h-dvh overflow-x-hidden bg-white text-[#203233] antialiased transition-colors dark:bg-[#0B1615] dark:text-[#EAF3F1]`}
     >
+      <ThemeSync />
       <LandingHeader />
       <main>
         <LandingHero />

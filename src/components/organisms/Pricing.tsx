@@ -76,7 +76,7 @@ export default function Pricing() {
                                 Track orders to maintain a smooth queue flow of pending orders.
                             </p>
                         </div>
-                        
+
                     </div>
                 </div>
 
@@ -87,7 +87,7 @@ export default function Pricing() {
                             <p className="text-2xl font-semibold mb-2">Premium</p>
 
                             <p className="text-[0.7rem] mb-15">
-                                Great for businesses that want to use AI 
+                                Great for businesses that want to use AI
                                 for smarter insights and easy custom PDF receipt generation.
                             </p>
                         </div>
@@ -132,7 +132,7 @@ export default function Pricing() {
                         <div className="flex flex-row items-center gap-2">
                             <BadgeCheck className="!h-7 !w-7"/>
                             <p className="text-[0.7rem] text-gray-500">
-                                Automate reminders, PDF receipts, and customer emails for efficiency.
+                                Automate reminders, (PDF and CSV data exports), and customer emails for efficiency.
                             </p>
                         </div>
                         <div className="flex flex-row items-center gap-2">
@@ -143,7 +143,7 @@ export default function Pricing() {
                         </div>
                     </div>
                 </div>
-            </div>   
+            </div>
         </div>
     )
 }
