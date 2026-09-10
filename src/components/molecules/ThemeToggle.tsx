@@ -1,6 +1,6 @@
 'use client'
 
-import { CloudSun, MoonStar } from 'lucide-react'
+import Image from 'next/image'
 import { useThemeStore } from '@/stores/theme.store'
 import { cn } from '@/lib/utils'
 
@@ -24,11 +24,13 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
         className,
       )}
     >
-      {isDark ? (
-        <MoonStar className="size-5" strokeWidth={1.5} />
-      ) : (
-        <CloudSun className="size-5" strokeWidth={1.5} />
-      )}
+      <Image
+        src={isDark ? '/theme-night.svg' : '/theme-day.svg'}
+        alt=""
+        aria-hidden="true"
+        width={24}
+        height={24}
+      />
     </button>
   )
 }

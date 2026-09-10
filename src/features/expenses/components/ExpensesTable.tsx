@@ -1,258 +1,177 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
-import type { ExpensesData, ExpenseFilters } from '@/features/expenses/expenses.types'
-import { usePaginatedExpensesQuery } from '@/features/expenses/hooks/usePaginatedExpensesQuery'
+import {
+  ArrowLeft,
+  ArrowRight,
+  Banknote,
+  CreditCard,
+  Eye,
+  Inbox,
+  Landmark,
+  Loader2,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  Wallet,
+} from 'lucide-react'
 import { PAYMENT_METHOD } from '@/constants'
-
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableFooter, TableRow } from '@/components/ui/table'
-import { ArrowLeft, ArrowRight, Banknote, CalendarDays, CreditCard, PhilippinePeso, Inbox, Landmark, Loader2, Tag, Wallet } from 'lucide-react'
+import type { ExpensesData } from '@/features/expenses/expenses.types'
+import { getExpenseCategoryLabel, formatExpenseAmount } from '../expense-summary'
 import { Button } from '@/components/ui/button'
-import ActionButton from '@/components/molecules/ActionButton'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import NoItemFound from '@/components/organisms/NoItemFound'
 
-type Props = {
-    onView: (data: ExpensesData) => void,
-    onUpdate: (data: ExpensesData) => void,
-    onDelete: (id: number) => void,
-    offset: number,
-    onOffsetChange: (value: number) => void,
-    currentPage: number,
-    onPageChange: (value: number) => void,
-    filters: ExpenseFilters
+type ExpensesTableProps = {
+  expenses: ExpensesData[]
+  isLoading: boolean
+  isError: boolean
+  hasNext: boolean
+  currentPage: number
+  onPageChange: (page: number) => void
+  onView: (expense: ExpensesData) => void
+  onUpdate: (expense: ExpensesData) => void
+  onDelete: (expenseId: number) => void
 }
 
 type MethodVisual = {
-    Icon: React.ElementType
-    color: string
+  Icon: React.ElementType
+  color: string
 }
 
-export default function ExpensesTable({ onView, onUpdate, onDelete, offset, onOffsetChange, currentPage, onPageChange, filters }: Props) {
-    const [limit, setLimit] = useState(10)
+const methodVisual = (method?: string): MethodVisual => {
+  const normalizedMethod = method?.toLowerCase() ?? ''
 
-    const { data, isLoading, isPending, isError } = usePaginatedExpensesQuery({ limit, offset, filters })
-    const expenses = data?.results ?? []
-    const hasNext = data?.hasNext ?? false
+  if (normalizedMethod.includes('cash')) {
+    return { Icon: Wallet, color: 'text-emerald-600 dark:text-emerald-400' }
+  }
 
-    useEffect(() => {
-        onOffsetChange((currentPage * limit) - limit )
-    }, [currentPage])
-      
-    function methodVisual(method?: string): MethodVisual {
-        const m = (method || '').toLowerCase()
-      
-        if (m.includes('cash')) {
-          return {
-            Icon: Wallet,
-            color: 'text-emerald-500',
-          }
-        }
-      
-        if (m.includes('card') || m.includes('visa') || m.includes('master')) {
-          return {
-            Icon: CreditCard,
-            color: 'text-blue-500',
-          }
-        }
-      
-        if (m.includes('bank') || m.includes('transfer')) {
-          return {
-            Icon: Landmark,
-            color: 'text-purple-500',
-          }
-        }
-      
-        return {
-          Icon: Banknote,
-          color: 'text-muted-foreground',
-        }
-    }
+  if (
+    normalizedMethod.includes('card') ||
+    normalizedMethod.includes('visa') ||
+    normalizedMethod.includes('master')
+  ) {
+    return { Icon: CreditCard, color: 'text-blue-600 dark:text-blue-400' }
+  }
 
-    function displayPaymentMethod(paymentMethod: string) {
-        if (paymentMethod=== 'maya') {
-            return (
-                <div className="flex justify-center">
-                    <img src="/svg/maya.svg" alt="Logo" className="h-3 w-auto" />
-                </div>
-            )
-        } else if (paymentMethod === 'gcash') {
-            return (
-                <div className="flex justify-center">
-                    <img src="/svg/gcash.svg" alt="Logo" className="h-4 w-auto" />
-                </div>
-            )
-        } else {
-            return (
-                <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                    {(() => {
-                        const { Icon, color } = methodVisual(paymentMethod)
-                        return <Icon className={`h-4 w-4 ${color}`} />
-                    })()}
+  if (normalizedMethod.includes('bank') || normalizedMethod.includes('transfer')) {
+    return { Icon: Landmark, color: 'text-violet-600 dark:text-violet-400' }
+  }
 
-                    <span className="capitalize text-muted-foreground">
-                        {PAYMENT_METHOD.find((item) => item.value === paymentMethod)?.name ?? ''}
-                    </span>
-                </div>
-            )
-        }
-    }
+  return { Icon: Banknote, color: 'text-[#7c8e8e]' }
+}
 
-    function emptyMessage() {
-        return (
-            <TableRow>
-              <TableCell colSpan={7}>
-                <div className="flex flex-col items-center justify-center">
-                  <NoItemFound title="No expenses recorded" description="Start tracking expenses to keep your records up to date."/>
-                </div>
-              </TableCell>
+function PaymentMethod({ paymentMethod }: { paymentMethod: string }) {
+  if (paymentMethod === 'maya') {
+    return <img src="/svg/maya.svg" alt="Maya" className="h-3 w-auto" />
+  }
+
+  if (paymentMethod === 'gcash') {
+    return <img src="/svg/gcash.svg" alt="GCash" className="h-4 w-auto" />
+  }
+
+  const { Icon, color } = methodVisual(paymentMethod)
+  const methodName =
+    PAYMENT_METHOD.find((method) => method.value === paymentMethod)?.name ??
+    paymentMethod.replaceAll('_', ' ')
+
+  return (
+    <span className="inline-flex items-center gap-2 capitalize text-[#5f7273] dark:text-[#9fb3b0]">
+      <Icon className={`size-4 ${color}`} strokeWidth={1.8} />
+      {methodName}
+    </span>
+  )
+}
+
+export default function ExpensesTable({
+  expenses,
+  isLoading,
+  isError,
+  hasNext,
+  currentPage,
+  onPageChange,
+  onView,
+  onUpdate,
+  onDelete,
+}: ExpensesTableProps) {
+  return (
+    <section className="overflow-hidden rounded-[20px] border border-[#e3e9e8] bg-white dark:border-[#243936] dark:bg-[#12201f]" aria-label="Expenses table">
+      <div className="overflow-x-auto">
+        <Table className="min-w-[940px]">
+          <TableHeader>
+            <TableRow className="border-[#edf1f0] bg-[#f8fafa] hover:bg-[#f8fafa] dark:border-[#1e322f] dark:bg-[#16292b] dark:hover:bg-[#16292b]">
+              <TableHead className="h-11 pl-[18px] text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#93a5a5]">Name</TableHead>
+              <TableHead className="h-11 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#93a5a5]">Date</TableHead>
+              <TableHead className="h-11 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#93a5a5]">Category</TableHead>
+              <TableHead className="h-11 text-right text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#93a5a5]">Amount</TableHead>
+              <TableHead className="h-11 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#93a5a5]">Method</TableHead>
+              <TableHead className="h-11 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#93a5a5]">Description</TableHead>
+              <TableHead className="h-11 pr-[18px] text-right text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#93a5a5]">Actions</TableHead>
             </TableRow>
-        )
-    }
-
-    function errorMessage() {
-        return (
-            <TableRow>
-              <TableCell colSpan={7} className="py-10">
-                <div className="flex flex-col items-center justify-center gap-2 text-center">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Inbox className="h-5 w-5" />
-                    <span className="text-sm font-medium">Error encountered while fetching data.</span>
-                  </div>
-                </div>
-              </TableCell>
-            </TableRow>
-        )
-    }
-
-    function loadingMessage() {
-        return (
-          <TableRow>
-            <TableCell colSpan={7} className="py-12">
-              <div className="flex flex-col items-center justify-center gap-3 text-muted-foreground">
-                <Loader2 className="h-6 w-6 animate-spin" />
-                <div className="text-sm font-medium">Loading expenses…</div>
-                <div className="text-xs">
-                  Please wait while we fetch your data
-                </div>
-              </div>
-            </TableCell>
-          </TableRow>
-        )
-    }
-
-    function renderTableData() {
-        return (
-            <>
-                {expenses.map((expense: ExpensesData) => (
-                    <TableRow key={expense.id} className="hover:bg-muted/40 text-xs">
-                        <TableCell className="font-medium">
-                            <div className="flex items-center gap-2">
-                                <Loader2 className="h-4 w-4 opacity-0" />
-                                <span className="truncate">{expense.title}</span>
-                            </div>
-                        </TableCell>
-
-                        <TableCell className="text-muted-foreground">
-                            <div className="flex items-center gap-2">
-                                <CalendarDays className="h-4 w-4 text-sky-500" />
-                                <span>{format(expense.dateIncurred, 'MMM. dd, yyyy')}</span>
-                            </div>
-                        </TableCell>
-
-                        <TableCell className="text-muted-foreground">
-                            <div className="flex items-center gap-2">
-                                <Tag className="h-4 w-4 text-yellow-400" />
-                                <span className="capitalize">{expense.category}</span>
-                            </div>
-                        </TableCell>
-
-                        <TableCell className="text-muted-foreground">
-                            <div className="flex items-center justify-end gap-2">
-                                <PhilippinePeso className="h-4 w-4 text-green-400" />
-                                <span className="font-semibold">{expense.amount}</span>
-                            </div>
-                        </TableCell>
-
-                        <TableCell className="text-muted-foreground">
-                            {displayPaymentMethod(expense.paymentMethod)}
-                        </TableCell>
-
-                        <TableCell className="max-w-[360px] text-muted-foreground">
-                            <p className="text-xs italic">
-                                {expense.description?.trim() ? expense.description : '—'}
-                            </p>
-                        </TableCell>
-
-                        <TableCell>
-                            <ActionButton
-                                // TODO: add view functionality
-                                onView={() => onView(expense)}
-                                onUpdate={() => onUpdate(expense)}
-                                onDelete={() => onDelete(expense.id!)}
-                            />
-                        </TableCell>
-                    </TableRow>
-                ))}
-            </>
-        )
-    }
-
-
-
-    return (
-        <div className="rounded-lg border bg-card shadow-sm">
-
-            <Table className="overflow-x-auto rounded-xl table-auto border border-border">
-                <TableHeader className="bg-muted/40">
-                    <TableRow className="hover:bg-transparent [&_th]:h-11 [&_th]:text-xs [&_th]:font-semibold dark:[&_th]:text-white [&_th]:uppercase [&_th]:tracking-wide [&_th]:text-muted-foreground [&_th:last-child]:pr-6">
-                        <TableHead className="pl-7">Name</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Category</TableHead>
-                        <TableHead className="text-center">Amount</TableHead>
-                        <TableHead className="text-center">Method</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead className="text-center w-[5%] whitespace-nowrap">Action</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    { isError ? errorMessage() : (
-                        isLoading || isPending ? loadingMessage()
-                            : expenses.length === 0
-                            ? emptyMessage()
-                            : renderTableData()
-                    )}
-                </TableBody>
-                <TableFooter className="w-full">
-                    <TableRow>
-                        <TableCell colSpan={7} className="p-0">
-                            <div className="flex w-full items-center justify-end gap-2 border px-4 py-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={currentPage === 1}
-                                    onClick={() => onPageChange(currentPage - 1)}
-                                    className="bg-teal-600 text-white hover:bg-teal-700"
-                                >
-                                    <ArrowLeft className="h-3 w-3" />
-                                    Previous
-                                </Button>
-
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={!hasNext}
-                                    onClick={() => onPageChange(currentPage + 1)}
-                                    className="bg-teal-600 text-white hover:bg-teal-700"
-                                >
-                                    Next
-                                    <ArrowRight className="h-3 w-3" />
-                                </Button>
-                            </div>
-                        </TableCell>
-                    </TableRow>
-                </TableFooter>
-            </Table>
-        </div>
-    )
+          </TableHeader>
+          <TableBody>
+            {isError && (
+              <TableRow><TableCell colSpan={7} className="h-40"><div className="flex items-center justify-center gap-2 text-sm text-red-700 dark:text-red-300"><Inbox className="size-5" />We could not load the expense records.</div></TableCell></TableRow>
+            )}
+            {isLoading && !isError && (
+              <TableRow><TableCell colSpan={7} className="h-40"><div className="flex flex-col items-center justify-center gap-2 text-[#7c8e8e]"><Loader2 className="size-5 animate-spin" /><span className="text-xs">Loading expenses…</span></div></TableCell></TableRow>
+            )}
+            {!isLoading && !isError && expenses.length === 0 && (
+              <TableRow><TableCell colSpan={7} className="h-52"><NoItemFound title="No expenses recorded" description="Start tracking expenses to keep your records up to date." /></TableCell></TableRow>
+            )}
+            {!isLoading && !isError && expenses.map((expense) => {
+              const expenseId = expense.id
+              return (
+                <TableRow key={expenseId ?? `${expense.title}-${expense.dateIncurred.toString()}`} className="border-[#edf1f0] text-[12.5px] transition-colors hover:bg-[#f8fafa] dark:border-[#1e322f] dark:hover:bg-[#16292b]">
+                  <TableCell className="py-[13px] pl-[18px] text-[13.5px] font-medium text-[#16292b] dark:text-[#eaf3f1]">{expense.title}</TableCell>
+                  <TableCell className="whitespace-nowrap py-[13px] text-[#5f7273] dark:text-[#9fb3b0]">{format(expense.dateIncurred, 'MMM. dd, yyyy')}</TableCell>
+                  <TableCell className="py-[13px]"><span className="inline-flex rounded-full border border-[#dce3e2] bg-[#f3fbf8] px-2.5 py-1 text-[11.5px] font-medium capitalize text-[#0c4b47] dark:border-[#2b514d] dark:bg-[#18302e] dark:text-[#8ce6dd]">{getExpenseCategoryLabel(expense)}</span></TableCell>
+                  <TableCell className="whitespace-nowrap py-[13px] text-right font-mono text-[13px] font-medium tabular-nums text-[#16292b] dark:text-[#eaf3f1]">{formatExpenseAmount(Number(expense.amount) || 0)}</TableCell>
+                  <TableCell className="py-[13px]"><PaymentMethod paymentMethod={expense.paymentMethod} /></TableCell>
+                  <TableCell className="max-w-[260px] py-[13px] text-[#5f7273] dark:text-[#9fb3b0]"><p className="truncate" title={expense.description?.trim() || undefined}>{expense.description?.trim() || '—'}</p></TableCell>
+                  <TableCell className="py-[13px] pr-[18px] text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="icon-sm" aria-label={`Actions for ${expense.title}`} className="size-8 rounded-[9px] border-[#dce3e2] bg-white shadow-none hover:border-[#00beaa] hover:bg-[#f3fbf8] dark:border-[#2b4340] dark:bg-[#12201f] dark:hover:bg-[#18302e]"><MoreHorizontal className="size-4" /></Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48 rounded-xl border-[#dce3e2] p-1.5 dark:border-[#2b4340]">
+                        <DropdownMenuLabel className="truncate px-2 py-1.5 font-mono text-[9.5px] font-medium uppercase tracking-[0.12em] text-[#93a5a5]">{expense.title}</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => onView(expense)} className="gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium"><Eye className="size-4 text-[#007f78]" />View details</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onUpdate(expense)} className="gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium"><Pencil className="size-4 text-[#b77a00]" />Edit expense</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem disabled={!expenseId} onClick={() => expenseId && onDelete(expenseId)} className="gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium text-red-700 focus:bg-red-50 focus:text-red-800 dark:text-red-400 dark:focus:bg-red-950/30"><Trash2 className="size-4" />Delete expense</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </div>
+      <footer className="flex flex-wrap items-center gap-3 border-t border-[#edf1f0] px-[18px] py-3 dark:border-[#1e322f]">
+        <span className="text-xs text-[#7c8e8e]">{expenses.length} {expenses.length === 1 ? 'record' : 'records'} on this page</span>
+        <nav className="ml-auto flex items-center gap-1.5" aria-label="Expense pages">
+          <Button variant="outline" size="sm" disabled={currentPage === 1 || isLoading} onClick={() => onPageChange(currentPage - 1)} className="h-8 rounded-[9px] border-[#dce3e2] bg-white px-3 text-xs shadow-none dark:border-[#2b4340] dark:bg-[#12201f]"><ArrowLeft className="size-3.5" />Previous</Button>
+          <span className="grid size-8 place-items-center rounded-[9px] bg-[#16292b] text-xs font-semibold text-white dark:bg-[#eaf3f1] dark:text-[#12201f]">{currentPage}</span>
+          <Button variant="outline" size="sm" disabled={!hasNext || isLoading} onClick={() => onPageChange(currentPage + 1)} className="h-8 rounded-[9px] border-[#dce3e2] bg-white px-3 text-xs shadow-none dark:border-[#2b4340] dark:bg-[#12201f]">Next<ArrowRight className="size-3.5" /></Button>
+        </nav>
+      </footer>
+    </section>
+  )
 }

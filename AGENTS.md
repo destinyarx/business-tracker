@@ -51,6 +51,18 @@ Follow these instructions unless the current task explicitly requires a differen
 
 ---
 
+## Backend API Repository
+
+This frontend consumes a NestJS API located at:
+
+```text
+C:\Users\AlphaQuadrant\Documents\0 self project\Nest.js\business-tracker-api
+```
+
+When investigating API integration problems, inspect that repository to verify endpoint contracts, request and response payloads, validation rules, authentication requirements, and backend behavior. Do not assume the frontend types alone define the complete API contract. Keep frontend and backend changes coordinated when a task affects both repositories.
+
+---
+
 ## Technology Stack
 
 Use the following technologies and libraries already selected for this project:
