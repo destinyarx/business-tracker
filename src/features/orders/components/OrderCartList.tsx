@@ -1,62 +1,64 @@
-import { useOrderStore } from '../useOrderStore'
-import { Button } from '@/components/ui/button'
-import { Minus, Plus, Trash2 } from 'lucide-react'
+import { Minus, Plus, X } from 'lucide-react'
+import { useOrderStore } from '@/features/orders/useOrderStore'
+import { formatOrderCurrency } from '@/features/orders/order.utils'
 
 export default function OrderCartList() {
-    const { carts, removeFromCart, increaseItem, decreaseItem } = useOrderStore()
+  const { carts, removeFromCart, increaseItem, decreaseItem } = useOrderStore()
 
-    return (
-        <div className="flex flex-col justify-center items-center w-full max-w-md space-y-3">
-            {carts.map((item) => (
-                <div
-                    key={item.id}
-                    className="grid grid-cols-1 lg:grid-cols-2 gap-4 justify-between rounded-lg border bg-white px-4 py-3 shadow-sm"
-                >
-                    <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-900">
-                            {item.title}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                            ₱{item.price.toFixed(2)}
-                        </span>
-                    </div>
+  return (
+    <div className="divide-y divide-[#edf1f0] dark:divide-[#1e322f]">
+      {carts.map((cartItem) => {
+        const quantity = cartItem.quantity ?? 0
 
-                    <div className="flex items-center gap-2">
-                        <Button
-                            size="icon"
-                            variant="outline"
-                            className="h-8 w-8"
-                            onClick={() => decreaseItem(item.id)}
-                            disabled={!item?.quantity}
-                        >
-                            <Minus className="h-4 w-4" />
-                        </Button>
-
-                        <span className="w-6 text-center text-sm font-medium">
-                            {item.quantity}
-                        </span>
-
-                        <Button
-                            size="icon"
-                            variant="outline"
-                            className="h-8 w-8"
-                            disabled={item.quantity === item.stock}
-                            onClick={() => increaseItem(item.id)}
-                        >
-                            <Plus className="h-4 w-4" />
-                        </Button>
-
-                        <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-8 w-8 text-red-500 hover:text-red-600"
-                            onClick={() => removeFromCart(item.id)}
-                        >
-                            <Trash2 className="h-4 w-4" />
-                        </Button>
-                    </div>
-                </div>
-            ))}
+        return (
+          <div key={cartItem.id} className="space-y-2.5 px-5 py-3">
+            <div className="flex items-start gap-2.5">
+              <p className="min-w-0 flex-1 text-[12.5px] font-semibold leading-snug text-[#16292b] dark:text-[#eaf3f1]">
+                {cartItem.title}
+              </p>
+              <button
+                type="button"
+                onClick={() => removeFromCart(cartItem.id)}
+                aria-label={`Remove ${cartItem.title} from order`}
+                className="grid size-6 shrink-0 place-items-center rounded-[7px] border border-[#e3e9e8] bg-white text-[#7c8e8e] transition-colors hover:border-[#dc2626] hover:bg-[#fdecec] hover:text-[#b01c1c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#12cdbe] dark:border-[#2b4340] dark:bg-[#12201f]"
+              >
+                <X className="size-3" />
+              </button>
             </div>
-    )
+
+            <div className="flex items-center gap-2.5">
+              <div className="flex items-center overflow-hidden rounded-[9px] border border-[#e3e9e8] dark:border-[#2b4340]">
+                <button
+                  type="button"
+                  onClick={() => decreaseItem(cartItem.id)}
+                  aria-label={`Decrease ${cartItem.title} quantity`}
+                  className="grid size-[27px] place-items-center bg-[#f8fafa] text-[#3f5254] transition-colors hover:bg-[#edf1f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#12cdbe] dark:bg-[#16292b] dark:text-[#c3d4d1]"
+                >
+                  <Minus className="size-3" />
+                </button>
+                <span className="w-8 text-center font-mono text-[12.5px]">
+                  {quantity}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => increaseItem(cartItem.id)}
+                  disabled={quantity >= cartItem.stock}
+                  aria-label={`Increase ${cartItem.title} quantity`}
+                  className="grid size-[27px] place-items-center bg-[#f8fafa] text-[#3f5254] transition-colors hover:bg-[#edf1f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#12cdbe] disabled:cursor-not-allowed disabled:opacity-35 dark:bg-[#16292b] dark:text-[#c3d4d1]"
+                >
+                  <Plus className="size-3" />
+                </button>
+              </div>
+              <span className="text-[11.5px] text-[#93a5a5]">
+                × {formatOrderCurrency(cartItem.price)}
+              </span>
+              <span className="ml-auto font-mono text-[13px] font-medium text-[#16292b] dark:text-[#eaf3f1]">
+                {formatOrderCurrency(cartItem.price * quantity)}
+              </span>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
 }

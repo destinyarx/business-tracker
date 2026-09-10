@@ -450,14 +450,32 @@ While making changes:
 8. Avoid unrelated cleanup or refactoring.
 9. Record durable architecture decisions in `docs/adr/` and reusable special coding conventions in `AGENTS.md`; skip both for routine implementation details.
 
+### Project Context Documentation
+
+`CONTEXT.md` is the durable project reference for future AI agents. Keep it accurate enough that an agent can understand the application's domain and established behavior without repeatedly scanning the entire repository.
+
+Update `CONTEXT.md` when a change adds, removes, or materially changes project knowledge such as:
+
+- Module responsibilities and relationships.
+- User-visible application behavior and business rules.
+- Important module flows and state transitions.
+- Forms, their fields, and meaningful validation behavior.
+- Tables and lists, including their significant columns, filters, and actions.
+- Domain types, statuses, categories, and terminology.
+- Important data relationships, derived values, and backend-facing behavior.
+
+Keep `CONTEXT.md` concise and current. Update or remove statements that become outdated. Do not add routine styling adjustments, temporary debugging notes, or low-level implementation details that do not help a future agent understand the application.
+
 After making changes:
 
 1. Check TypeScript types.
 2. Check imports and file paths.
 3. Check validation and error states.
 4. Check loading, empty, success, and failure states when applicable.
-5. Run the repository's existing lint, type-check, test, and build scripts when available.
-6. Report any checks that could not be completed.
+5. Run lint, type-check, and build checks when they are applicable to the change.
+6. Run only tests related to the changed or affected behavior. Do not run unrelated test suites or add excessive tests for unaffected modules.
+7. Broaden testing only when the change affects shared infrastructure, shared components, or cross-module contracts, or when a targeted check reveals a wider regression risk.
+8. Report any checks that could not be completed.
 
 ---
 

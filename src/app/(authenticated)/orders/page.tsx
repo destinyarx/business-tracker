@@ -1,107 +1,120 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
-import { cn } from '@/lib/utils'
-import { useProducts } from '@/features/products/hooks/useProducts'
-import { useOrderStore } from '@/features/orders/useOrderStore'
-import { useToast } from '@/hooks/useToast'
-import { toast }  from 'sonner'
-import { useCustomers } from '@/features/customers/hooks/useCustomers'
-import { useConfirmation } from '@/app/provider/ConfirmationProvider'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  ArrowLeft,
+  ArrowRight,
+  ChevronDown,
+  Filter,
+  ListFilter,
+  PackageOpen,
+  Plus,
+  Search,
+  X,
+} from 'lucide-react'
+import { ORDER_STATUS } from '@/constants'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
+import Loading from '@/components/organisms/Loading'
+import Order from '@/features/orders/components/Order'
+import OrderCard from '@/features/orders/components/OrderCard'
+import OrderForm from '@/features/orders/components/OrderForm'
 import { useOrderMutation } from '@/features/orders/hooks/useOrderMutation'
 import { useOrderQuery } from '@/features/orders/hooks/useOrderQuery'
-import { ORDER_STATUS } from '@/constants'
-import type { CreateOrderCommand, OrderStatus, OrderData, OrderForm } from '@/features/orders/order.type'
-import type { Product } from '@/features/products/products.types'
+import type { OrderFormValues } from '@/features/orders/order.schema'
+import type {
+  CreateOrderCommand,
+  OrderData,
+  OrderParams,
+  OrderStatus,
+  UpdateOrderCommand,
+} from '@/features/orders/order.type'
+import { useOrderStore } from '@/features/orders/useOrderStore'
+import { useProducts } from '@/features/products/hooks/useProducts'
+import { useCustomers } from '@/features/customers/hooks/useCustomers'
+import { useConfirmation } from '@/app/provider/ConfirmationProvider'
+import { useToast } from '@/hooks/useToast'
 
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Plus, ArrowLeft, Search, Filter, ArrowRight, ListFilter } from 'lucide-react'
-import { Input } from '@/components/ui/input';
-import Loading from '@/components/organisms/Loading'
-import { Button } from '@/components/ui/button'
-import OrderCard from '@/features/orders/components/OrderCard'
-import Order from '@/features/orders/components/Order'
-import { OrderParams } from '@/features/orders/order.type'
-import NoItemFound from '@/components/organisms/NoItemFound'
+const ordersPerPage = 6
 
-export default function index() {
+const isOrderStatus = (status: string): status is OrderStatus =>
+  status === 'pending' ||
+  status === 'in_progress' ||
+  status === 'completed' ||
+  status === 'cancelled' ||
+  status === 'failed'
+
+export default function OrdersPage() {
   const appToast = useToast()
   const confirmation = useConfirmation()
   const { productsQuery } = useProducts()
   const { customerQuery } = useCustomers()
-  const { addOrder, deleteOrder, updateOrderStatus } = useOrderMutation()
-  const { carts, resetCart, showForm, setShowForm, resetOrderForm, orderState, setOrderState } = useOrderStore()
-
-  const [currentPage, setCurrentPage] = useState<number>(1)
+  const { addOrder, deleteOrder, updateOrder, updateOrderStatus } =
+    useOrderMutation()
+  const {
+    carts,
+    resetCart,
+    resetOrderForm,
+    orderState,
+    setOrderState,
+  } = useOrderStore()
+  const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [filter, setFilter] = useState<string|undefined>('pending')
-  const [params, setParams] = useState<OrderParams>({
-    filter: filter,
-    searchKey: undefined,
-    offset: 0,
-    limit: 6,
-    sort: 'desc'
-  })
+  const [statusFilter, setStatusFilter] = useState<OrderStatus | undefined>(
+    'pending',
+  )
+  const [sort, setSort] = useState<'asc' | 'desc'>('desc')
+  const [editingOrder, setEditingOrder] = useState<OrderData | null>(null)
 
   useEffect(() => {
-    if (params.filter !== filter) {
+    const searchDelay = window.setTimeout(() => {
       setCurrentPage(1)
-    }
-
-    if (params?.limit) {
-      setParams((prev) => ({
-        ...prev,
-        filter: filter,
-        offset: currentPage !== 1 ? ((currentPage * params.limit!) - params.limit! + 1) : 0,
-        searchKey: debouncedSearch || undefined
-      }))
-    }
-  }, [currentPage, filter, debouncedSearch])
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
       setDebouncedSearch(searchQuery.trim())
     }, 500)
 
-    return () => clearTimeout(timer)
+    return () => window.clearTimeout(searchDelay)
   }, [searchQuery])
 
-  // order list pagination
-  const { ordersQuery } = useOrderQuery(params)
-  const hasNext = ordersQuery.data?.hasNext ?? false
-
+  const orderParams: OrderParams = {
+    filter: statusFilter,
+    searchKey: debouncedSearch || undefined,
+    offset: (currentPage - 1) * ordersPerPage,
+    limit: ordersPerPage,
+    sort,
+  }
+  const { ordersQuery } = useOrderQuery(orderParams)
   const orders = ordersQuery.data?.orders ?? []
-  
-  const availableProducts = useMemo(() => {
-    return (productsQuery.data ?? []).filter((product: Product) => product.stock > 0)
-  }, [productsQuery.data])
+  const availableProducts = useMemo(
+    () => (productsQuery.data ?? []).filter((product) => product.stock > 0),
+    [productsQuery.data],
+  )
+  const total = carts.reduce(
+    (amount, cartItem) => amount + cartItem.price * (cartItem.quantity ?? 0),
+    0,
+  )
 
-  const total = carts.reduce<number>((sum, item) => sum + item.price * (item.quantity ?? 0), 0);
-
-  // wait to fetch all data
-  const isLoading = productsQuery.isLoading || customerQuery.isLoading || ordersQuery.isLoading
-  const isError = productsQuery.isError || customerQuery.isError || ordersQuery.isError
-
-  if (isLoading) return <Loading />
-
-  if (isError) {
-    return (
-      <div className='p-4'>
-        Something went wrong loading data.
-      </div>
-    )
+  const selectStatusFilter = (status?: OrderStatus): void => {
+    setCurrentPage(1)
+    setStatusFilter(status)
   }
 
-  // TODO: add update function
-  const handleUpdate = async (_data: OrderData) => {}
-
-  const handleDelete = async (id: number) => {
-    const confirm = await confirmation('Are you sure?', 'Delete this order?')
-    if (!confirm) return
+  const handleDelete = async (orderId: number): Promise<void> => {
+    const confirmed = await confirmation(
+      'Delete this order?',
+      'This order will be permanently removed. This action cannot be undone.',
+    )
+    if (!confirmed) return
 
     try {
-      await appToast.loadingPromise(deleteOrder.mutateAsync(id), {
+      await appToast.loadingPromise(deleteOrder.mutateAsync(orderId), {
         loadingTitle: 'Deleting order...',
         successTitle: 'Order deleted',
         errorTitle: 'Failed to delete order',
@@ -112,226 +125,322 @@ export default function index() {
     }
   }
 
-  const handleUpdateStatus = async (data: OrderData, status: OrderStatus) => {
-    const statusName =  ORDER_STATUS.find((item) => item.value === status)?.name ?? ''
-
-    const confirm = await confirmation('Are you sure', `You want to update the order status to ${statusName}`)
-    if (!confirm) return
+  const handleUpdateStatus = async (
+    order: OrderData,
+    status: OrderStatus,
+  ): Promise<void> => {
+    const statusName =
+      ORDER_STATUS.find((statusOption) => statusOption.value === status)?.name ??
+      status
+    const confirmed = await confirmation(
+      'Update order status?',
+      `Move this order to ${statusName}?`,
+    )
+    if (!confirmed) return
 
     try {
-      await appToast.loadingPromise(updateOrderStatus.mutateAsync({ data, status }), {
-        loadingTitle: 'Updating order status...',
-        successTitle: 'Order status updated',
-        errorTitle: 'Failed to update order status',
-        errorDescription: 'Please try again.',
-      })
-      setFilter(status)
+      await appToast.loadingPromise(
+        updateOrderStatus.mutateAsync({ data: order, status }),
+        {
+          loadingTitle: 'Updating order status...',
+          successTitle: 'Order status updated',
+          errorTitle: 'Failed to update order status',
+          errorDescription: 'Please try again.',
+        },
+      )
+      selectStatusFilter(status)
     } catch {
       return
     }
   }
 
-  const returnToMainPage = async () => {
-    const confirm = await confirmation('Are you sure?', 'Unsaved data will be lost.')
-    if (!confirm) return
+  const returnToOrders = async (): Promise<void> => {
+    if (carts.length) {
+      const confirmed = await confirmation(
+        'Leave this order?',
+        'The items currently in the order will be cleared.',
+      )
+      if (!confirmed) return
+    }
 
+    resetCart()
+    resetOrderForm()
     setOrderState('show_orders')
   }
 
-  const cartsArray = carts.map((item) => {
-    return {
-      id: item.id,
-      price: item.price,
-      quantity: item.quantity ?? 0,
-      profit: item.profit
-    }
-  })
+  const checkout = async (orderValues: OrderFormValues): Promise<void> => {
+    if (!carts.length) return
 
-  const checkout = async (data: OrderForm) => {
-    const form: CreateOrderCommand = {
-      orderName: data.orderName ?? null,
-      customerId: data.customerId ?? null,
-      notes: data.notes ?? null,
-      orderItems: cartsArray,
+    const orderItems = carts.map((cartItem) => ({
+      id: cartItem.id,
+      price: cartItem.price,
+      quantity: cartItem.quantity ?? 0,
+      profit: cartItem.profit,
+    }))
+    const command: CreateOrderCommand = {
+      orderName: orderValues.orderName?.trim() || null,
+      customerId: orderValues.customerId,
+      notes: orderValues.notes?.trim() || null,
+      orderItems,
       totalAmount: String(total),
-      status: 'pending'
+      status: 'pending',
     }
-
-    const confirm = await confirmation('Confirm Order', `Please review your order items and details before placing the order.`)
-    if (!confirm) return
-    
-    const toastId = appToast.loading({
-      title: "Checking out orders...",
-      description: "Please wait..."
-    })
+    const confirmed = await confirmation(
+      'Place this order?',
+      'Review the order details and products before placing it in the pending queue.',
+    )
+    if (!confirmed) return
 
     try {
-      await addOrder.mutateAsync(form)
-
+      await appToast.loadingPromise(addOrder.mutateAsync(command), {
+        loadingTitle: 'Placing order...',
+        successTitle: 'Order created',
+        successDescription: 'The order was added to the pending queue.',
+        errorTitle: 'Failed to create order',
+        errorDescription: 'Please check the order and try again.',
+      })
       resetOrderForm()
-      setShowForm(false)
       resetCart()
+      selectStatusFilter('pending')
       setOrderState('show_orders')
-
-      appToast.success({
-        title: 'Orders sucessfully created',
-        description: 'The new record has been saved.'
-      })
-    } catch (error) {
-      appToast.error({
-        title: 'Failed to proccess the orders',
-        description: 'Please try again.'
-      })
-    } finally {
-      toast.dismiss(toastId)
+    } catch {
+      return
     }
   }
 
+  const saveOrderChanges = async (
+    orderValues: OrderFormValues,
+  ): Promise<void> => {
+    if (!editingOrder?.id) return
+
+    const command: UpdateOrderCommand = {
+      orderName: orderValues.orderName?.trim() || undefined,
+      customerId: orderValues.customerId,
+      notes: orderValues.notes?.trim() || undefined,
+    }
+
+    try {
+      await appToast.loadingPromise(
+        updateOrder.mutateAsync({ id: editingOrder.id, data: command }),
+        {
+          loadingTitle: 'Updating order...',
+          successTitle: 'Order updated',
+          successDescription: 'The order details have been saved.',
+          errorTitle: 'Failed to update order',
+          errorDescription: 'Please check the form and try again.',
+        },
+      )
+      setEditingOrder(null)
+    } catch {
+      return
+    }
+  }
+
+  const isLoading =
+    ordersQuery.isLoading || productsQuery.isLoading || customerQuery.isLoading
+  const isError =
+    ordersQuery.isError || productsQuery.isError || customerQuery.isError
+
+  if (isLoading) return <Loading />
+
+  if (isError) {
+    return (
+      <div className="mx-auto flex min-h-[420px] w-full max-w-[1480px] items-center justify-center rounded-[20px] border border-[#e3e9e8] bg-white p-8 text-center dark:border-[#243936] dark:bg-[#12201f]">
+        <div>
+          <p className="text-[15px] font-semibold">Orders could not be loaded</p>
+          <p className="mt-1 text-xs text-[#93a5a5]">
+            Check your connection, then try again.
+          </p>
+          <Button
+            type="button"
+            onClick={() => {
+              ordersQuery.refetch()
+              productsQuery.refetch()
+              customerQuery.refetch()
+            }}
+            className="mt-4 rounded-[10px] bg-[#0c4b47] text-white hover:bg-[#007f78]"
+          >
+            Try again
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  if (orderState !== 'show_orders') {
+    return (
+      <Order
+        products={availableProducts}
+        triggerCheckout={checkout}
+        onBack={returnToOrders}
+        isSubmitting={addOrder.isPending}
+      />
+    )
+  }
+
   return (
-    <>
-      <div className={cn('flex items-center mx-3', orderState === 'show_orders' ? 'justify-between' : 'justify-end')}>
-        { orderState === 'show_orders' && (
-          <div className="flex flex-row w-full md:w-[65%] lg:w-1/2 gap-3">
-            <div className="relative w-2/3">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                  placeholder="Search orders..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-              />
-            </div>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant='outline' className='gap-2'>
-                  <Filter className='h-4 w-4' />
-                  <span className='text-sm'>
-                    {!filter ? 'All Status' : ORDER_STATUS.find((item) => item.value === filter)?.name ?? ''}
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align='end' className='w-52'>
-                <DropdownMenuLabel>Status</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-
-                <DropdownMenuCheckboxItem
-                  checked={!filter}
-                  onCheckedChange={() => setFilter(undefined)}
-                >
-                  All
-                </DropdownMenuCheckboxItem>
-
-                <DropdownMenuSeparator />
-
-                {ORDER_STATUS.map((status) => (
-                  <DropdownMenuCheckboxItem
-                    key={status.value}
-                    checked={filter === status.value}
-                    onCheckedChange={() => setFilter(status.value)}
-                  >
-                    {status.name}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                  <Button variant='outline' className='gap-2'>
-                    <ListFilter className="h-4 w-4 text-amber-500" />
-                    <span className='text-sm'>
-                        {params.sort === 'asc' ? 'Oldest First' : 'Newest First'}
-                    </span>
-                  </Button>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align='end' className='w-52'>
-                    <DropdownMenuCheckboxItem
-                        checked={params.sort == 'desc'}
-                        onCheckedChange={() => setParams((prev) => ({ ...prev, sort: 'desc' }))}
-                    >
-                        Latest to oldest
-                    </DropdownMenuCheckboxItem>
-
-                    <DropdownMenuCheckboxItem
-                        checked={params.sort == 'asc'}
-                        onCheckedChange={() => setParams((prev) => ({ ...prev, sort: 'asc' }))}
-                    >
-                        Oldest to latest
-                    </DropdownMenuCheckboxItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+    <div className="mx-auto w-full max-w-[1480px] text-[#16292b] dark:text-[#eaf3f1]">
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2.5">
+          <div className="flex min-w-52 max-w-[320px] flex-1 items-center overflow-hidden rounded-full border border-[#e3e9e8] bg-[#f6f8f8] dark:border-[#243936] dark:bg-[#16292b]">
+            <Input
+              aria-label="Search orders"
+              placeholder="Search orders..."
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              className="h-10 flex-1 border-0 bg-transparent px-4 text-[13px] shadow-none focus-visible:ring-0"
+            />
+            <Search className="mr-4 size-4 text-[#7c8e8e]" />
           </div>
-        )}
+
+          <label className="flex h-[38px] items-center gap-2 rounded-full border border-[#e3e9e8] bg-white px-3 text-[#3f5254] transition-colors focus-within:border-[#00beaa] dark:border-[#2b4340] dark:bg-[#12201f] dark:text-[#c3d4d1]">
+            <Filter className="size-3.5 shrink-0" />
+            <select
+              aria-label="Filter orders by status"
+              value={statusFilter ?? 'all'}
+              onChange={(event) => {
+                const selectedStatus = event.target.value
+                selectStatusFilter(
+                  isOrderStatus(selectedStatus) ? selectedStatus : undefined,
+                )
+              }}
+              className="appearance-none bg-transparent text-[12.5px] font-medium outline-none"
+            >
+              <option value="all">All statuses</option>
+              {ORDER_STATUS.map((statusOption) => (
+                <option key={statusOption.value} value={statusOption.value}>
+                  {statusOption.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="size-3.5 shrink-0" />
+          </label>
+
+          <label className="flex h-[38px] items-center gap-2 rounded-full border border-[#e3e9e8] bg-white px-3 text-[#3f5254] transition-colors focus-within:border-[#00beaa] dark:border-[#2b4340] dark:bg-[#12201f] dark:text-[#c3d4d1]">
+            <ListFilter className="size-3.5 shrink-0" />
+            <select
+              aria-label="Sort orders by date"
+              value={sort}
+              onChange={(event) => {
+                setCurrentPage(1)
+                setSort(event.target.value === 'asc' ? 'asc' : 'desc')
+              }}
+              className="appearance-none bg-transparent text-[12.5px] font-medium outline-none"
+            >
+              <option value="desc">Order date (latest)</option>
+              <option value="asc">Order date (oldest)</option>
+            </select>
+            <ChevronDown className="size-3.5 shrink-0" />
+          </label>
+        </div>
 
         <Button
-          onClick={() =>  orderState === 'show_orders' ? setOrderState('add_order') : returnToMainPage()}
-          variant="outline"
-          className={cn(
-            "text-white flex items-center gap-2 mb-2",
-            orderState === 'show_orders' ? 'bg-teal-600 hover:bg-teal-700' : 'bg-sky-600 hover:bg-sky-700'
-          )}
+          type="button"
+          onClick={() => setOrderState('add_order')}
+          className="h-10 rounded-[11px] bg-[#0c4b47] px-[18px] text-[13px] font-semibold text-white hover:bg-[#007f78]"
         >
-          {orderState === 'show_orders' ? <Plus className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" /> }
-          {orderState === 'show_orders' ? 'Create Order' : 'Go Back'}
+          <Plus className="size-4" />
+          New order
         </Button>
       </div>
 
-      {orderState === 'show_orders' 
-        ? (
-          <>
-            {!orders.length && (
-              <NoItemFound />
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mx-3 mt-3">
-              {orders.map((order: OrderData, index: number) => (
-                <OrderCard 
-                  key={order.id}
-                  order={order}
-                  orderNumber={index + 1}
-                  onUpdate={handleUpdate}
-                  onDelete={handleDelete}
-                  updateStatus={handleUpdateStatus}
-                />
-              ))}
-            </div>
-
-
-            {!!ordersQuery?.data?.orders?.length && (
-              <div className="flex w-full items-center justify-end gap-2 px-4 py-2">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                    className="bg-teal-600 text-white hover:bg-teal-700"
-                >
-                    <ArrowLeft className="h-3 w-3" />
-                    Previous
-                </Button>
-
-                <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!hasNext}
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                    className="bg-teal-600 text-white hover:bg-teal-700"
-                >
-                    Next
-                    <ArrowRight className="h-3 w-3" />
-                </Button>
-              </div>
-            )}
-          </>
-        ) : (
-          <Order 
-            products={availableProducts ?? []}
-            triggerCheckout={checkout}
-          />
+      {orders.length ? (
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,340px),1fr))] gap-3.5">
+          {orders.map((order) => (
+            <OrderCard
+              key={order.id ?? `${order.createdAt}-${order.orderName}`}
+              order={order}
+              onUpdate={setEditingOrder}
+              onDelete={handleDelete}
+              updateStatus={handleUpdateStatus}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-[20px] border border-[#e3e9e8] bg-white px-6 py-16 text-center dark:border-[#243936] dark:bg-[#12201f]">
+          <span className="mx-auto mb-3 grid size-12 place-items-center rounded-[14px] bg-[#f2f5f4] text-[#7c8e8e] dark:bg-[#16292b]">
+            <PackageOpen className="size-5" />
+          </span>
+          <p className="text-[14px] font-semibold">No orders found</p>
+          <p className="mt-1 text-xs text-[#93a5a5]">
+            Try another search or status, or create a new order.
+          </p>
+        </div>
       )}
-    </>
-  );
+
+      {!!orders.length && (
+        <div className="mt-5 flex items-center justify-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((page) => page - 1)}
+            className="h-9 rounded-[9px] border-[#dce3e2] bg-white text-xs dark:border-[#2b4340] dark:bg-[#12201f]"
+          >
+            <ArrowLeft className="size-3.5" />
+            Previous
+          </Button>
+          <span className="grid size-[30px] place-items-center rounded-[9px] bg-[#16292b] text-xs font-semibold text-white">
+            {currentPage}
+          </span>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={!ordersQuery.data?.hasNext}
+            onClick={() => setCurrentPage((page) => page + 1)}
+            className="h-9 rounded-[9px] border-[#dce3e2] bg-white text-xs dark:border-[#2b4340] dark:bg-[#12201f]"
+          >
+            Next
+            <ArrowRight className="size-3.5" />
+          </Button>
+        </div>
+      )}
+
+      <Sheet
+        open={Boolean(editingOrder)}
+        onOpenChange={(open) => !open && setEditingOrder(null)}
+      >
+        <SheetContent className="w-[470px] max-w-[94vw] gap-0 border-l-0 bg-white p-0 shadow-[-30px_0_60px_-30px_rgba(11,32,33,0.5)] dark:bg-[#12201f] sm:max-w-[470px] [&>button]:hidden">
+          <SheetHeader className="flex-row items-start gap-3 border-b border-[#edf1f0] px-[22px] py-4 text-left dark:border-[#1e322f]">
+            <span className="w-1 shrink-0 self-stretch rounded-full bg-gradient-to-b from-[#12cdbe] to-[#0c4b47]" />
+            <div className="min-w-0 flex-1">
+              <SheetDescription className="mb-1 font-mono text-[10.5px] uppercase tracking-[0.12em] text-[#93a5a5]">
+                Orders / Edit details
+              </SheetDescription>
+              <SheetTitle className="text-[19px] font-semibold tracking-[-0.02em]">
+                Edit order
+              </SheetTitle>
+              <p className="mt-1 truncate text-[11.5px] text-[#7c8e8e]">
+                Order #{editingOrder?.id}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setEditingOrder(null)}
+              aria-label="Close order form"
+              className="grid size-8 place-items-center rounded-[10px] border border-[#e3e9e8] bg-white transition-colors hover:border-[#16292b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#12cdbe] dark:border-[#2b4340] dark:bg-[#12201f]"
+            >
+              <X className="size-4" />
+            </button>
+          </SheetHeader>
+          {editingOrder && (
+            <div className="flex-1 overflow-y-auto px-[22px] py-5">
+              <OrderForm
+                key={editingOrder.id}
+                customers={customerQuery.data ?? []}
+                initialValues={editingOrder}
+                onSubmit={saveOrderChanges}
+                formId="edit-order-details"
+                showSubmitButton
+                submitLabel="Update order"
+                isSubmitting={updateOrder.isPending}
+              />
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
+    </div>
+  )
 }

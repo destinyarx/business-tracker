@@ -1,56 +1,105 @@
-import Link from "next/link";
+'use client'
 
-export default function ComingSoonPage() {
-  return (
-    <div className="w-full max-w-full min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 via-gray-50 to-teal-100 text-gray-800 -mt-10">
-      <div className="text-center p-8 rounded-2xl shadow-lg bg-white/80 backdrop-blur-md border border-gray-200 max-w-lg">
-          <div className="flex justify-center mb-6">
-              {/* Business icon */}
-              <div className="w-20 h-20 flex items-center justify-center rounded-full bg-teal-600 text-white shadow-md">
-              <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.8}
-                  stroke="currentColor"
-                  className="w-10 h-10"
-              >
-                  <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 14l2-2m0 0l2-2m-2 2v6m8 4H5a2 2 0 01-2-2V5a2 2 0 012-2h8l6 6v13a2 2 0 01-2 2z"
-                  />
-              </svg>
-              </div>
-          </div>
-  
-          <h1 className="text-2xl font-bold text-teal-800 mb-3">
-              This Feature is Coming Soon 🚀
-          </h1>
-  
-          <p className="text-gray-600 mb-6">
-              We're working hard to bring this feature to you.  
-              Stay tuned <br/> it's designed to help you manage your business smarter
-              and track success effortlessly.
+import { useMemo, useState } from 'react'
+import { RefreshCw } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import Loading from '@/components/organisms/Loading'
+import { InventoryOverview } from '@/features/inventory/components/InventoryOverview'
+import { InventoryTable } from '@/features/inventory/components/InventoryTable'
+import { StockAdjustmentDialog } from '@/features/inventory/components/StockAdjustmentDialog'
+import type { StockOverrides } from '@/features/inventory/inventory.types'
+import {
+  createInventorySummary,
+  getEffectiveStock,
+} from '@/features/inventory/inventory.utils'
+import { useProducts } from '@/features/products/hooks/useProducts'
+import type { Product } from '@/features/products/products.types'
+import { useConfirmation } from '@/app/provider/ConfirmationProvider'
+import { useToast } from '@/hooks/useToast'
+
+export default function InventoryPage() {
+  const { productsQuery } = useProducts()
+  const confirmation = useConfirmation()
+  const appToast = useToast()
+  const [stockOverrides, setStockOverrides] = useState<StockOverrides>({})
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const products = productsQuery.data ?? []
+  const summary = useMemo(
+    () => createInventorySummary(products, stockOverrides),
+    [products, stockOverrides],
+  )
+  const selectedStock = selectedProduct
+    ? getEffectiveStock(selectedProduct, stockOverrides)
+    : 0
+
+  const refreshInventory = async (): Promise<void> => {
+    setStockOverrides({})
+    await productsQuery.refetch()
+  }
+
+  const saveStockPreview = async (stock: number): Promise<void> => {
+    const productId = selectedProduct?.id
+    if (!selectedProduct || !productId) return
+
+    const confirmed = await confirmation(
+      'Preview this stock update?',
+      `${selectedProduct.title} will show ${stock} units until this page is refreshed or closed.`,
+    )
+    if (!confirmed) return
+
+    setStockOverrides((currentOverrides) => ({
+      ...currentOverrides,
+      [productId]: stock,
+    }))
+    setSelectedProduct(null)
+    appToast.success({
+      title: 'Stock preview updated',
+      description: 'This temporary value has not been saved to the backend.',
+    })
+  }
+
+  if (productsQuery.isLoading) {
+    return <Loading message="Fetching inventory, please wait..." />
+  }
+
+  if (productsQuery.isError) {
+    return (
+      <div className="mx-auto flex min-h-[420px] w-full max-w-[1480px] items-center justify-center rounded-[20px] border border-[#e3e9e8] bg-white p-8 text-center dark:border-[#243936] dark:bg-[#12201f]">
+        <div>
+          <p className="text-[15px] font-semibold">Inventory could not be loaded</p>
+          <p className="mt-1 text-xs text-[#93a5a5]">
+            Check your connection, then try again.
           </p>
-  
-          <Link href="/dashboard">
-              <button
-                  type="button"
-                  className="px-6 py-3 rounded-lg font-semibold bg-teal-600 text-white hover:bg-teal-300 transition-colors shadow-md"
-              >
-                  Back to Dashboard
-              </button>
-          </Link>
-  
-          <div className="mt-8 text-sm text-teal-600 italic font-light">
-              <div className="px-3 py-1 rounded-md bg-mustard-200/50 text-mustard-700 font-medium">
-                  #NegosyoTracker <br/>
-                  #SmallBusinessOwner <br/>
-              </div>
-          </div>
+          <Button
+            type="button"
+            onClick={() => productsQuery.refetch()}
+            className="mt-4 rounded-[10px] bg-[#0c4b47] text-white hover:bg-[#007f78]"
+          >
+            <RefreshCw className="size-4" />
+            Try again
+          </Button>
+        </div>
       </div>
+    )
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-[1480px] text-[#16292b] dark:text-[#eaf3f1]">
+      <InventoryOverview summary={summary} />
+      <InventoryTable
+        products={products}
+        stockOverrides={stockOverrides}
+        onAdjustStock={setSelectedProduct}
+        onRefresh={refreshInventory}
+        isRefreshing={productsQuery.isFetching}
+      />
+      <StockAdjustmentDialog
+        key={`${selectedProduct?.id ?? 'closed'}-${selectedStock}`}
+        product={selectedProduct}
+        currentStock={selectedStock}
+        onClose={() => setSelectedProduct(null)}
+        onSave={saveStockPreview}
+      />
     </div>
-  );
+  )
 }
-  

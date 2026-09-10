@@ -38,20 +38,6 @@ export default function ProductTable({ products }: ProductTableProps) {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [currentPage, setCurrentPage] = useState(1)
 
-  const categories = useMemo(
-    () => [
-      'all',
-      ...Array.from(
-        new Set(
-          products
-            .map((product) => product.category)
-            .filter((category): category is string => Boolean(category)),
-        ),
-      ),
-    ],
-    [products],
-  )
-
   const filteredProducts = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase()
 
@@ -102,11 +88,10 @@ export default function ProductTable({ products }: ProductTableProps) {
           onChange={(event) => setSelectedCategory(event.target.value)}
           className="h-10 rounded-[11px] border border-[#dce3e2] bg-white px-3 text-xs text-[#3f5254] outline-none focus:border-[#00beaa] dark:border-[#2b4340] dark:bg-[#12201f] dark:text-[#c3d4d1]"
         >
-          {categories.map((category) => (
-            <option key={category} value={category}>
-              {category === 'all'
-                ? 'All categories'
-                : PRODUCT_CATEGORY.find((productCategory) => productCategory.value === category)?.name ?? category}
+          <option value="all">All categories</option>
+          {PRODUCT_CATEGORY.map((category) => (
+            <option key={category.value} value={category.value}>
+              {category.name}
             </option>
           ))}
         </select>

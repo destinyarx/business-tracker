@@ -1,6 +1,15 @@
 import { z } from 'zod'
 
-const orderStatusSchema = z.enum(['pending', 'in_progress', 'completed', 'cancelled', 'failed'])
+export const orderStatusSchema = z.enum(['pending', 'in_progress', 'completed', 'cancelled', 'failed'])
+
+export const orderFormSchema = z.object({
+  customerId: z.number().int().positive().nullable(),
+  orderName: z.string().max(50, 'Order name must be 50 characters or fewer.').optional(),
+  status: orderStatusSchema,
+  notes: z.string().max(500, 'Notes must be 500 characters or fewer.').optional(),
+})
+
+export type OrderFormValues = z.infer<typeof orderFormSchema>
 
 const orderProductSummaryResponseSchema = z.object({
   id: z.number().int().positive(),

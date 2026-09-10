@@ -1,101 +1,79 @@
-import { cn } from '@/lib/utils'
+'use client'
+
 import { format } from 'date-fns'
+import { Check, TriangleAlert, X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import type { OrderData } from '@/features/orders/order.type'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Separator } from "@/components/ui/separator"
-import { CircleUserRound } from 'lucide-react'
-import { OrderLineItem } from '@/features/orders/order.type'
+import {
+  formatSalesCurrency,
+  getOrderItems,
+  getOrderTotal,
+  getOrderUnits,
+  getSaleDate,
+} from '@/features/sales/sales.utils'
 
-export default function OrderCard({ order }: { order: Partial<OrderData> | undefined }) {
-    const computeSubTotal = (orderItems: OrderLineItem[]) => {
-        return orderItems.reduce((sum, item) => sum + ((item.priceAtPurchase ?? 0) * (item.quantity ?? 0)), 0)
-    }
+interface SalesCardProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  order?: OrderData
+}
 
-    return (
-        <Card className="flex h-full flex-col pt-3">
-            <CardHeader>
-                <div className="flex flex-row items-start justify-between gap-3">
-                    <div className="flex flex-row items-start gap-3">
-                        {order?.orderName?.trim() ? (
-                            <div className="font-semibold leading-snug line-clamp-1 text-[1rem]">
-                                {order?.orderName?.trim() ? order.orderName : ''}
-                            </div>
-                        ) : (
-                            <p className="text-gray-400 text-lg font-semibold">
-                                N/A
-                            </p>
-                        )}
-                    </div>
-                </div>
+export default function SalesCard({ open, onOpenChange, order }: SalesCardProps) {
+  const orderItems = order ? getOrderItems(order) : []
 
-                <div className="flex flex-row justify-between items-center">
-                    <div>
-                        {order?.customer?.name?.trim() && (
-                            <div className="flex flex-row items-center gap-1 text-[0.75rem] font-semibold">
-                                <CircleUserRound className="w-4 h-4 text-sky-600" />
-                                <p>{order?.customer?.name ?? ''}</p>
-                            </div>
-                        )}
-                    </div>
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[calc(100dvh-2.5rem)] w-[calc(100%-2rem)] max-w-[520px] gap-0 overflow-hidden rounded-[20px] border-0 bg-white p-0 shadow-[0_40px_80px_-30px_rgba(12,75,71,0.55)] dark:bg-[#12201f] sm:max-w-[520px] [&>button]:hidden">
+        <div className="h-[3px] bg-gradient-to-r from-[#a8d97c] to-[#12cdbe]" />
+        <header className="flex items-start gap-3 border-b border-[#edf1f0] px-[22px] pb-4 pt-5 dark:border-[#1e322f]">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2.5">
+              <span className="font-mono text-[11px] text-[#93a5a5]">{order?.id ? `#${order.id}` : 'No reference'}</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#e7f7ec] px-2.5 py-1 text-[10.5px] font-semibold text-[#166534] dark:bg-[#173824] dark:text-[#75db92]"><Check className="size-3" />Completed</span>
+            </div>
+            <DialogTitle className="mt-1 text-[17px] font-semibold tracking-[-0.02em] text-[#16292b] dark:text-[#eaf3f1]">{order?.orderName?.trim() || 'Untitled order'}</DialogTitle>
+            <DialogDescription className="mt-1 text-[12.5px] text-[#5f7273] dark:text-[#9fb3b0]">
+              {order?.customer?.name?.trim() || 'Guest customer'}
+              {order && ` · ${format(new Date(getSaleDate(order)), 'MMM. dd, yyyy · hh:mm a')}`}
+            </DialogDescription>
+          </div>
+          <DialogClose asChild>
+            <Button type="button" variant="outline" size="icon-sm" aria-label="Close sale details" className="size-8 shrink-0 rounded-[10px] border-[#dce3e2] bg-white shadow-none dark:border-[#2b4340] dark:bg-[#12201f]"><X className="size-4" /></Button>
+          </DialogClose>
+        </header>
 
-                    <p className="text-right text-light text-[0.7rem] text-gray-400 -mt-1">
-                        {order?.createdAt && (
-                            <>
-                                {format(new Date(order.createdAt), 'MMMM d, yyyy')} • {' '}
-                                {format(new Date(order.createdAt), 'hh:mm a')}
-                            </>
-                        )}
-                    </p>
-                </div>
+        <section className="max-h-[46vh] min-h-0 overflow-y-auto px-[22px] py-4" aria-label="Product items">
+          <h3 className="mb-2.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#93a5a5]">Product items</h3>
+          <div className="flex flex-col gap-2">
+            {orderItems.map((orderItem, index) => (
+              <div key={orderItem.id ?? `${orderItem.product?.id ?? 'product'}-${index}`} className="flex items-center gap-3 rounded-xl border border-[#edf1f0] bg-[#fbfcfc] px-3 py-2.5 dark:border-[#1e322f] dark:bg-[#16292b]">
+                <span className="min-w-[34px] font-mono text-xs font-semibold text-[#007f78] dark:text-[#55ddd0]">{orderItem.quantity}×</span>
+                <span className="min-w-0 flex-1 text-[13px] text-[#16292b] dark:text-[#eaf3f1]">{orderItem.product?.title || 'Product unavailable'}</span>
+                <span className="whitespace-nowrap font-mono text-[11.5px] text-[#93a5a5]">{formatSalesCurrency(orderItem.priceAtPurchase)} ea</span>
+                <span className="whitespace-nowrap font-mono text-[12.5px] font-medium">{formatSalesCurrency(orderItem.priceAtPurchase * orderItem.quantity)}</span>
+              </div>
+            ))}
+            {!orderItems.length && <p className="py-8 text-center text-xs text-[#93a5a5]">No product items are available for this sale.</p>}
+          </div>
+          {order?.notes?.trim() && <div className="mt-4 rounded-xl bg-[#f8fafa] px-3 py-2.5 text-xs leading-5 text-[#5f7273] dark:bg-[#16292b] dark:text-[#9fb3b0]"><span className="font-semibold text-[#3f5254] dark:text-[#c3d4d1]">Notes: </span>{order.notes}</div>}
+          {order?.profitInaccurate && <div className="mt-3 flex items-start gap-2 rounded-xl bg-[#fff7e0] px-3 py-2.5 text-[11.5px] leading-5 text-[#8a6100] dark:bg-[#493816] dark:text-[#ffd66b]"><TriangleAlert className="mt-0.5 size-3.5 shrink-0" />Profit may be inaccurate because one or more products have no recorded profit.</div>}
+        </section>
 
-                <Separator />
-
-                {!!order?.notes && (
-                    <>
-                        <p className="text-gray-600 text-[0.7rem]">
-                            Notes: {order.notes}
-                        </p>
-                        <Separator />
-                    </>
-                )}
-            </CardHeader>
-
-            <CardContent className="flex-1 -mt-5">
-                <div className="max-h-[200px] overflow-y-auto">
-                    <table className='w-full border-collapse text-xs mt-2'>
-                        <thead>
-                            <tr className='border-b bg-muted font-semibold [&_th]:px-3 [&_th]:py-2'>
-                                <th className='text-left w-[5%]'>Qty</th>
-                                <th className='text-left'>Title</th>
-                                <th className='text-right'>Price</th>
-                                <th className='text-right'>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {order?.items!.map((item: OrderLineItem, index) => (
-                                <tr key={index} className='border-b last:border-0 [&_td]:px-3 [&_td]:py-2'>
-                                    <td className="w-[5%]">{item.quantity}</td>
-                                    <td>{item?.product?.title}</td>
-                                    <td className='text-right min-w-[60px]'>₱ {item.priceAtPurchase}</td>
-                                    <td className='text-right min-w-[60px]'>₱ {item.priceAtPurchase! * item.quantity!}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-
-                <Separator />
-
-                <div className="flex justify-between font-semibold text-[1.1rem] mt-3">
-                    <div>Subtotal</div>
-                    <div>₱ {computeSubTotal(order?.items!)}</div>
-                </div>
-
-                <div className="flex justify-between font-semibold text-[1.1rem] mt-3">
-                    <div>Profit</div>
-                    <div className="text-green-400">+ ₱ {order?.totalProfit}</div>
-                </div>
-            </CardContent>
-        </Card>
-    )
+        <footer className="flex flex-wrap items-center gap-3 border-t border-[#edf1f0] px-[22px] pb-[18px] pt-3.5 dark:border-[#1e322f]">
+          <div>
+            <p className="text-[11px] text-[#93a5a5]">{order ? getOrderUnits(order) : 0} units · Profit {formatSalesCurrency(Number(order?.totalProfit) || 0)}</p>
+            <p className="mt-0.5 text-xl font-semibold tracking-[-0.02em] text-[#16292b] dark:text-[#eaf3f1]">{order ? formatSalesCurrency(getOrderTotal(order)) : formatSalesCurrency(0)}</p>
+          </div>
+          <DialogClose asChild><Button type="button" className="ml-auto h-10 rounded-xl bg-[#0c4b47] px-5 text-[13px] font-semibold text-white hover:bg-[#007f78]">Close details</Button></DialogClose>
+        </footer>
+      </DialogContent>
+    </Dialog>
+  )
 }

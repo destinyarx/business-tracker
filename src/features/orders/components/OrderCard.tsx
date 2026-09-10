@@ -1,167 +1,182 @@
-import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
-import type { OrderData, OrderStatus } from '@/features/orders/order.type'
+import { ChevronDown, Pencil, Trash2 } from 'lucide-react'
 import { ORDER_STATUS } from '@/constants'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import { Separator } from "@/components/ui/separator"
 import { Button } from '@/components/ui/button'
-import { Pencil, Trash, CircleUserRound } from 'lucide-react'
-import { OrderLineItem } from '@/features/orders/order.type'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import type {
+  OrderData,
+  OrderLineItem,
+  OrderStatus,
+} from '@/features/orders/order.type'
+import { formatOrderCurrency } from '@/features/orders/order.utils'
 
-type Props = {
-    order: OrderData,
-    orderNumber: number,
-    onDelete: (id: number) => void,
-    onUpdate: (data: OrderData) => void,
-    updateStatus: (data: OrderData, status: OrderStatus) => void
+interface OrderCardProps {
+  order: OrderData
+  onDelete: (orderId: number) => void | Promise<void>
+  onUpdate: (order: OrderData) => void
+  updateStatus: (order: OrderData, status: OrderStatus) => void | Promise<void>
 }
 
-export default function OrderCard({ order, orderNumber, onDelete, onUpdate, updateStatus }: Props) {
-    const computeSubTotal = (orderItems: OrderLineItem[]) => {
-        return orderItems.reduce((sum, item) => sum + ((item.priceAtPurchase ?? 0) * (item.quantity ?? 0)), 0)
-    }
+const statusStyles: Record<OrderStatus, string> = {
+  pending: 'bg-[#fff7e0] text-[#8a6100] dark:bg-[#4a3818] dark:text-[#ffd66b]',
+  in_progress: 'bg-[#e6f0fe] text-[#1d4ed8] dark:bg-[#17315a] dark:text-[#8cb8ff]',
+  completed: 'bg-[#e4f7f4] text-[#00706a] dark:bg-[#173d39] dark:text-[#55ddd0]',
+  cancelled: 'bg-[#fdecec] text-[#b01c1c] dark:bg-[#4a2020] dark:text-[#ff9999]',
+  failed: 'bg-[#f4e9ea] text-[#8f2630] dark:bg-[#422126] dark:text-[#ff9ca5]',
+}
 
-    const statusConfig = ORDER_STATUS.find((item) => item.value === (order.status ?? 'pending'))
+const getOrderTotal = (orderItems: OrderLineItem[]): number =>
+  orderItems.reduce(
+    (total, orderItem) =>
+      total + orderItem.priceAtPurchase * orderItem.quantity,
+    0,
+  )
 
-    return (
-        <Card className="flex h-full flex-col pt-3">
-            <CardHeader>
-                <div className="flex flex-row items-start justify-between gap-3">
-                    <div className="flex flex-row items-start gap-3">
-                        <div className="bg-amber-400 text-white text-[0.8rem] rounded-lg font-semibold py-1 px-2">
-                            #{orderNumber}
-                        </div>
+const getInitials = (label: string): string =>
+  label
+    .split(' ')
+    .filter(Boolean)
+    .map((word) => word[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
 
-                        {order?.orderName?.trim() ? (
-                            <div className="font-semibold leading-snug line-clamp-1 text-[1rem]">
-                                {order?.orderName?.trim() ? order.orderName : ''}
-                            </div>
-                        ) : (
-                            <p className="text-gray-400 text-lg font-semibold">
-                                N/A
-                            </p>
-                        )}
-                        
-                    </div>
+export default function OrderCard({
+  order,
+  onDelete,
+  onUpdate,
+  updateStatus,
+}: OrderCardProps) {
+  const status = order.status ?? 'pending'
+  const customerName = order.customer?.name?.trim() || 'Guest customer'
+  const displayName = order.orderName?.trim() || customerName
+  const totalQuantity = order.items.reduce(
+    (quantity, orderItem) => quantity + orderItem.quantity,
+    0,
+  )
+  const orderTotal = order.totalAmount ?? getOrderTotal(order.items)
+  const statusLabel =
+    ORDER_STATUS.find((statusOption) => statusOption.value === status)?.name ??
+    (status === 'failed' ? 'Failed' : 'Pending')
 
-                    <div className={cn(statusConfig?.color, 'text-white text-[0.8rem] font-semibold whitespace-nowrap leading-none shrink-0 py-1 px-3 rounded-lg items-start self-start')}>
-                        {order.status ? statusConfig?.name : 'Pending'}
-                    </div>
-                </div>
+  return (
+    <article className="flex min-h-[280px] flex-col gap-3.5 rounded-[18px] border border-[#e3e9e8] bg-white px-[18px] pb-[15px] pt-[17px] transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[#c2e7e2] hover:shadow-[0_18px_34px_-28px_rgba(12,75,71,0.5)] dark:border-[#243936] dark:bg-[#12201f] dark:hover:border-[#2f625d]">
+      <div className="flex items-start gap-3">
+        <span className="grid size-9 shrink-0 place-items-center rounded-[11px] bg-[#f2f5f4] text-xs font-bold text-[#3f5254] dark:bg-[#16292b] dark:text-[#c3d4d1]">
+          {getInitials(customerName) || 'G'}
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <span className="font-mono text-[11px] text-[#7c8e8e]">
+              #{order.id ?? '—'}
+            </span>
+            <span className="text-[11px] text-[#b7c3c3]">
+              {format(new Date(order.createdAt), 'MMM d, yyyy · h:mm a')}
+            </span>
+          </div>
+          <h2 className="mt-0.5 truncate text-[14.5px] font-semibold tracking-[-0.01em]">
+            {displayName}
+          </h2>
+          <p className="mt-0.5 truncate text-xs text-[#5f7273] dark:text-[#9fb3b0]">
+            {customerName}
+          </p>
+        </div>
+        <span
+          className={`shrink-0 rounded-full px-2.5 py-1 text-[10.5px] font-semibold ${statusStyles[status]}`}
+        >
+          {statusLabel}
+        </span>
+      </div>
 
-                <div className="flex flex-row justify-between items-center">
-                    <div>
-                        {order.customer?.name?.trim() && (
-                            <div className="flex flex-row items-center gap-1 text-[0.75rem] font-semibold">
-                                <CircleUserRound className="w-4 h-4 text-sky-600" />
-                                <p>{order?.customer?.name ?? ''}</p>
-                            </div>
-                        )}
-                    </div>
+      {order.notes && (
+        <p className="line-clamp-2 text-[11.5px] leading-relaxed text-[#7c8e8e] dark:text-[#9fb3b0]">
+          {order.notes}
+        </p>
+      )}
 
-                    <p className="text-right text-light text-[0.7rem] text-gray-400 -mt-1">
-                        {order.createdAt && (
-                            <>
-                                {format(new Date(order.createdAt), 'MMMM d, yyyy')} • {' '}
-                                {format(new Date(order.createdAt), 'hh:mm a')}
-                            </>
-                        )}
-                    </p>
-                </div>
+      <div className="flex-1 border-t border-dashed border-[#e3e9e8] pt-3 dark:border-[#2b4340]">
+        <div className="max-h-[78px] space-y-[7px] overflow-y-auto pr-1">
+          {order.items.map((orderItem, index) => (
+            <div
+              key={orderItem.id ?? `${orderItem.product?.id ?? 'item'}-${index}`}
+              className="flex items-center gap-2.5 text-[12.5px]"
+            >
+              <span className="min-w-[26px] font-mono text-[#007f78] dark:text-[#55ddd0]">
+                {orderItem.quantity}×
+              </span>
+              <span className="min-w-0 flex-1 truncate text-[#3f5254] dark:text-[#c3d4d1]">
+                {orderItem.product?.title ?? 'Unavailable product'}
+              </span>
+              <span className="font-mono text-[11.5px] text-[#5f7273] dark:text-[#9fb3b0]">
+                {formatOrderCurrency(orderItem.priceAtPurchase * orderItem.quantity)}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
 
-                <Separator />
+      <div className="mt-auto flex flex-wrap items-end gap-2 border-t border-[#edf1f0] pt-3 dark:border-[#1e322f]">
+        <div className="mr-auto">
+          <p className="text-[10.5px] text-[#7c8e8e]">
+            {totalQuantity} {totalQuantity === 1 ? 'item' : 'items'}
+          </p>
+          <p className="text-[17px] font-semibold tracking-[-0.02em]">
+            {formatOrderCurrency(orderTotal)}
+          </p>
+        </div>
 
-                {!!order.notes && (
-                    <>
-                        <p className="text-gray-600 text-[0.7rem]">
-                            Notes: {order.notes}
-                        </p>
-                        <Separator />
-                    </>
-                )}
-            </CardHeader>
-
-            <CardContent className="flex-1 -mt-5">
-                <div className="max-h-[200px] overflow-y-auto">
-                    <table className='w-full border-collapse text-xs mt-2'>
-                        <thead>
-                            <tr className='border-b bg-muted font-semibold [&_th]:px-3 [&_th]:py-2'>
-                                <th className='text-left w-[5%]'>Qty</th>
-                                <th className='text-left'>Title</th>
-                                <th className='text-right'>Price</th>
-                                <th className='text-right'>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {order.items.map((item: OrderLineItem, index) => (
-                                <tr key={index} className='border-b last:border-0 [&_td]:px-3 [&_td]:py-2'>
-                                    <td className="w-[5%]">{item.quantity}</td>
-                                    <td>{item?.product?.title}</td>
-                                    <td className='text-right min-w-[60px]'>₱ {item.priceAtPurchase}</td>
-                                    <td className='text-right min-w-[60px]'>₱ {item.priceAtPurchase! * item.quantity!}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-
-                <Separator />
-
-                <div className="flex justify-between font-semibold text-[1.1rem] mt-3">
-                    <div>Subtotal</div>
-                    <div>₱ {computeSubTotal(order.items)}</div>
-                </div>
-            </CardContent>
-
-            <CardFooter className="flex flex-row flex-wrap justify-end gap-2">
-                <Button
-                    onClick={() => onUpdate(order)}
-                    size="sm"
-                    variant="outline"
-                    className="flex-1 dark:text-white hover:text-white hover:bg-amber-400"
-                >
-                    <Pencil className="w-6 h-6 text-amber-500" />
-                    Update
-                </Button>
-
-                <Button
-                    onClick={() => onDelete(order.id!)}
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 dark:text-white hover:text-white hover:bg-rose-400"
-                >
-                    <Trash className="w-6 h-6 text-rose-600" />
-                    Delete
-                </Button>
-
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            onClick={() => undefined}
-                            size="sm"
-                            variant="outline"
-                            className="flex-1 text-white bg-teal-400 hover:bg-teal-200"
-                        >
-                            Update Status
-                        </Button>
-                    </DropdownMenuTrigger>
-
-                    <DropdownMenuContent className="w-44">
-                        {ORDER_STATUS.filter(status => status.value !== order.status)
-                            .map((status) => (
-                                <DropdownMenuItem
-                                    key={status.name}
-                                    onClick={() => updateStatus(order, status.value)}
-                                    className="cursor-pointer"
-                                >
-                                    {status.name}
-                                </DropdownMenuItem>
-                            )
-                        )}
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </CardFooter>
-        </Card>
-    )
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => onUpdate(order)}
+          className="h-8 rounded-[10px] border-[#dce3e2] px-3 text-xs font-medium dark:border-[#2b4340] dark:bg-[#12201f]"
+        >
+          <Pencil className="size-3.5" />
+          Edit
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!order.id}
+          onClick={() => order.id && onDelete(order.id)}
+          className="h-8 rounded-[10px] border-[#f1cccc] px-3 text-xs font-medium text-[#b01c1c] hover:bg-[#fdecec] hover:text-[#b01c1c] dark:border-[#663535] dark:bg-[#12201f]"
+        >
+          <Trash2 className="size-3.5" />
+          Delete
+        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              size="sm"
+              className="h-8 rounded-[10px] bg-[#e4f7f4] px-3 text-xs font-semibold text-[#00706a] hover:bg-[#12cdbe] hover:text-white dark:bg-[#173d39] dark:text-[#55ddd0]"
+            >
+              Update status
+              <ChevronDown className="size-3.5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-44">
+            {ORDER_STATUS.filter(
+              (statusOption) => statusOption.value !== status,
+            ).map((statusOption) => (
+              <DropdownMenuItem
+                key={statusOption.value}
+                onClick={() => updateStatus(order, statusOption.value)}
+                className="cursor-pointer text-[13px]"
+              >
+                {statusOption.name}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </article>
+  )
 }

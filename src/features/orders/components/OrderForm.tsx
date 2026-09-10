@@ -1,144 +1,178 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useOrderStore } from '@/features/orders/useOrderStore'
+'use client'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Customer } from '@/features/customers/customers.types'
-import { useToast } from '@/hooks/useToast'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import type { Customer } from '@/features/customers/customers.types'
+import {
+  orderFormSchema,
+  type OrderFormValues,
+} from '@/features/orders/order.schema'
+import type { OrderForm as OrderFormData } from '@/features/orders/order.type'
 
-const orderFormSchema = z.object({
-    customerId: z.number().int().nullable(),
-    orderName: z.string().optional(),
-    status: z.enum(['pending', 'in_progress', 'failed', 'completed', 'cancelled']),
-    notes: z.string().optional()
-})
-
-type OrderForm = z.infer<typeof orderFormSchema>
-
-interface Props {
-    customers: Customer[],
-    onSubmit: (data: OrderForm) => void
+interface OrderFormProps {
+  customers: Customer[]
+  onSubmit: (order: OrderFormValues) => void | Promise<void>
+  formId?: string
+  initialValues?: OrderFormData
+  showSubmitButton?: boolean
+  submitLabel?: string
+  isSubmitting?: boolean
 }
 
-export default function OrderForm({ customers, onSubmit }: Props ) {
-    const { error } = useToast()
-    const { orderForm, showForm } = useOrderStore()
+const guestCustomerValue = 'guest'
 
-    const form = useForm<OrderForm>({
-        resolver: zodResolver(orderFormSchema),
-        defaultValues: {
-            customerId: orderForm?.customerId ?? null,
-            orderName: orderForm?.orderName ?? '',
-            status: orderForm?.status ?? 'pending',
-            notes: orderForm?.notes ?? ''
-        }
-    })
+export default function OrderForm({
+  customers,
+  onSubmit,
+  formId = 'order-details-form',
+  initialValues,
+  showSubmitButton = false,
+  submitLabel = 'Save order',
+  isSubmitting = false,
+}: OrderFormProps) {
+  const form = useForm<OrderFormValues>({
+    resolver: zodResolver(orderFormSchema),
+    defaultValues: {
+      customerId: initialValues?.customerId ?? null,
+      orderName: initialValues?.orderName ?? '',
+      status: initialValues?.status ?? 'pending',
+      notes: initialValues?.notes ?? '',
+    },
+  })
 
-    const customer = form.watch('customerId')
-    const orderName = form.watch('orderName')
+  const submitOrder = async (orderValues: OrderFormValues): Promise<void> => {
+    form.clearErrors(['orderName', 'customerId'])
 
-    const submitOrder = async () => {
-        form.clearErrors(['orderName', 'customerId'])
-
-        if (!customer && !orderName) {
-            form.setError('orderName', { type: 'manual', message: 'Fill up order name or customer field' })
-            form.setError('customerId', { type: 'manual', message: 'Fill up order name or customer field' })
-            return
-        }
-
-        onSubmit(form.getValues())
+    if (!orderValues.customerId && !orderValues.orderName?.trim()) {
+      const message = 'Enter an order name or attach a customer.'
+      form.setError('orderName', { type: 'manual', message })
+      form.setError('customerId', { type: 'manual', message })
+      return
     }
 
-    return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(submitOrder)}>
-                <FormField
-                    control={form.control}
-                    name="orderName"
-                    render={({field}) => (
-                        <FormItem className="mb-5">
-                            <FormLabel>Order Name</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Add order name" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
+    await onSubmit(orderValues)
+  }
+
+  return (
+    <Form {...form}>
+      <form
+        id={formId}
+        onSubmit={form.handleSubmit(submitOrder)}
+        className="space-y-4"
+      >
+        <input type="hidden" {...form.register('status')} />
+        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="orderName"
+            render={({ field }) => (
+              <FormItem className="min-w-0">
+                <FormLabel className="text-xs font-medium">Order name</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Add an order name"
+                    maxLength={50}
+                    className="h-11 rounded-[11px] border-[#dce3e2] px-3.5 text-[13.5px] shadow-none dark:border-[#2b4340]"
+                    {...field}
+                  />
+                </FormControl>
+                <p className="text-[11px] text-[#93a5a5]">
+                  Optional if a customer is attached.
+                </p>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="customerId"
+            render={({ field }) => (
+              <FormItem className="min-w-0">
+                <FormLabel className="text-xs font-medium">Customer</FormLabel>
+                <Select
+                  value={field.value ? String(field.value) : guestCustomerValue}
+                  onValueChange={(customerId) =>
+                    field.onChange(
+                      customerId === guestCustomerValue ? null : Number(customerId),
+                    )
+                  }
+                >
+                  <FormControl>
+                    <SelectTrigger className="h-11 w-full rounded-[11px] border-[#dce3e2] px-3.5 text-[13.5px] shadow-none dark:border-[#2b4340]">
+                      <SelectValue placeholder="Select customer" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value={guestCustomerValue}>
+                      Guest customer (no record)
+                    </SelectItem>
+                    {customers.map((customer) =>
+                      customer.id ? (
+                        <SelectItem key={customer.id} value={String(customer.id)}>
+                          {customer.name}
+                        </SelectItem>
+                      ) : null,
                     )}
+                  </SelectContent>
+                </Select>
+                <p className="text-[11px] text-[#93a5a5]">
+                  Leave as guest for walk-in sales.
+                </p>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <FormField
+          control={form.control}
+          name="notes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-xs font-medium">Notes</FormLabel>
+              <FormControl>
+                <Textarea
+                  rows={3}
+                  maxLength={500}
+                  placeholder="Delivery instructions, discounts agreed, or notes for staff."
+                  className="resize-y rounded-[11px] border-[#dce3e2] px-3.5 py-3 text-[13.5px] shadow-none dark:border-[#2b4340]"
+                  {...field}
                 />
+              </FormControl>
+              <FormMessage className="text-xs" />
+            </FormItem>
+          )}
+        />
 
-                <FormField
-                    control={form.control}
-                    name="customerId"
-                    render={({ field }) => { 
-                        const customerId = field.value; 
-
-                        return (
-                            <div className="flex flex-row items-center w-full gap-2">
-                                <FormItem className="mb-5 flex-1 flex flex-col">
-                                    <FormLabel>Customer</FormLabel>
-                                    <Select
-                                        value={customerId?.toString() ?? ""}
-                                        onValueChange={(val) => field.onChange(val === "" ? null : Number(val)) }
-                                    >
-                                        <FormControl>
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select customer" />
-                                            </SelectTrigger>
-                                        </FormControl>
-
-                                        <SelectContent>
-                                            {customers.map((customer) => (
-                                                <SelectItem key={customer.id} value={String(customer.id)}>
-                                                {customer.name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-
-                                {customerId !== null && (
-                                    <Button
-                                        onClick={() => field.onChange(null)}
-                                        size="sm"
-                                        variant="outline"
-                                        className="bg-rose-500 text-white"
-                                    >
-                                        Clear
-                                    </Button>
-                                )}
-                            </div>
-                        );
-                    }}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="notes"
-                    render={({field}) => 
-                        <FormItem className="mb-5">
-                            <FormLabel>Notes</FormLabel>
-                            <FormControl>
-                                <Textarea placeholder="Add notes or remarks here.." {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    }
-                />
-
-                <div className="flex justify-center">
-                    <Button
-                        type="submit"
-                        className="mt-4 rounded-lg bg-gray-900 px-8 py-3 text-sm font-medium text-white hover:bg-gray-800"
-                    >
-                        Submit
-                    </Button>
-                </div>
-            </form>
-        </Form>
-    )
+        {showSubmitButton && (
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="h-11 w-full rounded-xl bg-[#0c4b47] text-[13px] font-semibold text-white hover:bg-[#007f78]"
+          >
+            {submitLabel}
+          </Button>
+        )}
+      </form>
+    </Form>
+  )
 }
