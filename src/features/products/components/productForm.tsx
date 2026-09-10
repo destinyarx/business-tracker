@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ImageIcon, Upload } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -10,29 +11,39 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { SearchableSelect } from '@/components/molecules/SearchableSelect'
 import { PRODUCT_CATEGORY } from '@/constants'
-import { useProductFormStore } from '@/features/products/store/useProductFormStore';
+import { useProductFormStore } from '@/features/products/store/useProductFormStore'
 import { useProducts } from '../hooks/useProducts'
 import { FormState } from '@/features/products/products.types'
-import { Image, PhilippinePeso, Layers, Percent } from 'lucide-react'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Dropzone, DropZoneArea, DropzoneTrigger, DropzoneMessage, useDropzone } from "@/components/ui/dropzone";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  Dropzone,
+  DropZoneArea,
+  DropzoneTrigger,
+  DropzoneMessage,
+  useDropzone,
+} from '@/components/ui/dropzone'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useConfirmation } from '@/app/provider/ConfirmationProvider'
 import { useToast } from '@/hooks/useToast'
-import { productFormSchema } from '../products.schema'
-import type { ProductFormValues } from '../products.schema'
+import {
+  productFormSchema,
+  type ProductFormInput,
+  type ProductFormValues,
+} from '../products.schema'
+
+type ImageMode = 'current' | 'upload' | 'url'
 
 export default function ProductForm() {
   const { formState, product, closeForm } = useProductFormStore()
   const { createProduct, updateProduct } = useProducts()
   const confirmation = useConfirmation()
   const appToast = useToast()
+  const [isLoading, setIsLoading] = useState(false)
+  const [imageMode, setImageMode] = useState<ImageMode>('upload')
+  const isReadOnly = formState === FormState.VIEW
 
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [imageMode, setImageMode] = useState<string>('upload')
-
-  const form = useForm<ProductFormValues>({
-    resolver: zodResolver(productFormSchema) as any,
+  const form = useForm<ProductFormInput, undefined, ProductFormValues>({
+    resolver: zodResolver(productFormSchema),
     defaultValues: {
       id: undefined,
       title: '',
@@ -46,67 +57,83 @@ export default function ProductForm() {
       profit: undefined,
       profitPercentage: undefined,
       image: null,
-      imageUrl: null
-    }
+      imageUrl: null,
+    },
   })
 
   const lastEdited = useRef<'amount' | 'percentage' | null>(null)
-
-  const id = Number(form.watch('id'))
   const price = Number(form.watch('price'))
   const amount = Number(form.watch('profit'))
   const percentage = Number(form.watch('profitPercentage'))
 
-  const handleAddProduct = async (values: ProductFormValues): Promise<boolean> => {
-    const file = dropzone.fileStatuses.length ? dropzone.fileStatuses[0] : null  
+  const dropzone = useDropzone({
+    onDropFile: async (file: File) => ({
+      status: 'success',
+      result: URL.createObjectURL(file),
+    }),
+    validation: {
+      accept: { 'image/*': ['.png', '.jpg', '.jpeg'] },
+      maxSize: 10 * 1024 * 1024,
+      maxFiles: 1,
+    },
+    shiftOnMaxFiles: true,
+  })
 
-    if (file) {
-      const MAX_SIZE = 2 * 1024 * 1024; // 2 MB
-      const fileSize = file.file.size; 
+  const avatarSrc = dropzone.fileStatuses[0]?.result
+  const isPending = dropzone.fileStatuses[0]?.status === 'pending'
 
-      if (fileSize > MAX_SIZE) {
-        appToast.error({
-          title: "Image too large",
-          description: "Please upload an image smaller than 2 MB."
-        })
+  const handleAddProduct = async (productValues: ProductFormValues): Promise<boolean> => {
+    const selectedImage = dropzone.fileStatuses[0] ?? null
 
-        return false
-      }
+    if (selectedImage && selectedImage.file.size > 2 * 1024 * 1024) {
+      appToast.error({
+        title: 'Image too large',
+        description: 'Please upload an image smaller than 2 MB.',
+      })
+      return false
     }
 
     if (!amount) {
-      const confirm = await confirmation('Profit not set', 'Without a profit amount, this product won’t be included correctly in profit calculations')
-      if (!confirm) return false
+      const confirmed = await confirmation(
+        'Profit not set',
+        'Without a profit amount, this product will not be included correctly in profit calculations.',
+      )
+      if (!confirmed) return false
     }
 
-    await appToast.loadingPromise(createProduct.mutateAsync({ values, file }), {
-      loadingTitle: 'Adding product...',
-      successTitle: 'Product added',
-      successDescription: 'The new product has been saved.',
-      errorTitle: 'Failed to create product',
-      errorDescription: 'Please check the form and try again.',
-    })
+    await appToast.loadingPromise(
+      createProduct.mutateAsync({ values: productValues, file: selectedImage }),
+      {
+        loadingTitle: 'Adding product...',
+        successTitle: 'Product added',
+        successDescription: 'The new product has been saved.',
+        errorTitle: 'Failed to create product',
+        errorDescription: 'Please check the form and try again.',
+      },
+    )
 
     return true
   }
 
-  const onSubmit = async (values: ProductFormValues) => {
-    const updateId = values.id ?? product?.id
-
+  const onSubmit = async (productValues: ProductFormValues) => {
+    const updateId = productValues.id ?? product?.id
     setIsLoading(true)
 
     try {
       if (formState === FormState.ADD) {
-        const wasCreated = await handleAddProduct(values)
+        const wasCreated = await handleAddProduct(productValues)
         if (!wasCreated) return
       } else if (formState === FormState.EDIT && updateId) {
-        await appToast.loadingPromise(updateProduct.mutateAsync({ id: updateId, values }), {
-          loadingTitle: 'Updating product...',
-          successTitle: 'Product updated',
-          successDescription: 'The product details have been updated.',
-          errorTitle: 'Failed to update product',
-          errorDescription: 'Please check the form and try again.',
-        })
+        await appToast.loadingPromise(
+          updateProduct.mutateAsync({ id: updateId, values: productValues }),
+          {
+            loadingTitle: 'Updating product...',
+            successTitle: 'Product updated',
+            successDescription: 'The product details have been updated.',
+            errorTitle: 'Failed to update product',
+            errorDescription: 'Please check the form and try again.',
+          },
+        )
       }
 
       closeForm()
@@ -117,343 +144,198 @@ export default function ProductForm() {
     }
   }
 
-  // product image
-  const dropzone = useDropzone({
-    onDropFile: async (file: File) => {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      return {
-        status: "success",
-        result: URL.createObjectURL(file),
-      };
-    },
-    validation: {
-      accept: {
-        "image/*": [".png", ".jpg", ".jpeg"],
-      },
-      maxSize: 10 * 1024 * 1024,
-      maxFiles: 1,
-    },
-    shiftOnMaxFiles: true,
-  });
- 
-  const avatarSrc = dropzone.fileStatuses[0]?.result;
-  const isPending = dropzone.fileStatuses[0]?.status === "pending";
-
   useEffect(() => {
     if (!price) return
 
     if (lastEdited.current === 'percentage') {
-      const newAmount = (price * percentage) / 100
-      form.setValue('profit', Number(newAmount.toFixed(2)))
+      form.setValue('profit', Number(((price * percentage) / 100).toFixed(2)))
     }
 
     if (lastEdited.current === 'amount') {
-      const newPercentage = (amount / price) * 100
-      form.setValue('profitPercentage', Number(newPercentage.toFixed(2)))
+      form.setValue('profitPercentage', Number(((amount / price) * 100).toFixed(2)))
     }
   }, [price, amount, percentage, form])
 
   useEffect(() => {
-    if (product) {
-      form.reset(product)
-
-      if (product.imageSource === 'url') {
-        setImageMode('url')
-      } else if(product.imageSource === 'upload') {
-        setImageMode('current')
-      }
-
-    } else {
+    if (!product) {
       form.reset()
+      setImageMode('upload')
+      return
     }
-  }, [product])
+
+    form.reset(product)
+    setImageMode(product.imageSource === 'url' ? 'url' : 'current')
+  }, [product, form])
+
+  const setValidatedImageMode = (mode: string) => {
+    if (mode === 'current' || mode === 'upload' || mode === 'url') {
+      setImageMode(mode)
+    }
+  }
+
+  const fieldClassName =
+    'h-11 rounded-xl border-[#dce3e2] px-3.5 text-[13px] shadow-none dark:border-[#2b4340]'
+  const labelClassName = 'mb-1.5 text-[12.5px] font-medium'
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 w-full'>
-      <div className='grid gap-1'>
-        <Label className='mb-1 flex items-center gap-1'>
-          <span>Product Title</span>
-          <span className='text-red-700 font-bold'>*</span>
-        </Label>
-
-        <Input 
-          {...form.register('title')} 
-          readOnly={formState === FormState.VIEW}
-          placeholder='Enter product name' 
-        />
-
-        {form.formState.errors.title && (
-          <p className='text-red-500 text-sm mt-1'>
-            {form.formState.errors.title.message as string}
-          </p>
-        )}
-      </div>
-
-      <div className='grid gap-1'>
-        <Label className='mb-2'>Description</Label>
-        <Textarea 
-          {...form.register('description')} 
-          rows={4} 
-          readOnly={formState === FormState.VIEW}
-          placeholder='Write product details...' 
-        />
-      </div>
-
-      <div className='grid grid-cols-3 gap-7'>
-        <div>
-          <Label className='mb-1 flex items-center gap-1'>
-            <span>Category</span>
-            <span className='text-red-700 font-bold'>*</span>
-          </Label>
-          <SearchableSelect 
-            value={form.watch('category')}
-            items={PRODUCT_CATEGORY.map(c => ({ value: c.value, label: c.name }))}
-            onChange={(val) =>
-              form.setValue("category", val, {
-                shouldValidate: true,
-                shouldDirty: true,
-                shouldTouch: true,
-              })
-            }
-            readOnly={formState === FormState.VIEW}
-            label='Category'
-            placeholder='Choose category'
-          />
-
-          {form.formState.errors.category && (
-            <p className="text-sm text-red-500">
-              {form.formState.errors.category.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <Label className='mb-2'>Product Code / SKU</Label>
-          <Input 
-            {...form.register('sku')} 
-            readOnly={formState === FormState.VIEW}
-            placeholder='SKU code (optional)' 
-          />
-        </div>
-
-        <div>
-          <Label className='mb-2'>Supplier</Label>
-          <Input 
-            {...form.register('supplier')} 
-            readOnly={formState === FormState.VIEW}
-            placeholder='Supplier name (optional)' 
-          />
-        </div>
-      </div>
-
-      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4'>
-        <div>
-          <Label className='flex items-center gap-1 mb-2'>
-            <span>Price</span>
-            <span className='text-red-700 font-bold'>*</span>
-          </Label>
-
-          <div className='flex rounded-md shadow-xs'>
-            <Input 
-               type='number' 
-               step='0.01' 
-               {...form.register('price')} 
-               readOnly={formState === FormState.VIEW}
-               placeholder='0.00'
-              className='-me-px rounded-r-none shadow-none' 
-            />
-            <span className='border-input bg-background text-muted-foreground -z-1 inline-flex items-center rounded-r-md border px-3 text-sm'>
-              <PhilippinePeso className='size-4 text-green-700' />
-            </span>
-          </div>
-
-          {form.formState.errors.price && (
-            <p className='text-red-500 text-sm mt-1'>
-              {form.formState.errors.price.message as string}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <Label className='mb-2'>Stock / Qty</Label>
-          <div className='flex rounded-md shadow-xs'>
-            <Input 
-               {...form.register('stock')} 
-               readOnly={formState === FormState.VIEW}
-               type='number' 
-               placeholder='0'
-              className='-me-px rounded-r-none shadow-none' 
-            />
-            <span className='border-input bg-background text-muted-foreground -z-1 inline-flex items-center rounded-r-md border px-3 text-sm'>
-              <Layers className='size-4 text-purple-700' />
-            </span>
-          </div>
-          
-          {form.formState.errors.stock && (
-            <p className='text-red-500 text-sm mt-1'>
-              {form.formState.errors.stock.message as string}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <Label className='mb-2'>Profit</Label>
-          <div className='flex rounded-md shadow-xs'>
-            <Input 
-              {...form.register('profitPercentage', {
-                onChange: () => (lastEdited.current = 'percentage'),
-              })}
-              readOnly={formState === FormState.VIEW}
-              disabled={!price}
-              placeholder='0.00'
-              type='number'
-              step='0.01'
-              className='-me-px rounded-r-none shadow-none' 
-            />
-            <span className='border-input bg-background text-muted-foreground -z-1 inline-flex items-center rounded-r-md border px-3 text-sm'>
-              <Percent className='size-4 text-blue-700' />
-            </span>
-          </div>
-
-          {form.formState.errors.profitPercentage && (
-            <p className='text-red-500 text-sm mt-1'>
-              {form.formState.errors.profitPercentage.message as string}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <Label className='mb-2'>Profit Amount</Label>
-            <div className='flex rounded-md shadow-xs'>
-              <Input 
-                {...form.register('profit', {
-                  onChange: () => (lastEdited.current = 'amount'),
-                })}
-                readOnly={formState === FormState.VIEW}
-                disabled={!price}
-                placeholder='0.00'
-                type='number'
-                step='0.01' 
-                className='-me-px rounded-r-none shadow-none' 
-              />
-              <span className='border-input bg-background text-muted-foreground -z-1 inline-flex items-center rounded-r-md border px-3 text-sm'>
-                <PhilippinePeso className='size-4 text-green-700' />
-              </span>
-            </div>
-
-          {form.formState.errors.profit && (
-            <p className='text-red-500 text-sm mt-1'>
-              {form.formState.errors.profit.message as string}
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* ditoka */}
-      <RadioGroup 
-        value={imageMode}
-        onValueChange={setImageMode}
-        defaultValue='upload' 
-        className="flex flex-row gap-7 mt-5"
-      >
-        {product?.id && (
-          <div className='flex items-center gap-2'>
-            <RadioGroupItem
-              value='current'
-              id='current'
-              className='border-primary focus-visible:border-primary border-dashed'
-            />
-            <Label htmlFor='current' className="flex-1">Use previously uploaded image</Label>
-          </div>
-        )}
-
-        <div className='flex items-center gap-2'>
-          <RadioGroupItem
-            value='upload'
-            id='upload'
-            className='border-primary focus-visible:border-primary border-dashed'
-          />
-          <Label htmlFor='upload' className="flex-1">Upload Product Image</Label>
-        </div>
-
-        <div className='flex items-center gap-2'>
-          <RadioGroupItem
-            value='url'
-            id='url'
-            className='border-primary focus-visible:border-primary border-dashed'
-          />
-          <Label htmlFor='url' className="flex-1">URL Image</Label>
-        </div>
-      </RadioGroup>
-
-      {!!(imageMode === 'url') && (
-          <div className='flex-1 w-full px-2'>
-            <div className='flex rounded-md shadow-xs'>
-              <Input 
-                {...form.register('imageUrl')}  
-                type='text' 
-                placeholder='Insert image link here...' 
-                className='-me-px rounded-r-none shadow-none' 
-              />
-              <span className='border-input bg-background text-muted-foreground -z-1 inline-flex items-center rounded-r-md border px-3 text-sm'>
-                <Image className='size-4 text-sky-600' />
-              </span>
+    <form onSubmit={form.handleSubmit(onSubmit)} className="flex min-h-0 flex-1 flex-col">
+      <div className="flex-1 space-y-4 overflow-y-auto px-[22px] py-5">
+        <div className="rounded-2xl border border-dashed border-[#dce3e2] bg-[#fbfcfc] p-3.5 dark:border-[#2b4340] dark:bg-[#16292b]">
+          <div className="mb-3 flex items-center gap-2">
+            <ImageIcon className="size-4 text-[#007f78]" />
+            <div>
+              <p className="text-[12.5px] font-semibold">Product photo</p>
+              <p className="text-[11px] text-[#93a5a5]">Upload an image or paste a URL. Optional.</p>
             </div>
           </div>
-      )}
 
-      {!!(imageMode === 'upload') && (
-        <div className="w-full">
-          <Dropzone {...dropzone}>
-            <div className="flex justify-between w-full -mt-7">
+          <RadioGroup value={imageMode} onValueChange={setValidatedImageMode} className="mb-3 flex flex-wrap gap-3" disabled={isReadOnly}>
+            {product?.id && (
+              <div className="flex items-center gap-1.5">
+                <RadioGroupItem value="current" id="current" />
+                <Label htmlFor="current" className="text-[11.5px]">Current</Label>
+              </div>
+            )}
+            <div className="flex items-center gap-1.5">
+              <RadioGroupItem value="upload" id="upload" />
+              <Label htmlFor="upload" className="text-[11.5px]">Upload</Label>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <RadioGroupItem value="url" id="url" />
+              <Label htmlFor="url" className="text-[11.5px]">Image URL</Label>
+            </div>
+          </RadioGroup>
+
+          {imageMode === 'current' && (
+            <div className="flex items-center gap-3">
+              <Avatar className="size-[66px] rounded-xl">
+                <AvatarImage className="object-cover" src={product?.imageUrl ?? undefined} />
+                <AvatarFallback className="rounded-xl"><ImageIcon className="size-5" /></AvatarFallback>
+              </Avatar>
+              <p className="text-xs text-[#5f7273] dark:text-[#9fb3b0]">Using the saved product image.</p>
+            </div>
+          )}
+
+          {imageMode === 'url' && (
+            <Input
+              {...form.register('imageUrl')}
+              readOnly={isReadOnly}
+              placeholder="Paste image link"
+              className={fieldClassName}
+            />
+          )}
+
+          {imageMode === 'upload' && !isReadOnly && (
+            <Dropzone {...dropzone}>
               <DropzoneMessage />
-            </div>
-
-            <DropZoneArea className="w-full">
-              <DropzoneTrigger
-                className={cn(
-                  'w-full flex items-center gap-4 bg-transparent text-sm px-4 py-3',
-                  'border border-dashed rounded-md hover:bg-muted/40 transition'
-                )}
-              >
-                <Avatar className={cn('h-24 w-24', isPending && 'animate-pulse')}>
-                  <AvatarImage className="object-cover" src={avatarSrc} />
-                  <AvatarFallback>JG</AvatarFallback>
-                </Avatar>
-
-                <div className="flex flex-col gap-1 font-semibold text-left ml-10">
-                  <p>{avatarSrc ? 'Change product image' : 'Upload product image'}</p>
-                  <p className="text-xs text-muted-foreground">
-                    Please select an image smaller than 2MB
-                  </p>
-                </div>
-              </DropzoneTrigger>
-            </DropZoneArea>
-          </Dropzone>
-        </div>
-      )}
-      
-      {formState !== FormState.VIEW && (
-        <div className='flex justify-end'>
-          {formState === FormState.EDIT ? (
-            <Button 
-              type="submit"
-              disabled={isLoading} 
-              className='bg-teal-600 hover:bg-teal-700 text-white px-6'
-            >
-              Update Product
-            </Button>
-          ) : (
-            <Button 
-              type="submit"
-              disabled={isLoading} 
-              className='bg-teal-600 hover:bg-teal-700 text-white px-6'
-            >
-              Save Product
-            </Button>
+              <DropZoneArea>
+                <DropzoneTrigger className="flex w-full items-center gap-3 rounded-xl border border-dashed border-[#dce3e2] bg-white p-3 text-left hover:bg-[#f8fafa] dark:border-[#2b4340] dark:bg-[#12201f]">
+                  <Avatar className={cn('size-[58px] rounded-xl', isPending && 'animate-pulse')}>
+                    <AvatarImage className="object-cover" src={avatarSrc} />
+                    <AvatarFallback className="rounded-xl"><Upload className="size-5" /></AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-[12.5px] font-semibold">{avatarSrc ? 'Change product image' : 'Choose product image'}</p>
+                    <p className="mt-0.5 text-[11px] text-[#93a5a5]">PNG or JPG, smaller than 2 MB</p>
+                  </div>
+                </DropzoneTrigger>
+              </DropZoneArea>
+            </Dropzone>
           )}
         </div>
-      )}
+
+        <div>
+          <Label className={labelClassName}>Title <span className="text-red-600">*</span></Label>
+          <Input {...form.register('title')} readOnly={isReadOnly} placeholder="Enter product name" className={fieldClassName} />
+          {form.formState.errors.title && <p className="mt-1 text-xs text-red-600">{form.formState.errors.title.message}</p>}
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label className={labelClassName}>SKU</Label>
+            <Input {...form.register('sku')} readOnly={isReadOnly} placeholder="SKU code" className={cn(fieldClassName, 'font-mono')} />
+          </div>
+          <div>
+            <Label className={labelClassName}>Barcode</Label>
+            <Input {...form.register('barcode')} readOnly={isReadOnly} placeholder="Scan or type" className={cn(fieldClassName, 'font-mono')} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3">
+          <div className="min-w-0">
+            <Label className={labelClassName}>Price <span className="text-red-600">*</span></Label>
+            <Input {...form.register('price')} readOnly={isReadOnly} type="number" step="0.01" placeholder="0.00" className={cn(fieldClassName, 'font-mono')} />
+            {form.formState.errors.price && <p className="mt-1 text-xs text-red-600">{form.formState.errors.price.message}</p>}
+          </div>
+          <div className="min-w-0">
+            <Label className={labelClassName}>Stock</Label>
+            <Input {...form.register('stock')} readOnly={isReadOnly} type="number" placeholder="0" className={cn(fieldClassName, 'font-mono')} />
+            {form.formState.errors.stock && <p className="mt-1 text-xs text-red-600">{form.formState.errors.stock.message}</p>}
+          </div>
+          <div className="min-w-0">
+            <Label className={labelClassName}>Margin</Label>
+            <Input
+              {...form.register('profitPercentage', { onChange: () => { lastEdited.current = 'percentage' } })}
+              readOnly={isReadOnly}
+              disabled={!price}
+              type="number"
+              step="0.01"
+              placeholder="0%"
+              className={cn(fieldClassName, 'font-mono')}
+            />
+            {form.formState.errors.profitPercentage && <p className="mt-1 text-xs text-red-600">{form.formState.errors.profitPercentage.message}</p>}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label className={labelClassName}>Category <span className="text-red-600">*</span></Label>
+            <SearchableSelect
+              value={form.watch('category')}
+              items={PRODUCT_CATEGORY.map((category) => ({ value: category.value, label: category.name }))}
+              onChange={(category) => form.setValue('category', category, { shouldValidate: true, shouldDirty: true, shouldTouch: true })}
+              readOnly={isReadOnly}
+              label="Category"
+              placeholder="Choose category"
+            />
+            {form.formState.errors.category && <p className="mt-1 text-xs text-red-600">{form.formState.errors.category.message}</p>}
+          </div>
+          <div>
+            <Label className={labelClassName}>Supplier</Label>
+            <Input {...form.register('supplier')} readOnly={isReadOnly} placeholder="Supplier name" className={fieldClassName} />
+          </div>
+        </div>
+
+        <div>
+          <Label className={labelClassName}>Profit amount</Label>
+          <Input
+            {...form.register('profit', { onChange: () => { lastEdited.current = 'amount' } })}
+            readOnly={isReadOnly}
+            disabled={!price}
+            type="number"
+            step="0.01"
+            placeholder="0.00"
+            className={cn(fieldClassName, 'font-mono')}
+          />
+          {form.formState.errors.profit && <p className="mt-1 text-xs text-red-600">{form.formState.errors.profit.message}</p>}
+        </div>
+
+        <div>
+          <Label className={labelClassName}>Description</Label>
+          <Textarea {...form.register('description')} readOnly={isReadOnly} rows={3} placeholder="Optional notes for staff." className="resize-y rounded-xl border-[#dce3e2] px-3.5 py-3 text-[13px] shadow-none dark:border-[#2b4340]" />
+        </div>
+      </div>
+
+      <div className="flex gap-2.5 border-t border-[#edf1f0] bg-[#fbfcfc] px-[22px] py-3.5 dark:border-[#1e322f] dark:bg-[#16292b]">
+        <Button type="button" variant="outline" onClick={closeForm} className="h-11 flex-1 rounded-xl border-[#dce3e2] bg-white text-[13px] dark:border-[#2b4340] dark:bg-[#12201f]">
+          {isReadOnly ? 'Close' : 'Cancel'}
+        </Button>
+        {!isReadOnly && (
+          <Button type="submit" disabled={isLoading} className="h-11 flex-[1.4] rounded-xl bg-[#0c4b47] text-[13px] font-semibold text-white hover:bg-[#007f78]">
+            {formState === FormState.EDIT ? 'Update product' : 'Save product'}
+          </Button>
+        )}
+      </div>
     </form>
   )
 }

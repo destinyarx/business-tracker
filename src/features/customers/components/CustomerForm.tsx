@@ -1,93 +1,105 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Customer, CustomerType } from "@/features/customers/customers.types";
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-const customerSchema = z.object({
-  name: z.string().min(1, "Customer name is required").max(100),
-  // phone: z.string()
-  //   .transform((v) => (v === '' ? null : v))
-  //   .pipe(
-  //     z.string().max(11, 'Phone must be 11 digits maximum')
-  //   )
-  //   .optional(),
-  phone: z.string().max(11, 'Phone number should only at 11 digits').optional(),
-  customerType: z.enum(["normal", "loyal", "deluxe", "premium", "VIP"]),
-  email: z.string().max(50).optional(),
-  notes: z.string().max(500).optional(),
-});
-
-type CustomerFormData = z.infer<typeof customerSchema>;
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import type { Customer } from '@/features/customers/customers.types'
+import {
+  customerFormSchema,
+  type CustomerFormValues,
+} from '@/features/customers/customers.schema'
+import { Button } from '@/components/ui/button'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { cn } from '@/lib/utils'
 
 interface CustomerFormProps {
-  customer?: Customer;
-  onSubmit: (data: CustomerFormData) => void;
-  onCancel: () => void;
+  customer?: Customer
+  onSubmit: (customer: CustomerFormValues) => Promise<void> | void
+  onCancel: () => void
 }
 
+const customerTypes = ['normal', 'loyal', 'deluxe', 'premium', 'VIP'] as const
+
 export function CustomerForm({ customer, onSubmit, onCancel }: CustomerFormProps) {
-  const form = useForm<CustomerFormData>({
-    resolver: zodResolver(customerSchema),
+  const form = useForm<CustomerFormValues>({
+    resolver: zodResolver(customerFormSchema),
     defaultValues: {
-      name: customer?.name || '',
-      phone: customer?.phone || undefined,
-      customerType: customer?.customerType || 'normal',
-      notes: customer?.notes || undefined,
-      email: customer?.email || undefined,
+      name: customer?.name ?? '',
+      phone: customer?.phone ?? '',
+      customerType: customer?.customerType ?? 'normal',
+      notes: customer?.notes ?? '',
+      email: customer?.email ?? '',
     },
-  });
+  })
+
+  const nameLength = form.watch('name').length
+  const notesLength = form.watch('notes')?.length ?? 0
 
   return (
     <Form {...form}>
-      <form 
-        onSubmit={form.handleSubmit(onSubmit)} 
-        className="flex flex-col gap-5"
-      >
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Name
-                <strong className="text-red-700">*</strong>
-              </FormLabel>
-              <FormControl>
-                <Input placeholder="Enter customer name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex min-h-0 flex-1 flex-col">
+        <div className="flex-1 space-y-4 overflow-y-auto px-[22px] py-5">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-baseline gap-2">
+                  <FormLabel className="text-[12.5px] font-medium">Name</FormLabel>
+                  <span className="text-[12.5px] text-red-600">*</span>
+                  <span className="ml-auto font-mono text-[10.5px] text-[#93a5a5]">{nameLength}/100</span>
+                </div>
+                <FormControl>
+                  <Input
+                    placeholder="e.g. Nena Ramirez"
+                    className="h-11 rounded-xl border-[#dce3e2] px-3.5 text-[13.5px] shadow-none dark:border-[#2b4340]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Contact Number</FormLabel>
-              <FormControl>
-                <Input placeholder="0948123456" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-[12.5px] font-medium">Contact number</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="09xxxxxxxxx"
+                    inputMode="tel"
+                    className="h-11 rounded-xl border-[#dce3e2] px-3.5 font-mono text-[13.5px] shadow-none dark:border-[#2b4340]"
+                    {...field}
+                  />
+                </FormControl>
+                <p className="text-[11px] text-[#93a5a5]">11 digits, optional.</p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <div className="flex flex-row w-full gap-4">
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>Email</FormLabel>
+              <FormItem>
+                <FormLabel className="text-[12.5px] font-medium">Email address</FormLabel>
                 <FormControl>
-                  <Input placeholder="sample@gmail.com" {...field} />
+                  <Input
+                    placeholder="name@email.com"
+                    type="email"
+                    className="h-11 rounded-xl border-[#dce3e2] px-3.5 text-[13.5px] shadow-none dark:border-[#2b4340]"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -99,56 +111,64 @@ export function CustomerForm({ customer, onSubmit, onCancel }: CustomerFormProps
             name="customerType"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Type</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select customer type" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="normal">Normal</SelectItem>
-                    <SelectItem value="loyal">Loyal</SelectItem>
-                    <SelectItem value="deluxe">Deluxe</SelectItem>
-                    <SelectItem value="premium">Premium</SelectItem>
-                    <SelectItem value="VIP">VIP</SelectItem>
-                  </SelectContent>
-                </Select>
+                <FormLabel className="text-[12.5px] font-medium">Customer type</FormLabel>
+                <div className="flex flex-wrap gap-1.5">
+                  {customerTypes.map((customerType) => {
+                    const selected = field.value === customerType
+                    return (
+                      <button
+                        key={customerType}
+                        type="button"
+                        aria-pressed={selected}
+                        onClick={() => field.onChange(customerType)}
+                        className={cn(
+                          'rounded-full border border-[#e3e9e8] bg-white px-[15px] py-2 text-[12.5px] font-medium capitalize text-[#3f5254] transition-colors hover:border-[#00beaa] dark:border-[#2b4340] dark:bg-[#12201f] dark:text-[#c3d4d1]',
+                          selected && 'border-[#16292b] bg-[#16292b] text-white hover:border-[#16292b] dark:border-[#eaf3f1] dark:bg-[#eaf3f1] dark:text-[#16292b]',
+                        )}
+                      >
+                        {customerType}
+                      </button>
+                    )
+                  })}
+                </div>
+                <p className="text-[11px] text-[#93a5a5]">Tier drives the badge on the customers table.</p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="notes"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-baseline gap-2">
+                  <FormLabel className="text-[12.5px] font-medium">Notes</FormLabel>
+                  <span className="ml-auto font-mono text-[10.5px] text-[#93a5a5]">{notesLength}/500</span>
+                </div>
+                <FormControl>
+                  <Textarea
+                    placeholder="Delivery address, payment habits, discounts agreed."
+                    rows={4}
+                    className="resize-y rounded-xl border-[#dce3e2] px-3.5 py-3 text-[13.5px] shadow-none dark:border-[#2b4340]"
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
 
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Notes</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Add any additional notes..."
-                  className="resize-none"
-                  rows={4}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="flex justify-end gap-3 pt-4">
-          <Button type="button" variant="outline" onClick={onCancel}>
+        <div className="flex gap-2.5 border-t border-[#edf1f0] bg-[#fbfcfc] px-[22px] py-3.5 dark:border-[#1e322f] dark:bg-[#16292b]">
+          <Button type="button" variant="outline" onClick={onCancel} className="h-11 flex-1 rounded-xl border-[#dce3e2] bg-white text-[13px] dark:border-[#2b4340] dark:bg-[#12201f]">
             Cancel
           </Button>
-
-          <Button type="submit" className="bg-teal-600 hover:bg-teal-300">
-            {customer ? "Update" : "Submit"}
+          <Button type="submit" disabled={form.formState.isSubmitting} className="h-11 flex-[1.4] rounded-xl bg-[#0c4b47] text-[13px] font-semibold text-white hover:bg-[#007f78]">
+            {customer ? 'Update customer' : 'Save customer'}
           </Button>
         </div>
       </form>
     </Form>
-  );
+  )
 }

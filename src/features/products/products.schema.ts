@@ -43,6 +43,7 @@ export const productFormSchema = z.object({
 })
 
 export type ProductFormValues = z.infer<typeof productFormSchema>
+export type ProductFormInput = z.input<typeof productFormSchema>
 
 export const productResponseSchema = z.object({
   id: z.number().int().positive(),
