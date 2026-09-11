@@ -168,8 +168,8 @@ export default function Customers() {
 
   return (
     <div className="mx-auto w-full max-w-[1480px] text-[#16292b] dark:text-[#eaf3f1]">
-      <div className="mb-5 flex flex-wrap items-center gap-3">
-        <div className="flex min-w-60 max-w-[460px] flex-1 items-center overflow-hidden rounded-full border border-[#e3e9e8] bg-[#f6f8f8] dark:border-[#243936] dark:bg-[#16292b]">
+      <div className="flex flex-wrap items-center gap-3 mb-5">
+        {/*<div className="flex min-w-60 max-w-[460px] flex-1 items-center overflow-hidden rounded-full border border-[#e3e9e8] bg-[#f6f8f8] dark:border-[#243936] dark:bg-[#16292b]">
           <Input
             aria-label="Search customers"
             placeholder="Search customers..."
@@ -178,7 +178,7 @@ export default function Customers() {
             className="h-10 flex-1 border-0 bg-transparent px-4 text-[13px] shadow-none focus-visible:ring-0"
           />
           <Search className="mr-4 size-4 text-[#7c8e8e]" />
-        </div>
+        </div>*/}
         <Button
           onClick={openAddPanel}
           className="ml-auto h-10 rounded-[11px] bg-[#0c4b47] px-[18px] text-[13px] font-semibold text-white hover:bg-[#007f78]"
