@@ -2,6 +2,10 @@
 
 Business Tracker records the operational information a small or medium-sized business uses to manage customers, products, orders, inventory, sales, and costs.
 
+## Customers module
+
+Customer phone and email are optional. When supplied, a phone must contain exactly 11 digits and an email must have a valid email format. The customer form blocks submission and shows a field error when either value is invalid. Blank phone and email fields are sent to the API as `null`.
+
 ## Language
 
 **Expense**:

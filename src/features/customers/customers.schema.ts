@@ -2,9 +2,19 @@ import { z } from 'zod'
 
 export const customerFormSchema = z.object({
   name: z.string().min(1, 'Customer name is required').max(100),
-  phone: z.string().max(11, 'Phone number should only be 11 digits').optional(),
+  phone: z
+    .string()
+    .refine((phone) => phone === '' || /^\d{11}$/.test(phone), {
+      message: 'Phone number must contain exactly 11 digits',
+    })
+    .optional(),
   customerType: z.enum(['normal', 'loyal', 'deluxe', 'premium', 'VIP']),
-  email: z.string().max(50).optional(),
+  email: z
+    .union([
+      z.literal(''),
+      z.email({ error: 'Enter a valid email address' }).max(50, 'Email must be 50 characters or fewer'),
+    ])
+    .optional(),
   notes: z.string().max(500).optional(),
 })
 

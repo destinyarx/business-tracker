@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { customersResponseSchema } from '../src/features/customers/customers.schema.ts'
+import {
+  customerFormSchema,
+  customersResponseSchema,
+} from '../src/features/customers/customers.schema.ts'
+import { createCustomersApi } from '../src/features/customers/customers.api.ts'
 import { paginatedExpensesResponseSchema } from '../src/features/expenses/expenses.schema.ts'
 import { paginatedOrdersResponseSchema } from '../src/features/orders/order.schema.ts'
 import { toUpdateOrderStatusCommand } from '../src/features/orders/order.mapper.ts'
@@ -45,6 +49,65 @@ test('customer response parsing accepts backend status codes', () => {
   })
 
   assert.equal(result.success, true)
+})
+
+test('customer form accepts an omitted phone or exactly 11 digits', () => {
+  const baseCustomer = {
+    name: 'Sample Customer',
+    customerType: 'normal',
+    email: '',
+    notes: '',
+  }
+
+  assert.equal(customerFormSchema.safeParse({ ...baseCustomer, phone: '' }).success, true)
+  assert.equal(customerFormSchema.safeParse({ ...baseCustomer, phone: '09123456789' }).success, true)
+  assert.equal(customerFormSchema.safeParse({ ...baseCustomer, phone: '9123456789' }).success, false)
+  assert.equal(customerFormSchema.safeParse({ ...baseCustomer, phone: '091234567890' }).success, false)
+  assert.equal(customerFormSchema.safeParse({ ...baseCustomer, phone: '09123abc789' }).success, false)
+})
+
+test('customer form accepts an omitted or valid email', () => {
+  const baseCustomer = {
+    name: 'Sample Customer',
+    customerType: 'normal',
+    phone: '',
+    notes: '',
+  }
+
+  assert.equal(customerFormSchema.safeParse({ ...baseCustomer, email: '' }).success, true)
+  assert.equal(customerFormSchema.safeParse({ ...baseCustomer, email: 'customer@example.com' }).success, true)
+  assert.equal(customerFormSchema.safeParse({ ...baseCustomer, email: 'invalid-email' }).success, false)
+})
+
+test('customer create and update requests normalize blank contacts to null', async () => {
+  let createRequestBody
+  let updateRequestBody
+  const customersApi = createCustomersApi({
+    post: async (_path, body) => {
+      createRequestBody = body
+      return { data: {} }
+    },
+    patch: async (_path, body) => {
+      updateRequestBody = body
+      return { data: {} }
+    },
+  })
+
+  const customer = {
+    name: 'Sample Customer',
+    customerType: 'normal',
+    phone: '',
+    email: ' ',
+    notes: '',
+  }
+
+  await customersApi.create(customer)
+  await customersApi.update(1, customer)
+
+  assert.equal(createRequestBody.phone, null)
+  assert.equal(createRequestBody.email, null)
+  assert.equal(updateRequestBody.phone, null)
+  assert.equal(updateRequestBody.email, null)
 })
 
 test('product response parsing rejects a missing required field', () => {

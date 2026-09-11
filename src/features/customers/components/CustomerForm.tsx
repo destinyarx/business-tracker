@@ -29,6 +29,7 @@ const customerTypes = ['normal', 'loyal', 'deluxe', 'premium', 'VIP'] as const
 export function CustomerForm({ customer, onSubmit, onCancel }: CustomerFormProps) {
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerFormSchema),
+    mode: 'onTouched',
     defaultValues: {
       name: customer?.name ?? '',
       phone: customer?.phone ?? '',
@@ -77,6 +78,7 @@ export function CustomerForm({ customer, onSubmit, onCancel }: CustomerFormProps
                   <Input
                     placeholder="09xxxxxxxxx"
                     inputMode="tel"
+                    autoComplete="tel"
                     className="h-11 rounded-xl border-[#dce3e2] px-3.5 font-mono text-[13.5px] shadow-none dark:border-[#2b4340]"
                     {...field}
                   />
@@ -97,6 +99,7 @@ export function CustomerForm({ customer, onSubmit, onCancel }: CustomerFormProps
                   <Input
                     placeholder="name@email.com"
                     type="email"
+                    autoComplete="email"
                     className="h-11 rounded-xl border-[#dce3e2] px-3.5 text-[13.5px] shadow-none dark:border-[#2b4340]"
                     {...field}
                   />

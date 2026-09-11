@@ -11,5 +11,8 @@ export interface Customer {
   createdAt?: Date
 }
 
-export type CreateCustomerCommand = Omit<Customer, 'id' | 'createdAt'>
+export type CreateCustomerCommand = Omit<Customer, 'id' | 'createdAt' | 'phone' | 'email'> & {
+  phone?: string | null
+  email?: string | null
+}
 export type UpdateCustomerCommand = CreateCustomerCommand
