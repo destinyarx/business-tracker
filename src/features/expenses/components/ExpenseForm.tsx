@@ -76,6 +76,7 @@ export default function ExpenseForm({
       isUpdate
         ? `${expenseValues.title} will be updated with the details you entered.`
         : `${expenseValues.title} will be added to your expense records.`,
+      { confirmText: isUpdate ? 'Update expense' : 'Save expense' },
     )
     if (!confirmed) return
 

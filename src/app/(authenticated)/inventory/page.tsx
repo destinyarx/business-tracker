@@ -44,6 +44,7 @@ export default function InventoryPage() {
     const confirmed = await confirmation(
       'Preview this stock update?',
       `${selectedProduct.title} will show ${stock} units until this page is refreshed or closed.`,
+      { confirmText: 'Update stock' },
     )
     if (!confirmed) return
 

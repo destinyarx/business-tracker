@@ -3,10 +3,12 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { useOrderService } from '@/features/orders/orderService.service'
 import type { CreateOrderCommand, OrderData, OrderStatus, UpdateOrderCommand } from '@/features/orders/order.type'
+import { businessKeys, useBusinessScope } from '@/lib/business-scope'
 
 export function useOrderMutation() {
     const qc = useQueryClient()
     const orderService = useOrderService()
+    const { userId } = useBusinessScope()
 
     const addOrder = useMutation({
         mutationFn: (order: CreateOrderCommand) => orderService.create(order),
@@ -19,7 +21,9 @@ export function useOrderMutation() {
         mutationFn: ({ id, data }: { id: number, data: UpdateOrderCommand }) => orderService.update(id, data),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['orders'] })
+            qc.invalidateQueries({ queryKey: businessKeys.dashboardRoot(userId) })
             qc.invalidateQueries({ queryKey: ['sales'] })
+            qc.invalidateQueries({ queryKey: businessKeys.dashboardRoot(userId) })
         }
     })
 
@@ -27,6 +31,7 @@ export function useOrderMutation() {
         mutationFn: (id: number) => orderService.delete(id),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['orders'] })
+            qc.invalidateQueries({ queryKey: businessKeys.dashboardRoot(userId) })
         }
     })
 
@@ -36,6 +41,7 @@ export function useOrderMutation() {
             qc.invalidateQueries({ queryKey: ['orders']})
             qc.invalidateQueries({ queryKey: ['products']})
             qc.invalidateQueries({ queryKey: ['sales'] })
+            qc.invalidateQueries({ queryKey: businessKeys.dashboardRoot(userId) })
         }
     })
 

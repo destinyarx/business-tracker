@@ -8,16 +8,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { ConfirmationDialog } from '@/components/organisms/ConfirmationDialog'
 
 export type ConfirmOptions = {
   title: string
@@ -48,7 +39,7 @@ const DEFAULTS: Required<
 export function ConfirmationProvider({ children }: { children: ReactNode }) {
   const resolverRef = useRef<((value: boolean) => void) | null>(null)
   const [open, setOpen] = useState<boolean>(false)
-  const [opts, setOpts] = useState<ConfirmOptions>({
+  const [options, setOptions] = useState<ConfirmOptions>({
     title: '',
     description: '',
     ...DEFAULTS,
@@ -68,7 +59,7 @@ export function ConfirmationProvider({ children }: { children: ReactNode }) {
         resolverRef.current = null
       }
 
-      setOpts({
+      setOptions({
         title,
         description,
         confirmText: more?.confirmText ?? DEFAULTS.confirmText,
@@ -80,54 +71,30 @@ export function ConfirmationProvider({ children }: { children: ReactNode }) {
       return new Promise<boolean>((resolve) => {
         resolverRef.current = resolve
       })
-  },[])
+  }, [])
 
   return (
     <ConfirmationContext.Provider value={confirm}>
       {children}
 
-      <AlertDialog open={open} onOpenChange={(v) => !v && close(false)}>
-        <AlertDialogContent className='sm:max-w-[420px] rounded-2xl'>
-          <AlertDialogHeader>
-            <AlertDialogTitle className='text-base'>
-              {opts.title}
-            </AlertDialogTitle>
-            {opts.description ? (
-              <AlertDialogDescription className='text-sm'>
-                {opts.description}
-              </AlertDialogDescription>
-            ) : null}
-          </AlertDialogHeader>
-
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => close(false)}
-              className='rounded-xl text-white bg-rose-600 hover:bg-rose-400'
-            >
-              {opts.cancelText}
-            </AlertDialogCancel>
-
-            <AlertDialogAction
-              onClick={() => close(true)}
-              className={
-                opts.destructive
-                  ? 'rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90'
-                  : 'rounded-xl text-white bg-green-500 hover:bg-green-300'
-              }
-            >
-              {opts.confirmText}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmationDialog
+        open={open}
+        title={options.title}
+        description={options.description}
+        confirmText={options.confirmText ?? DEFAULTS.confirmText}
+        cancelText={options.cancelText ?? DEFAULTS.cancelText}
+        destructive={options.destructive ?? DEFAULTS.destructive}
+        onCancel={() => close(false)}
+        onConfirm={() => close(true)}
+      />
     </ConfirmationContext.Provider>
   )
 }
 
-export function useConfirmation() {
-  const ctx = useContext(ConfirmationContext)
-  if (!ctx) {
-    throw new Error('Unexpected error occured.')
+export function useConfirmation(): ConfirmFn {
+  const confirmation = useContext(ConfirmationContext)
+  if (!confirmation) {
+    throw new Error('useConfirmation must be used within ConfirmationProvider.')
   }
-  return ctx
+  return confirmation
 }

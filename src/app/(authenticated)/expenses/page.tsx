@@ -153,6 +153,10 @@ export default function ExpensesPage() {
     const confirmed = await confirmation(
       'Delete this expense?',
       'This expense will be removed from your records. This action cannot be undone.',
+      {
+        confirmText: 'Delete expense',
+        destructive: true,
+      },
     )
     if (!confirmed) return
 

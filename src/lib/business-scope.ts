@@ -15,6 +15,9 @@ export function useBusinessScope() {
 }
 
 export const businessKeys = {
+  dashboardRoot: (userId: string | null) => ['dashboard', userId] as const,
+  dashboard: (userId: string | null, range: string) =>
+    ['dashboard', userId, { range }] as const,
   customers: (userId: string | null) => ['customers', userId] as const,
   products: (userId: string | null) => ['products', userId] as const,
   expenses: (userId: string | null, ...parts: unknown[]) =>

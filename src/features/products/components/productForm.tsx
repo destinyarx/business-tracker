@@ -97,6 +97,7 @@ export default function ProductForm() {
       const confirmed = await confirmation(
         'Profit not set',
         'Without a profit amount, this product will not be included correctly in profit calculations.',
+        { confirmText: 'Continue without profit' },
       )
       if (!confirmed) return false
     }

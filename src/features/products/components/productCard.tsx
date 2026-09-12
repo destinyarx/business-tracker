@@ -35,7 +35,14 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleDelete = async (productId: number | undefined, imageName: string | null | undefined) => {
     if (!productId) return
 
-    const confirmed = await confirmation('Delete this product?', `${product.title} will be permanently removed.`)
+    const confirmed = await confirmation(
+      'Delete this product?',
+      `${product.title} will be permanently removed. This action cannot be undone.`,
+      {
+        confirmText: 'Delete product',
+        destructive: true,
+      },
+    )
     if (!confirmed) return
 
     try {

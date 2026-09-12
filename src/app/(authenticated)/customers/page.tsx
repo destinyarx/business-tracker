@@ -26,19 +26,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
 import Loading from '@/components/organisms/Loading'
 import { useInvalidateQuery } from '@/hooks/useInvalidateQuery'
 import { useToast } from '@/hooks/useToast'
+import { useConfirmation } from '@/app/provider/ConfirmationProvider'
 
 const tierStyles: Record<CustomerType, { color: string; label: string }> = {
   normal: { color: '#93a5a5', label: 'Normal' },
@@ -54,9 +45,9 @@ export default function Customers() {
   const { customerQuery, createCustomer, updateCustomer, deleteCustomer } = useCustomers()
   const { invalidateKey } = useInvalidateQuery()
   const appToast = useToast()
+  const confirmation = useConfirmation()
   const [searchQuery, setSearchQuery] = useState('')
   const [isFormOpen, setIsFormOpen] = useState(false)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
 
   const customers = customerQuery.data ?? []
@@ -105,18 +96,27 @@ export default function Customers() {
     }
   }
 
-  const handleDeleteCustomer = async () => {
-    if (!selectedCustomer?.id) return
+  const handleDeleteCustomer = async (customer: Customer) => {
+    if (!customer.id) return
+
+    const confirmed = await confirmation(
+      'Delete this customer?',
+      `${customer.name} will be permanently removed. This action cannot be undone.`,
+      {
+        confirmText: 'Delete customer',
+        destructive: true,
+      },
+    )
+
+    if (!confirmed) return
 
     try {
-      await appToast.loadingPromise(deleteCustomer.mutateAsync(selectedCustomer.id), {
+      await appToast.loadingPromise(deleteCustomer.mutateAsync(customer.id), {
         loadingTitle: 'Deleting customer...',
         successTitle: 'Customer deleted',
         errorTitle: 'Failed to delete customer',
         errorDescription: 'Please try again.',
       })
-      setIsDeleteDialogOpen(false)
-      setSelectedCustomer(null)
     } catch {
       return
     }
@@ -130,11 +130,6 @@ export default function Customers() {
   const openEditPanel = (customer: Customer) => {
     setSelectedCustomer(customer)
     setIsFormOpen(true)
-  }
-
-  const openDeleteDialog = (customer: Customer) => {
-    setSelectedCustomer(customer)
-    setIsDeleteDialogOpen(true)
   }
 
   const closeFormPanel = () => {
@@ -216,7 +211,7 @@ export default function Customers() {
       <CustomerTable
         data={customers}
         onEdit={openEditPanel}
-        onDelete={openDeleteDialog}
+        onDelete={handleDeleteCustomer}
         globalFilter={searchQuery}
         onGlobalFilterChange={setSearchQuery}
       />
@@ -246,22 +241,6 @@ export default function Customers() {
         </SheetContent>
       </Sheet>
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete this customer?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {selectedCustomer?.name} will be permanently removed. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteCustomer} className="bg-red-600 text-white hover:bg-red-700">
-              Delete customer
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   )
 }

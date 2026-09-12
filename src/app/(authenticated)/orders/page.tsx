@@ -118,6 +118,10 @@ export default function OrdersPage() {
     const confirmed = await confirmation(
       'Delete this order?',
       'This order will be permanently removed. This action cannot be undone.',
+      {
+        confirmText: 'Delete order',
+        destructive: true,
+      },
     )
     if (!confirmed) return
 
@@ -165,6 +169,7 @@ export default function OrdersPage() {
     const confirmed = await confirmation(
       'Update order status?',
       `Move this order to ${statusName}?`,
+      { confirmText: 'Update status' },
     )
     if (!confirmed) return
 
@@ -195,6 +200,7 @@ export default function OrdersPage() {
       const confirmed = await confirmation(
         'Leave this order?',
         'The items currently in the order will be cleared.',
+        { confirmText: 'Leave order', destructive: true },
       )
       if (!confirmed) return
     }
@@ -224,6 +230,7 @@ export default function OrdersPage() {
     const confirmed = await confirmation(
       'Place this order?',
       'Review the order details and products before placing it in the pending queue.',
+      { confirmText: 'Place order' },
     )
     if (!confirmed) return
 

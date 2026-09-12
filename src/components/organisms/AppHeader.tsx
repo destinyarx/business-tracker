@@ -7,7 +7,11 @@ import { ThemeToggle } from '@/components/molecules/ThemeToggle'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 
 const routeCopy: Record<string, { title: string; description: string }> = {
-  dashboard: { title: 'Dashboard', description: 'A clear view of how your business is doing.' },
+  dashboard: {
+    title: 'Dashboard',
+    description:
+      'One screen for the whole shop — money in, money out, and what needs doing.',
+  },
   sales: { title: 'Sales', description: 'Track revenue and understand what is selling.' },
   orders: { title: 'Orders', description: 'Manage every order from pending to completed.' },
   customers: { title: 'Customers', description: 'Manage relationships and keep customer details close.' },

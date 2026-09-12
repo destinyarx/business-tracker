@@ -1,7 +1,10 @@
 'use client'
 
-import { toast } from 'sonner'
-import { CheckCircle, XCircle, Loader2, HelpCircle } from 'lucide-react'
+import { toast, type ExternalToast } from 'sonner'
+import {
+  AppToast,
+  type AppToastVariant,
+} from '@/components/ui/app-toast'
 
 type ToastOptions = {
   title: string
@@ -17,50 +20,53 @@ type LoadingPromiseOptions = {
   errorDescription?: string | ((error: Error) => string)
 }
 
-export function useToast() {
-  function success({ title, description }: ToastOptions) {
-    toast(
-      <div className="flex items-start gap-3">
-        <CheckCircle className="h-5 w-5 text-green-400" />
-        <div>
-          <p className="font-semibold">{title}</p>
-          {description && (
-            <p className="text-sm opacity-80">{description}</p>
-          )}
-        </div>
-      </div>
-    )
+type ToastId = string | number
+
+type AppToastApi = {
+  success: (options: ToastOptions) => ToastId
+  error: (options: ToastOptions) => ToastId
+  loading: (options: ToastOptions) => ToastId
+  loadingPromise: <Result>(
+    promise: Promise<Result>,
+    options: LoadingPromiseOptions,
+  ) => Promise<Result>
+}
+
+const TRANSIENT_TOAST_DURATION = 2800
+
+export function showAppToast(
+  { title, description }: ToastOptions,
+  variant: AppToastVariant = 'info',
+  options?: ExternalToast,
+): ToastId {
+  return toast.custom(
+    () => (
+      <AppToast
+        title={title}
+        description={description}
+        variant={variant}
+      />
+    ),
+    {
+      duration: TRANSIENT_TOAST_DURATION,
+      unstyled: true,
+      ...options,
+    },
+  )
+}
+
+export function useToast(): AppToastApi {
+  function success(options: ToastOptions): ToastId {
+    return showAppToast(options, 'success')
   }
 
-  function error({ title, description }: ToastOptions) {
-    toast(
-      <div className="flex items-start gap-3">
-        <XCircle className="h-5 w-5 text-red-400" />
-        <div>
-          <p className="font-semibold">{title}</p>
-          {description && (
-            <p className="text-sm opacity-80">{description}</p>
-          )}
-        </div>
-      </div>
-    )
+  function error(options: ToastOptions): ToastId {
+    return showAppToast(options, 'error')
   }
 
-  function loading({ title, description }: ToastOptions) {
-    return toast(
-      <div className="flex items-start gap-3">
-        <Loader2 className="h-5 w-5 animate-spin text-blue-400" />
-        <div>
-          <p className="font-semibold">{title}</p>
-          {description && (
-            <p className="text-sm opacity-80">{description}</p>
-          )}
-        </div>
-      </div>,
-      { duration: 0 }
-    )
+  function loading(options: ToastOptions): ToastId {
+    return showAppToast(options, 'loading', { duration: Infinity })
   }
-
 
   async function loadingPromise<T>(
     promise: Promise<T>,
@@ -70,26 +76,26 @@ export function useToast() {
       successTitle,
       successDescription,
       errorTitle,
-      errorDescription
-    }: LoadingPromiseOptions
+      errorDescription,
+    }: LoadingPromiseOptions,
   ): Promise<T> {
-    const id = loading({
+    const toastId = loading({
       title: loadingTitle,
-      description: loadingDescription
+      description: loadingDescription,
     })
 
     try {
       const result = await promise
-      toast.dismiss(id)
+      toast.dismiss(toastId)
 
       success({
         title: successTitle,
-        description: successDescription
+        description: successDescription,
       })
 
       return result
     } catch (caughtError) {
-      toast.dismiss(id)
+      toast.dismiss(toastId)
 
       const errorValue =
         caughtError instanceof Error
@@ -101,53 +107,12 @@ export function useToast() {
         description:
           typeof errorDescription === 'function'
             ? errorDescription(errorValue)
-            : errorDescription
+            : errorDescription,
       })
 
       throw errorValue
     }
   }
 
-  function confirmation({ title, description }: ToastOptions): Promise<boolean> {
-    return new Promise((resolve) => {
-      const id = toast(
-        <div className="flex flex-col gap-3">
-          <div className="flex items-start gap-3">
-            <HelpCircle className="h-5 w-5 text-muted-foreground" />
-            <div>
-              <p className="font-semibold">{title}</p>
-              {description && (
-                <p className="text-sm opacity-80">{description}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-2 pt-2">
-            <button
-              onClick={() => {
-                toast.dismiss(id)
-                resolve(false)
-              }}
-              className="rounded-md border px-3 py-1 text-xs hover:bg-muted"
-            >
-              Cancel
-            </button>
-
-            <button
-              onClick={() => {
-                toast.dismiss(id)
-                resolve(true)
-              }}
-              className="rounded-md bg-foreground px-3 py-1 text-xs font-medium text-background hover:bg-foreground/90"
-            >
-              Confirm
-            </button>
-          </div>
-        </div>,
-        { duration: Infinity }
-      )
-    })
-  }
-
-  return { success, error, loading, loadingPromise, confirmation }
+  return { success, error, loading, loadingPromise }
 }

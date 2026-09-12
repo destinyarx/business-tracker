@@ -24,6 +24,12 @@ The Inventory overview shows total stock value, out-of-stock products, low-stock
 
 The Update stock flow is temporarily a client-side preview because the backend does not yet expose a dedicated stock-update endpoint. A preview changes the Inventory cards and table for the current page session, but it is not persisted and resets when the page is refreshed or left. Product data from the Products query remains the server source of truth.
 
+## Dashboard module
+
+The Dashboard presents Sales, Expenses, estimated profit, completed Orders, cashflow, expense categories, attention items, top Products, and top Customers for This month, This week, or Last week. Reporting sections use the selected period, while attention items represent the current stock, Order queue, Customer cadence, and Expense anomalies.
+
+The Dashboard reads one authenticated backend overview for the selected reporting range. Successful Order, Expense, and Product mutations invalidate its TanStack Query cache so its cross-module totals and attention items are refreshed.
+
 ## Sales module
 
 Sale is a separate record recognized from an Order when that Order moves to `completed`. A Sale keeps the recognized order name, customer name, notes, totals, profit quality, and recognition time. Moving a completed Order to another allowed status changes its Sale state from `active` to `reverted` and requires a reversal reason. Completing the Order again reactivates its existing Sale.
@@ -37,3 +43,9 @@ The Sales overview derives total sales, average sale, units sold, and best custo
 Order statuses are `pending`, `in_progress`, `completed`, `cancelled`, and `failed`. Allowed transitions are pending to in progress, cancelled, or failed; in progress to completed, cancelled, or failed; completed to in progress, cancelled, or failed; and cancelled or failed to in progress. Completing an Order recognizes its Sale. Leaving completed requires a reversal reason of at most 500 characters and reverses that Sale.
 
 The backend owns stock and Sale changes during status transitions and reads stored Order items for those operations. The frontend status request sends only the target status and an optional reversal reason. Completed Orders cannot be edited. An Order that has ever produced a Sale cannot be deleted, even while its Sale is reverted.
+
+## Application feedback
+
+Actions that need user approval use one global confirmation dialog. Standard confirmations use the teal brand treatment, while irreversible actions use the red destructive treatment. Closing the dialog, pressing Escape, or choosing Cancel resolves the pending action as cancelled.
+
+Success, error, loading, and informational notifications use the global bottom-right toast system. Promise-based actions keep a loading toast visible until the operation settles, then replace it with the matching success or error message.

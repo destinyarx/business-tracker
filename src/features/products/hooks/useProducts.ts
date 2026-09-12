@@ -20,6 +20,7 @@ export function useProducts() {
         mutationFn: ({ values, file }: { values: CreateProductCommand, file: ProductImageSelection | null }) => productService.create(values, file),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['products'] })
+            qc.invalidateQueries({ queryKey: businessKeys.dashboardRoot(userId) })
         }
     })
 
@@ -28,6 +29,7 @@ export function useProducts() {
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['products'] })
             qc.invalidateQueries({ queryKey: ['sales'] })
+            qc.invalidateQueries({ queryKey: businessKeys.dashboardRoot(userId) })
         }
     })
 
@@ -36,6 +38,7 @@ export function useProducts() {
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['products'] })
             qc.invalidateQueries({ queryKey: ['sales'] })
+            qc.invalidateQueries({ queryKey: businessKeys.dashboardRoot(userId) })
         }
     })
 

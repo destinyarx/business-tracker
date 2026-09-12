@@ -26,7 +26,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <ClerkProvider appearance={{ theme: shadcn }}>
           <Providers>
             {children}
-            <Toaster position="top-right" richColors closeButton />
+            <Toaster
+              position="bottom-right"
+              visibleToasts={4}
+              gap={10}
+              offset={24}
+              mobileOffset={16}
+            />
           </Providers>
         </ClerkProvider>
       </body>
