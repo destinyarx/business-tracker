@@ -19,6 +19,7 @@ export function useOrderMutation() {
         mutationFn: ({ id, data }: { id: number, data: UpdateOrderCommand }) => orderService.update(id, data),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['orders'] })
+            qc.invalidateQueries({ queryKey: ['sales'] })
         }
     })
 
@@ -30,10 +31,11 @@ export function useOrderMutation() {
     })
 
     const updateOrderStatus = useMutation({
-        mutationFn: ({data, status}: {data: OrderData, status: OrderStatus}) => orderService.updateOrderStatus(data, status),
+        mutationFn: ({ data, status, reversalReason }: { data: OrderData, status: OrderStatus, reversalReason?: string }) => orderService.updateOrderStatus(data, status, reversalReason),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['orders']})
             qc.invalidateQueries({ queryKey: ['products']})
+            qc.invalidateQueries({ queryKey: ['sales'] })
         }
     })
 

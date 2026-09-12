@@ -21,4 +21,12 @@ export const businessKeys = {
     ['expenses', userId, ...parts] as const,
   orders: (userId: string | null, params: unknown) =>
     ['orders', userId, params] as const,
+  sales: (
+    userId: string | null,
+    range: string,
+    state: string,
+    sort: string,
+  ) => ['sales', userId, { range, state, sort }] as const,
+  sale: (userId: string | null, saleId: number) =>
+    ['sales', userId, 'detail', saleId] as const,
 }

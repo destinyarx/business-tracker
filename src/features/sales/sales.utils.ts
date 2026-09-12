@@ -1,4 +1,4 @@
-import type { OrderData, OrderLineItem } from '@/features/orders/order.type'
+import type { SaleRecord } from './sales.type'
 
 const philippinePesoFormatter = new Intl.NumberFormat('en-PH', {
   style: 'currency',
@@ -17,40 +17,35 @@ export type SalesSummary = {
 export const formatSalesCurrency = (amount: number): string =>
   philippinePesoFormatter.format(amount)
 
-export const getSaleDate = (order: OrderData): string =>
-  order.statusUpdatedAt ?? order.createdAt
+export const getSaleTotal = (sale: SaleRecord): number =>
+  Number(sale.totalAmount) || 0
 
-export const getOrderItems = (order: Pick<OrderData, 'items' | 'orderItems'>): OrderLineItem[] =>
-  order.items.length ? order.items : order.orderItems
+export const getSaleProfit = (sale: SaleRecord): number =>
+  Number(sale.totalProfit) || 0
 
-export const getOrderUnits = (order: Pick<OrderData, 'items' | 'orderItems'>): number =>
-  getOrderItems(order).reduce((total, orderItem) => total + orderItem.quantity, 0)
-
-export const getOrderTotal = (order: OrderData): number => {
-  if (typeof order.totalAmount === 'number') {
-    return order.totalAmount
-  }
-
-  return getOrderItems(order).reduce(
-    (total, orderItem) => total + orderItem.priceAtPurchase * orderItem.quantity,
+export const getSaleUnits = (sale: SaleRecord): number =>
+  sale.orderItems.reduce(
+    (total, orderItem) => total + orderItem.quantity,
     0,
   )
-}
 
-export const getSalesSummary = (orders: OrderData[]): SalesSummary => {
+export const getSalesSummary = (sales: SaleRecord[]): SalesSummary => {
   const customerSales = new Map<string, number>()
   let totalSales = 0
   let unitsSold = 0
   let profitInaccurate = false
 
-  orders.forEach((order) => {
-    const orderTotal = getOrderTotal(order)
-    const customerName = order.customer?.name?.trim() || 'Guest customer'
+  sales.forEach((sale) => {
+    const saleTotal = getSaleTotal(sale)
+    const customerName = sale.customerName?.trim() || 'Guest customer'
 
-    totalSales += orderTotal
-    unitsSold += getOrderUnits(order)
-    profitInaccurate ||= Boolean(order.profitInaccurate)
-    customerSales.set(customerName, (customerSales.get(customerName) ?? 0) + orderTotal)
+    totalSales += saleTotal
+    unitsSold += getSaleUnits(sale)
+    profitInaccurate ||= sale.profitInaccurate
+    customerSales.set(
+      customerName,
+      (customerSales.get(customerName) ?? 0) + saleTotal,
+    )
   })
 
   const bestCustomer = Array.from(customerSales.entries()).sort(
@@ -59,7 +54,7 @@ export const getSalesSummary = (orders: OrderData[]): SalesSummary => {
 
   return {
     totalSales,
-    averageSale: orders.length ? totalSales / orders.length : 0,
+    averageSale: sales.length ? totalSales / sales.length : 0,
     unitsSold,
     bestCustomer,
     profitInaccurate,
@@ -67,32 +62,26 @@ export const getSalesSummary = (orders: OrderData[]): SalesSummary => {
 }
 
 export const getFilteredSales = (
-  orders: OrderData[],
+  sales: SaleRecord[],
   searchQuery: string,
   sort: 'asc' | 'desc',
-): OrderData[] => {
+): SaleRecord[] => {
   const normalizedQuery = searchQuery.trim().toLowerCase()
 
-  return orders
-    .filter((order) => {
-      if (!normalizedQuery) {
-        return true
-      }
+  return sales
+    .filter((sale) => {
+      if (!normalizedQuery) return true
 
-      const searchableText = [
-        order.id,
-        order.orderName,
-        order.customer?.name,
-        ...getOrderItems(order).map((orderItem) => orderItem.product?.title),
-      ]
-        .filter((searchPart) => searchPart !== undefined)
-        .join(' ')
-        .toLowerCase()
-
-      return searchableText.includes(normalizedQuery)
+      return [sale.orderName, sale.customerName, sale.notes]
+        .filter((searchPart): searchPart is string => Boolean(searchPart))
+        .some((searchPart) =>
+          searchPart.toLowerCase().includes(normalizedQuery),
+        )
     })
-    .sort((firstOrder, secondOrder) => {
-      const difference = new Date(getSaleDate(firstOrder)).getTime() - new Date(getSaleDate(secondOrder)).getTime()
+    .sort((firstSale, secondSale) => {
+      const difference =
+        new Date(firstSale.recognizedAt).getTime() -
+        new Date(secondSale.recognizedAt).getTime()
       return sort === 'asc' ? difference : -difference
     })
 }

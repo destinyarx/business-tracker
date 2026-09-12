@@ -14,6 +14,7 @@ import type {
   OrderStatus,
 } from '@/features/orders/order.type'
 import { formatOrderCurrency } from '@/features/orders/order.utils'
+import { getAllowedOrderStatusTargets } from '@/features/orders/order.utils'
 
 interface OrderCardProps {
   order: OrderData
@@ -63,6 +64,8 @@ export default function OrderCard({
   const statusLabel =
     ORDER_STATUS.find((statusOption) => statusOption.value === status)?.name ??
     (status === 'failed' ? 'Failed' : 'Pending')
+  const allowedTargets = getAllowedOrderStatusTargets(status)
+  const hasKnownSale = status === 'completed'
 
   return (
     <article className="flex min-h-[280px] flex-col gap-3.5 rounded-[18px] border border-[#e3e9e8] bg-white px-[18px] pb-[15px] pt-[17px] transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-[#c2e7e2] hover:shadow-[0_18px_34px_-28px_rgba(12,75,71,0.5)] dark:border-[#243936] dark:bg-[#12201f] dark:hover:border-[#2f625d]">
@@ -134,7 +137,9 @@ export default function OrderCard({
           type="button"
           variant="outline"
           size="sm"
+          disabled={status === 'completed'}
           onClick={() => onUpdate(order)}
+          title={status === 'completed' ? 'Move this order out of completed before editing it.' : undefined}
           className="h-8 rounded-[10px] border-[#dce3e2] px-3 text-xs font-medium dark:border-[#2b4340] dark:bg-[#12201f]"
         >
           <Pencil className="size-3.5" />
@@ -144,8 +149,9 @@ export default function OrderCard({
           type="button"
           variant="outline"
           size="sm"
-          disabled={!order.id}
+          disabled={!order.id || hasKnownSale}
           onClick={() => order.id && onDelete(order.id)}
+          title={hasKnownSale ? 'Orders that have produced a Sale cannot be deleted.' : undefined}
           className="h-8 rounded-[10px] border-[#f1cccc] px-3 text-xs font-medium text-[#b01c1c] hover:bg-[#fdecec] hover:text-[#b01c1c] dark:border-[#663535] dark:bg-[#12201f]"
         >
           <Trash2 className="size-3.5" />
@@ -163,8 +169,8 @@ export default function OrderCard({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-44">
-            {ORDER_STATUS.filter(
-              (statusOption) => statusOption.value !== status,
+            {ORDER_STATUS.filter((statusOption) =>
+              allowedTargets.includes(statusOption.value),
             ).map((statusOption) => (
               <DropdownMenuItem
                 key={statusOption.value}

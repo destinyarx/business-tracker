@@ -52,13 +52,20 @@ export function useOrderService() {
       }
     },
 
-    async updateOrderStatus(order: OrderData, status: OrderStatus): Promise<void> {
+    async updateOrderStatus(
+      order: OrderData,
+      status: OrderStatus,
+      reversalReason?: string,
+    ): Promise<void> {
       if (!order.id) {
         throw ensureFeatureError('order', new Error('Order ID is required.'))
       }
 
       try {
-        await ordersApi.updateStatus(order.id, toUpdateOrderStatusCommand(order, status))
+        await ordersApi.updateStatus(
+          order.id,
+          toUpdateOrderStatusCommand(status, reversalReason),
+        )
       } catch (error) {
         throw ensureFeatureError('order', error instanceof Error ? error : null)
       }

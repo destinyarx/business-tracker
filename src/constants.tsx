@@ -55,6 +55,7 @@ export const ORDER_STATUS = [
     { name: 'In Progress', value: 'in_progress', color: 'bg-[#3B82F6]' },
     { name: 'Completed', value: 'completed', color: 'bg-[#16A34A]' },
     { name: 'Cancelled', value: 'cancelled', color: 'bg-[#DC2626]' },
+    { name: 'Failed', value: 'failed', color: 'bg-[#991B1B]' },
 ] as const
 
 export const ORDER_STATUS_VALUE = {

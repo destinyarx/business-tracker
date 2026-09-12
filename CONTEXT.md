@@ -26,8 +26,14 @@ The Update stock flow is temporarily a client-side preview because the backend d
 
 ## Sales module
 
-Sales is a read-only view of completed Order records. The selected time period and sort direction use the existing Orders query. Search and table pagination run over the returned completed orders in the client so users can search order names, customer names, references, and product names without changing the backend contract. The Sales module does not create a separate sales record or call a separate sales endpoint. The sale date shown in the table and detail view is the order status update date when available, because that represents when the order became completed, with the order creation date as a fallback.
+Sale is a separate record recognized from an Order when that Order moves to `completed`. A Sale keeps the recognized order name, customer name, notes, totals, profit quality, and recognition time. Moving a completed Order to another allowed status changes its Sale state from `active` to `reverted` and requires a reversal reason. Completing the Order again reactivates its existing Sale.
 
-The Sales table shows Sale, Order date, Customer, Product items, Profit, and Sale total. Payment is not shown because the current Order API has no payment field. Selecting a row opens the sale detail dialog with all product lines, quantities, unit prices, totals, notes, profit quality warning, and the order total.
+The Sales module reads active Sales from the dedicated Sales API. Its ranges are Today, Yesterday, This week, and This month. The backend calculates date boundaries in Asia/Manila, and `this_week` starts on Monday. Search runs locally over order name, customer name, and notes, so it does not change the overview values. The Sales table paginates locally and shows Sale, Sale date, Customer, Product items, Profit, and Sale total. Selecting a row loads the Sale detail with its product lines, quantities, captured unit prices and subtotals, notes, profit warning, and total.
 
-The Sales overview derives sales total, average sale, units sold, and best customer from all completed orders returned for the selected time period. Profit warnings indicate that at least one returned order contains a product without recorded profit.
+The Sales overview derives total sales, average sale, units sold, and best customer from every active Sale returned for the selected range. Profit warnings indicate that at least one returned Sale contains a product without recorded profit. Money crosses the HTTP boundary as decimal strings and is converted only for calculations and display.
+
+## Orders module
+
+Order statuses are `pending`, `in_progress`, `completed`, `cancelled`, and `failed`. Allowed transitions are pending to in progress, cancelled, or failed; in progress to completed, cancelled, or failed; completed to in progress, cancelled, or failed; and cancelled or failed to in progress. Completing an Order recognizes its Sale. Leaving completed requires a reversal reason of at most 500 characters and reverses that Sale.
+
+The backend owns stock and Sale changes during status transitions and reads stored Order items for those operations. The frontend status request sends only the target status and an optional reversal reason. Completed Orders cannot be edited. An Order that has ever produced a Sale cannot be deleted, even while its Sale is reverted.

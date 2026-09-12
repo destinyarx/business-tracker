@@ -6,16 +6,16 @@ import { formatSalesCurrency } from '@/features/sales/sales.utils'
 interface SalesOverviewProps {
   summary: SalesSummary
   periodLabel: string
-  orderCount: number
+  saleCount: number
 }
 
-export function SalesOverview({ summary, periodLabel, orderCount }: SalesOverviewProps) {
+export function SalesOverview({ summary, periodLabel, saleCount }: SalesOverviewProps) {
   return (
     <section className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 xl:grid-cols-4" aria-label="Sales overview">
       <ModuleMetricCard
         label={`Sales ${periodLabel.toLowerCase()}`}
         value={formatSalesCurrency(summary.totalSales)}
-        hint={`${orderCount} completed ${orderCount === 1 ? 'order' : 'orders'}`}
+        hint={`${saleCount} recognized ${saleCount === 1 ? 'sale' : 'sales'}`}
         icon={ChartNoAxesColumnIncreasing}
         accent="#12cdbe"
         iconClassName="bg-[#e4f7f4] text-[#007f78] dark:bg-[#173d39] dark:text-[#55ddd0]"
@@ -24,7 +24,7 @@ export function SalesOverview({ summary, periodLabel, orderCount }: SalesOvervie
       <ModuleMetricCard
         label="Average sale"
         value={formatSalesCurrency(summary.averageSale)}
-        hint="Per completed order"
+        hint="Per recognized sale"
         icon={ShoppingCart}
         accent="#ffb018"
         iconClassName="bg-[#fff7e0] text-[#8a6100] dark:bg-[#493816] dark:text-[#ffd66b]"

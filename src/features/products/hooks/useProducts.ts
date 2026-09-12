@@ -27,6 +27,7 @@ export function useProducts() {
         mutationFn: ({ id, values }: { id: number, values: UpdateProductCommand }) => productService.update(id, values),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['products'] })
+            qc.invalidateQueries({ queryKey: ['sales'] })
         }
     })
 
@@ -34,6 +35,7 @@ export function useProducts() {
         mutationFn: (id: number) => productService.delete(id),
         onSuccess: () => {
             qc.invalidateQueries({ queryKey: ['products'] })
+            qc.invalidateQueries({ queryKey: ['sales'] })
         }
     })
 

@@ -4,35 +4,36 @@ import { format } from 'date-fns'
 import { ArrowLeft, ArrowRight, Loader2, TriangleAlert } from 'lucide-react'
 import NoItemFound from '@/components/organisms/NoItemFound'
 import { Button } from '@/components/ui/button'
-import type { OrderData } from '@/features/orders/order.type'
+import type { SaleRecord } from '@/features/sales/sales.type'
 import {
   formatSalesCurrency,
-  getOrderItems,
-  getOrderTotal,
-  getSaleDate,
+  getSaleProfit,
+  getSaleTotal,
 } from '@/features/sales/sales.utils'
 
 interface SalesTableProps {
-  orders: OrderData[]
+  sales: SaleRecord[]
   currentPage: number
   totalRecords: number
   totalPages: number
   hasNext: boolean
   isLoading: boolean
   isError: boolean
+  errorMessage?: string
   periodLabel: string
   onPageChange: (page: number) => void
-  onViewSale: (order: OrderData) => void
+  onViewSale: (sale: SaleRecord) => void
 }
 
 export function SalesTable({
-  orders,
+  sales,
   currentPage,
   totalRecords,
   totalPages,
   hasNext,
   isLoading,
   isError,
+  errorMessage,
   periodLabel,
   onPageChange,
   onViewSale,
@@ -44,7 +45,7 @@ export function SalesTable({
           <thead className="bg-[#f8fafa] dark:bg-[#16292b]">
             <tr>
               <th className="border-b border-[#edf1f0] px-[18px] py-[11px] text-left text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#93a5a5] dark:border-[#1e322f]">Sale</th>
-              <th className="border-b border-[#edf1f0] px-3.5 py-[11px] text-left text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#93a5a5] dark:border-[#1e322f]">Order date</th>
+              <th className="border-b border-[#edf1f0] px-3.5 py-[11px] text-left text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#93a5a5] dark:border-[#1e322f]">Sale date</th>
               <th className="border-b border-[#edf1f0] px-3.5 py-[11px] text-left text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#93a5a5] dark:border-[#1e322f]">Customer</th>
               <th className="border-b border-[#edf1f0] px-3.5 py-[11px] text-left text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#93a5a5] dark:border-[#1e322f]">Product items</th>
               <th className="border-b border-[#edf1f0] px-3.5 py-[11px] text-right text-[10.5px] font-semibold uppercase tracking-[0.1em] text-[#93a5a5] dark:border-[#1e322f]">Profit</th>
@@ -52,39 +53,75 @@ export function SalesTable({
             </tr>
           </thead>
           <tbody>
-            {isError && <tr><td colSpan={6} className="h-44 text-center text-sm text-red-700 dark:text-red-300">We could not load the sales records.</td></tr>}
+            {isError && (
+              <tr>
+                <td colSpan={6} className="h-44 px-6 text-center text-sm text-red-700 dark:text-red-300">
+                  {errorMessage || 'We could not load the sales records.'}
+                </td>
+              </tr>
+            )}
             {isLoading && !isError && (
-              <tr><td colSpan={6} className="h-44"><div className="flex flex-col items-center justify-center gap-2 text-[#7c8e8e]"><Loader2 className="size-5 animate-spin" /><span className="text-xs">Loading sales…</span></div></td></tr>
+              <tr>
+                <td colSpan={6} className="h-44">
+                  <div className="flex flex-col items-center justify-center gap-2 text-[#7c8e8e]">
+                    <Loader2 className="size-5 animate-spin" />
+                    <span className="text-xs">Loading sales...</span>
+                  </div>
+                </td>
+              </tr>
             )}
-            {!isLoading && !isError && orders.length === 0 && (
-              <tr><td colSpan={6} className="h-56"><NoItemFound title="No sales match your filters" description={`Completed orders for ${periodLabel.toLowerCase()} will appear here.`} /></td></tr>
+            {!isLoading && !isError && sales.length === 0 && (
+              <tr>
+                <td colSpan={6} className="h-56">
+                  <NoItemFound
+                    title="No sales match your filters"
+                    description={`Recognized sales for ${periodLabel.toLowerCase()} will appear here.`}
+                  />
+                </td>
+              </tr>
             )}
-            {!isLoading && !isError && orders.map((order) => {
-              const orderItems = getOrderItems(order)
-              const previewItems = orderItems.slice(0, 2)
-              const additionalItems = orderItems.length - previewItems.length
+            {!isLoading && !isError && sales.map((sale) => {
+              const previewItems = sale.orderItems.slice(0, 2)
+              const additionalItems = sale.orderItems.length - previewItems.length
 
               return (
                 <tr
-                  key={order.id ?? `${order.orderName}-${order.createdAt}`}
+                  key={sale.id}
                   tabIndex={0}
                   role="button"
-                  onClick={() => onViewSale(order)}
+                  onClick={() => onViewSale(sale)}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault()
-                      onViewSale(order)
+                      onViewSale(sale)
                     }
                   }}
                   className="cursor-pointer border-b border-[#f1f4f3] transition-colors last:border-b-0 hover:bg-[#f8fafa] focus-visible:bg-[#f3fbf8] focus-visible:outline-none dark:border-[#1e322f] dark:hover:bg-[#16292b] dark:focus-visible:bg-[#18302e]"
-                  aria-label={`View details for ${order.orderName || `sale ${order.id ?? ''}`}`}
+                  aria-label={`View details for ${sale.orderName || `sale ${sale.id}`}`}
                 >
-                  <td className="px-[18px] py-3"><p className="text-[13px] font-medium text-[#16292b] dark:text-[#eaf3f1]">{order.orderName?.trim() || 'Untitled order'}</p><p className="mt-0.5 font-mono text-[10.5px] text-[#93a5a5]">{order.id ? `#${order.id}` : 'No reference'}</p></td>
-                  <td className="whitespace-nowrap px-3.5 py-3 text-[12.5px] text-[#5f7273] dark:text-[#9fb3b0]">{format(new Date(getSaleDate(order)), 'MMM. dd, yyyy · hh:mm a')}</td>
-                  <td className="px-3.5 py-3 text-[12.5px] text-[#16292b] dark:text-[#eaf3f1]">{order.customer?.name?.trim() || 'Guest customer'}</td>
-                  <td className="px-3.5 py-3"><div className="flex flex-col gap-0.5">{previewItems.map((orderItem, index) => <span key={orderItem.id ?? `${orderItem.product?.id ?? 'product'}-${index}`} className="text-[12.5px] text-[#5f7273] dark:text-[#9fb3b0]">{orderItem.quantity}× {orderItem.product?.title || 'Product unavailable'}</span>)}{additionalItems > 0 && <span className="text-[11px] font-medium text-[#007f78] dark:text-[#55ddd0]">+{additionalItems} more {additionalItems === 1 ? 'product' : 'products'}</span>}</div></td>
-                  <td className="px-3.5 py-3 text-right font-mono text-[12.5px] font-medium tabular-nums text-[#166534] dark:text-[#75db92]"><span className="inline-flex items-center justify-end gap-1.5">{formatSalesCurrency(Number(order.totalProfit) || 0)}{order.profitInaccurate && <TriangleAlert className="size-3.5 text-[#b77a00]" aria-label="Profit may be inaccurate" />}</span></td>
-                  <td className="px-[18px] py-3 text-right font-mono text-[13px] font-medium tabular-nums text-[#16292b] dark:text-[#eaf3f1]">{formatSalesCurrency(getOrderTotal(order))}</td>
+                  <td className="px-[18px] py-3">
+                    <p className="text-[13px] font-medium text-[#16292b] dark:text-[#eaf3f1]">{sale.orderName?.trim() || 'Untitled order'}</p>
+                    <p className="mt-0.5 font-mono text-[10.5px] text-[#93a5a5]">Sale #{sale.id} · Order #{sale.orderId}</p>
+                  </td>
+                  <td className="whitespace-nowrap px-3.5 py-3 text-[12.5px] text-[#5f7273] dark:text-[#9fb3b0]">{format(new Date(sale.recognizedAt), 'MMM. dd, yyyy · hh:mm a')}</td>
+                  <td className="px-3.5 py-3 text-[12.5px] text-[#16292b] dark:text-[#eaf3f1]">{sale.customerName?.trim() || 'Guest customer'}</td>
+                  <td className="px-3.5 py-3">
+                    <div className="flex flex-col gap-0.5">
+                      {previewItems.map((orderItem, index) => (
+                        <span key={orderItem.id || `${orderItem.productId ?? 'product'}-${index}`} className="text-[12.5px] text-[#5f7273] dark:text-[#9fb3b0]">
+                          {orderItem.quantity}× {orderItem.product?.title || 'Product unavailable'}
+                        </span>
+                      ))}
+                      {additionalItems > 0 && <span className="text-[11px] font-medium text-[#007f78] dark:text-[#55ddd0]">+{additionalItems} more {additionalItems === 1 ? 'product' : 'products'}</span>}
+                    </div>
+                  </td>
+                  <td className="px-3.5 py-3 text-right font-mono text-[12.5px] font-medium tabular-nums text-[#166534] dark:text-[#75db92]">
+                    <span className="inline-flex items-center justify-end gap-1.5">
+                      {formatSalesCurrency(getSaleProfit(sale))}
+                      {sale.profitInaccurate && <TriangleAlert className="size-3.5 text-[#b77a00]" aria-label="Profit may be inaccurate" />}
+                    </span>
+                  </td>
+                  <td className="px-[18px] py-3 text-right font-mono text-[13px] font-medium tabular-nums text-[#16292b] dark:text-[#eaf3f1]">{formatSalesCurrency(getSaleTotal(sale))}</td>
                 </tr>
               )
             })}

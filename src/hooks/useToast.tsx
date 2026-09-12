@@ -8,6 +8,15 @@ type ToastOptions = {
   description?: string
 }
 
+type LoadingPromiseOptions = {
+  loadingTitle: string
+  loadingDescription?: string
+  successTitle: string
+  successDescription?: string
+  errorTitle: string
+  errorDescription?: string | ((error: Error) => string)
+}
+
 export function useToast() {
   function success({ title, description }: ToastOptions) {
     toast(
@@ -62,14 +71,7 @@ export function useToast() {
       successDescription,
       errorTitle,
       errorDescription
-    }: {
-      loadingTitle: string
-      loadingDescription?: string
-      successTitle: string
-      successDescription?: string
-      errorTitle: string
-      errorDescription?: string
-    }
+    }: LoadingPromiseOptions
   ): Promise<T> {
     const id = loading({
       title: loadingTitle,
@@ -86,15 +88,23 @@ export function useToast() {
       })
 
       return result
-    } catch (err) {
+    } catch (caughtError) {
       toast.dismiss(id)
+
+      const errorValue =
+        caughtError instanceof Error
+          ? caughtError
+          : new Error('An unexpected error occurred.')
 
       error({
         title: errorTitle,
-        description: errorDescription
+        description:
+          typeof errorDescription === 'function'
+            ? errorDescription(errorValue)
+            : errorDescription
       })
 
-      throw err
+      throw errorValue
     }
   }
 

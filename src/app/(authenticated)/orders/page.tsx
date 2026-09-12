@@ -26,6 +26,7 @@ import Loading from '@/components/organisms/Loading'
 import Order from '@/features/orders/components/Order'
 import OrderCard from '@/features/orders/components/OrderCard'
 import OrderForm from '@/features/orders/components/OrderForm'
+import OrderReversalDialog from '@/features/orders/components/OrderReversalDialog'
 import { useOrderMutation } from '@/features/orders/hooks/useOrderMutation'
 import { useOrderQuery } from '@/features/orders/hooks/useOrderQuery'
 import type { OrderFormValues } from '@/features/orders/order.schema'
@@ -43,6 +44,11 @@ import { useConfirmation } from '@/app/provider/ConfirmationProvider'
 import { useToast } from '@/hooks/useToast'
 
 const ordersPerPage = 6
+
+type PendingReversal = {
+  order: OrderData
+  status: OrderStatus
+}
 
 const isOrderStatus = (status: string): status is OrderStatus =>
   status === 'pending' ||
@@ -73,6 +79,8 @@ export default function OrdersPage() {
   )
   const [sort, setSort] = useState<'asc' | 'desc'>('desc')
   const [editingOrder, setEditingOrder] = useState<OrderData | null>(null)
+  const [pendingReversal, setPendingReversal] =
+    useState<PendingReversal | null>(null)
 
   useEffect(() => {
     const searchDelay = window.setTimeout(() => {
@@ -118,17 +126,39 @@ export default function OrdersPage() {
         loadingTitle: 'Deleting order...',
         successTitle: 'Order deleted',
         errorTitle: 'Failed to delete order',
-        errorDescription: 'Please try again.',
+        errorDescription: (error) => error.message,
       })
     } catch {
       return
     }
   }
 
+  const commitStatusUpdate = async (
+    order: OrderData,
+    status: OrderStatus,
+    reversalReason?: string,
+  ): Promise<void> => {
+    await appToast.loadingPromise(
+      updateOrderStatus.mutateAsync({ data: order, status, reversalReason }),
+      {
+        loadingTitle: 'Updating order status...',
+        successTitle: 'Order status updated',
+        errorTitle: 'Failed to update order status',
+        errorDescription: (error) => error.message,
+      },
+    )
+    selectStatusFilter(status)
+  }
+
   const handleUpdateStatus = async (
     order: OrderData,
     status: OrderStatus,
   ): Promise<void> => {
+    if (order.status === 'completed' && status !== 'completed') {
+      setPendingReversal({ order, status })
+      return
+    }
+
     const statusName =
       ORDER_STATUS.find((statusOption) => statusOption.value === status)?.name ??
       status
@@ -139,16 +169,22 @@ export default function OrdersPage() {
     if (!confirmed) return
 
     try {
-      await appToast.loadingPromise(
-        updateOrderStatus.mutateAsync({ data: order, status }),
-        {
-          loadingTitle: 'Updating order status...',
-          successTitle: 'Order status updated',
-          errorTitle: 'Failed to update order status',
-          errorDescription: 'Please try again.',
-        },
+      await commitStatusUpdate(order, status)
+    } catch {
+      return
+    }
+  }
+
+  const submitReversal = async (reversalReason: string): Promise<void> => {
+    if (!pendingReversal) return
+
+    try {
+      await commitStatusUpdate(
+        pendingReversal.order,
+        pendingReversal.status,
+        reversalReason,
       )
-      selectStatusFilter(status)
+      setPendingReversal(null)
     } catch {
       return
     }
@@ -212,6 +248,14 @@ export default function OrdersPage() {
     orderValues: OrderFormValues,
   ): Promise<void> => {
     if (!editingOrder?.id) return
+    if (editingOrder.status === 'completed') {
+      appToast.error({
+        title: 'Completed orders cannot be edited',
+        description: 'Move the order out of completed before changing its details.',
+      })
+      setEditingOrder(null)
+      return
+    }
 
     const command: UpdateOrderCommand = {
       orderName: orderValues.orderName?.trim() || undefined,
@@ -227,7 +271,7 @@ export default function OrdersPage() {
           successTitle: 'Order updated',
           successDescription: 'The order details have been saved.',
           errorTitle: 'Failed to update order',
-          errorDescription: 'Please check the form and try again.',
+          errorDescription: (error) => error.message,
         },
       )
       setEditingOrder(null)
@@ -350,7 +394,11 @@ export default function OrdersPage() {
             <OrderCard
               key={order.id ?? `${order.createdAt}-${order.orderName}`}
               order={order}
-              onUpdate={setEditingOrder}
+              onUpdate={(selectedOrder) => {
+                if (selectedOrder.status !== 'completed') {
+                  setEditingOrder(selectedOrder)
+                }
+              }}
               onDelete={handleDelete}
               updateStatus={handleUpdateStatus}
             />
@@ -441,6 +489,14 @@ export default function OrdersPage() {
           )}
         </SheetContent>
       </Sheet>
+
+      <OrderReversalDialog
+        open={Boolean(pendingReversal)}
+        targetStatus={pendingReversal?.status}
+        isSubmitting={updateOrderStatus.isPending}
+        onCancel={() => setPendingReversal(null)}
+        onSubmit={submitReversal}
+      />
     </div>
   )
 }

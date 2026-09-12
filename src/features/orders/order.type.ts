@@ -63,15 +63,8 @@ export type CreateOrderCommand = {
 export type UpdateOrderCommand = Pick<OrderData, 'orderName' | 'customerId' | 'notes'>
 
 export type UpdateOrderStatusCommand = {
-  orderItems: UpdateOrderStatusItemCommand[]
   status: OrderStatus
-}
-
-export type UpdateOrderStatusItemCommand = {
-  priceAtPurchase: string
-  quantity: number
-  subtotal: string
-  product: Pick<OrderProductSummary, 'id' | 'title' | 'price'>
+  reversalReason?: string
 }
 
 export type PaginatedOrders = {

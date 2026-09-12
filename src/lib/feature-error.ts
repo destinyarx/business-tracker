@@ -4,6 +4,7 @@ import { ZodError } from 'zod'
 export type FeatureErrorKind =
   | 'unauthenticated'
   | 'forbidden'
+  | 'not_found'
   | 'conflict'
   | 'invalid_request'
   | 'invalid_response'
@@ -40,7 +41,7 @@ export function toFeatureError(featureName: string, error: Error): FeatureError 
     )
   }
 
-  if (!axios.isAxiosError(error)) {
+  if (!axios.isAxiosError<{ message?: string | string[] }>(error)) {
     return new FeatureError(
       `An unexpected ${featureName} error occurred.`,
       'unexpected',
@@ -50,6 +51,10 @@ export function toFeatureError(featureName: string, error: Error): FeatureError 
   }
 
   const status = error.response?.status
+  const responseMessage = error.response?.data?.message
+  const apiMessage = Array.isArray(responseMessage)
+    ? responseMessage.join(' ')
+    : responseMessage
 
   if (!status) {
     return new FeatureError(
@@ -61,8 +66,10 @@ export function toFeatureError(featureName: string, error: Error): FeatureError 
   }
 
   const kindByStatus: Partial<Record<number, FeatureErrorKind>> = {
+    400: 'invalid_request',
     401: 'unauthenticated',
     403: 'forbidden',
+    404: 'not_found',
     409: 'conflict',
     422: 'invalid_request',
   }
@@ -70,7 +77,7 @@ export function toFeatureError(featureName: string, error: Error): FeatureError 
   const kind = kindByStatus[status] ?? (status >= 500 ? 'server' : 'unexpected')
 
   return new FeatureError(
-    `The ${featureName} request failed.`,
+    apiMessage?.trim() || `The ${featureName} request failed.`,
     kind,
     status,
     { cause: error },
