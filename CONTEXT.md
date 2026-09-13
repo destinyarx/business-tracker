@@ -44,8 +44,10 @@ Order statuses are `pending`, `in_progress`, `completed`, `cancelled`, and `fail
 
 The backend owns stock and Sale changes during status transitions and reads stored Order items for those operations. The frontend status request sends only the target status and an optional reversal reason. Completed Orders cannot be edited. An Order that has ever produced a Sale cannot be deleted, even while its Sale is reverted.
 
+The Orders list can filter by fulfillment status and Order creation date. Date ranges are All dates, Today, Yesterday, and This week. The backend evaluates date ranges in Asia/Manila, and This week starts on Monday. Orders can be sorted newest-first or oldest-first by creation date.
+
 ## Application feedback
 
 Actions that need user approval use one global confirmation dialog. Standard confirmations use the teal brand treatment, while irreversible actions use the red destructive treatment. Closing the dialog, pressing Escape, or choosing Cancel resolves the pending action as cancelled.
 
-Success, error, loading, and informational notifications use the global bottom-right toast system. Promise-based actions keep a loading toast visible until the operation settles, then replace it with the matching success or error message.
+Success, error, loading, and informational notifications use the global top-right toast system. Promise-based actions keep a loading toast visible until the operation settles, then replace it with the matching success or error message.

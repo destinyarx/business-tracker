@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   ArrowLeft,
   ArrowRight,
+  CalendarRange,
   ChevronDown,
   Filter,
   ListFilter,
@@ -33,6 +34,7 @@ import type { OrderFormValues } from '@/features/orders/order.schema'
 import type {
   CreateOrderCommand,
   OrderData,
+  OrderDateRange,
   OrderParams,
   OrderStatus,
   UpdateOrderCommand,
@@ -45,6 +47,13 @@ import { useToast } from '@/hooks/useToast'
 
 const ordersPerPage = 6
 
+const orderDateRanges: { label: string; value: OrderDateRange }[] = [
+  { label: 'All dates', value: 'all' },
+  { label: 'Today', value: 'today' },
+  { label: 'Yesterday', value: 'yesterday' },
+  { label: 'This week', value: 'this_week' },
+]
+
 type PendingReversal = {
   order: OrderData
   status: OrderStatus
@@ -56,6 +65,12 @@ const isOrderStatus = (status: string): status is OrderStatus =>
   status === 'completed' ||
   status === 'cancelled' ||
   status === 'failed'
+
+const isOrderDateRange = (range: string): range is OrderDateRange =>
+  range === 'all' ||
+  range === 'today' ||
+  range === 'yesterday' ||
+  range === 'this_week'
 
 export default function OrdersPage() {
   const appToast = useToast()
@@ -78,6 +93,7 @@ export default function OrdersPage() {
     'pending',
   )
   const [sort, setSort] = useState<'asc' | 'desc'>('desc')
+  const [dateRange, setDateRange] = useState<OrderDateRange>('all')
   const [editingOrder, setEditingOrder] = useState<OrderData | null>(null)
   const [pendingReversal, setPendingReversal] =
     useState<PendingReversal | null>(null)
@@ -97,6 +113,7 @@ export default function OrdersPage() {
     offset: (currentPage - 1) * ordersPerPage,
     limit: ordersPerPage,
     sort,
+    timePeriod: dateRange,
   }
   const { ordersQuery } = useOrderQuery(orderParams)
   const orders = ordersQuery.data?.orders ?? []
@@ -378,8 +395,31 @@ export default function OrdersPage() {
               }}
               className="appearance-none bg-transparent text-[12.5px] font-medium outline-none"
             >
-              <option value="desc">Order date (latest)</option>
-              <option value="asc">Order date (oldest)</option>
+              <option value="desc">Newest first</option>
+              <option value="asc">Oldest first</option>
+            </select>
+            <ChevronDown className="size-3.5 shrink-0" />
+          </label>
+
+          <label className="flex h-[38px] items-center gap-2 rounded-full border border-[#e3e9e8] bg-white px-3 text-[#3f5254] transition-colors focus-within:border-[#00beaa] dark:border-[#2b4340] dark:bg-[#12201f] dark:text-[#c3d4d1]">
+            <CalendarRange className="size-3.5 shrink-0 text-[#007f78] dark:text-[#7fe0da]" />
+            <select
+              aria-label="Filter orders by order date"
+              value={dateRange}
+              onChange={(event) => {
+                const selectedRange = event.target.value
+                if (!isOrderDateRange(selectedRange)) return
+
+                setCurrentPage(1)
+                setDateRange(selectedRange)
+              }}
+              className="appearance-none bg-transparent text-[12.5px] font-medium outline-none"
+            >
+              {orderDateRanges.map((range) => (
+                <option key={range.value} value={range.value}>
+                  {range.label}
+                </option>
+              ))}
             </select>
             <ChevronDown className="size-3.5 shrink-0" />
           </label>
@@ -424,7 +464,7 @@ export default function OrdersPage() {
       )}
 
       {!!orders.length && (
-        <div className="mt-5 flex items-center justify-center gap-2">
+        <div className="mt-5 flex items-center justify-end gap-2">
           <Button
             type="button"
             variant="outline"
@@ -436,7 +476,7 @@ export default function OrdersPage() {
             <ArrowLeft className="size-3.5" />
             Previous
           </Button>
-          <span className="grid size-[30px] place-items-center rounded-[9px] bg-[#16292b] text-xs font-semibold text-white">
+          <span className="grid size-[30px] place-items-center rounded-[9px] bg-slate-800 text-xs font-semibold text-white">
             {currentPage}
           </span>
           <Button

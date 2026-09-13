@@ -27,7 +27,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Providers>
             {children}
             <Toaster
-              position="bottom-right"
+              position="top-right"
               visibleToasts={4}
               gap={10}
               offset={24}

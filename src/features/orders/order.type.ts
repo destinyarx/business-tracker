@@ -73,14 +73,14 @@ export type PaginatedOrders = {
   hasPrev?: boolean
 }
 
-export type Period = 'today' | 'yesterday' | 'week' | 'last_week' | 'month'
+export type OrderDateRange = 'all' | 'today' | 'yesterday' | 'this_week'
 
 export type OrderParams = {
   filter?: string,
   searchKey?: string,
   offset?: number,
   limit?: number,
-  timePeriod?: Period,
+  timePeriod?: OrderDateRange,
   sort?: 'asc' | 'desc'
   sortByStatus?: 'asc' | 'desc'
 }

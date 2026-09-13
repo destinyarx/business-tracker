@@ -184,7 +184,7 @@ export function CustomerTable({
 
   return (
     <section className="overflow-hidden rounded-[20px] border border-[#e3e9e8] bg-white dark:border-[#243936] dark:bg-[#12201f]">
-      <div className="flex flex-wrap items-center gap-3 border-b border-[#edf1f0] px-[18px] py-3.5 dark:border-[#1e322f]">
+      <div className="flex flex-wrap justify-between items-center gap-3 border-b border-[#edf1f0] px-[18px] py-3.5 dark:border-[#1e322f]">
         <div className="flex min-w-60 items-center gap-2 rounded-[10px] border border-[#e3e9e8] bg-[#f8fafa] px-3 dark:border-[#2b4340] dark:bg-[#1b2e2c]">
           <Search className="size-3.5 text-[#7c8e8e]" />
           <Input
