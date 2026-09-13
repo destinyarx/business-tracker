@@ -1,5 +1,9 @@
 import type { AxiosInstance } from 'axios'
-import type { CreateProductCommand, UpdateProductCommand } from './products.types'
+import type {
+  CreateProductCommand,
+  UpdateProductCommand,
+  UpdateProductStockCommand,
+} from './products.types'
 
 export function createProductsApi(api: AxiosInstance) {
   return {
@@ -22,6 +26,13 @@ export function createProductsApi(api: AxiosInstance) {
 
     async update(productId: number, product: UpdateProductCommand): Promise<void> {
       await api.patch(`/products/${productId}`, product)
+    },
+
+    async updateStock(
+      productId: number,
+      command: UpdateProductStockCommand,
+    ): Promise<void> {
+      await api.patch(`/products/${productId}/stock`, command)
     },
 
     async delete(productId: number): Promise<void> {

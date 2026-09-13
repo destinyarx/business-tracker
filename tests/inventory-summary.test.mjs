@@ -2,7 +2,6 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import {
   createInventorySummary,
-  getEffectiveStock,
 } from '../src/features/inventory/inventory.utils.ts'
 
 const products = [
@@ -22,16 +21,14 @@ const products = [
   },
 ]
 
-test('inventory summary applies temporary stock previews to every derived value', () => {
-  const stockOverrides = { 1: 0, 2: 8 }
-  const summary = createInventorySummary(products, stockOverrides)
+test('inventory summary derives every value from persisted product stock', () => {
+  const summary = createInventorySummary(products)
 
-  assert.equal(getEffectiveStock(products[0], stockOverrides), 0)
-  assert.equal(summary.stockValue, 40)
-  assert.equal(summary.unitsOnHand, 8)
+  assert.equal(summary.stockValue, 3020)
+  assert.equal(summary.unitsOnHand, 16)
   assert.deepEqual(
     summary.outOfStockProducts.map((product) => product.id),
-    [1],
+    [],
   )
   assert.deepEqual(
     summary.lowStockProducts.map((product) => product.id),

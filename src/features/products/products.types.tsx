@@ -32,6 +32,10 @@ export interface Product extends ProductInput {
 export type CreateProductCommand = ProductInput
 export type UpdateProductCommand = ProductInput
 
+export type UpdateProductStockCommand = {
+    stock: number
+}
+
 export type ProductImageSelection = {
     file: File
 }

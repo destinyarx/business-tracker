@@ -1,8 +1,5 @@
 import type { Product } from '@/features/products/products.types'
-import type {
-  InventorySummary,
-  StockOverrides,
-} from '@/features/inventory/inventory.types'
+import type { InventorySummary } from '@/features/inventory/inventory.types'
 
 const philippinePesoFormatter = new Intl.NumberFormat('en-PH', {
   style: 'currency',
@@ -13,23 +10,14 @@ const philippinePesoFormatter = new Intl.NumberFormat('en-PH', {
 export const formatInventoryCurrency = (amount: number): string =>
   philippinePesoFormatter.format(amount)
 
-export const getEffectiveStock = (
-  product: Product,
-  stockOverrides: StockOverrides,
-): number =>
-  product.id ? (stockOverrides[product.id] ?? product.stock) : product.stock
-
-export const createInventorySummary = (
-  products: Product[],
-  stockOverrides: StockOverrides,
-): InventorySummary => {
+export const createInventorySummary = (products: Product[]): InventorySummary => {
   const outOfStockProducts: Product[] = []
   const lowStockProducts: Product[] = []
   let stockValue = 0
   let unitsOnHand = 0
 
   products.forEach((product) => {
-    const stock = getEffectiveStock(product, stockOverrides)
+    const stock = product.stock
     stockValue += product.price * stock
     unitsOnHand += stock
 

@@ -7,6 +7,7 @@ import type {
   Product,
   ProductImageSelection,
   UpdateProductCommand,
+  UpdateProductStockCommand,
 } from './products.types'
 import { useApi } from '@/hooks/useApi'
 import { ensureFeatureError } from '@/lib/feature-error'
@@ -51,6 +52,21 @@ export function useProductService() {
     async update(productId: number, product: UpdateProductCommand): Promise<void> {
       try {
         await productsApi.update(productId, product)
+      } catch (error) {
+        throw ensureFeatureError('product', error instanceof Error ? error : null)
+      }
+    },
+
+    async updateStock(
+      productId: number,
+      command: UpdateProductStockCommand,
+    ): Promise<void> {
+      if (!productId) {
+        throw ensureFeatureError('product', new Error('Product ID is required.'))
+      }
+
+      try {
+        await productsApi.updateStock(productId, command)
       } catch (error) {
         throw ensureFeatureError('product', error instanceof Error ? error : null)
       }

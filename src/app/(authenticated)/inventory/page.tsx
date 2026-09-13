@@ -7,56 +7,54 @@ import Loading from '@/components/organisms/Loading'
 import { InventoryOverview } from '@/features/inventory/components/InventoryOverview'
 import { InventoryTable } from '@/features/inventory/components/InventoryTable'
 import { StockAdjustmentDialog } from '@/features/inventory/components/StockAdjustmentDialog'
-import type { StockOverrides } from '@/features/inventory/inventory.types'
-import {
-  createInventorySummary,
-  getEffectiveStock,
-} from '@/features/inventory/inventory.utils'
+import { createInventorySummary } from '@/features/inventory/inventory.utils'
 import { useProducts } from '@/features/products/hooks/useProducts'
 import type { Product } from '@/features/products/products.types'
 import { useConfirmation } from '@/app/provider/ConfirmationProvider'
 import { useToast } from '@/hooks/useToast'
 
 export default function InventoryPage() {
-  const { productsQuery } = useProducts()
+  const { productsQuery, updateProductStock } = useProducts()
   const confirmation = useConfirmation()
   const appToast = useToast()
-  const [stockOverrides, setStockOverrides] = useState<StockOverrides>({})
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const products = productsQuery.data ?? []
   const summary = useMemo(
-    () => createInventorySummary(products, stockOverrides),
-    [products, stockOverrides],
+    () => createInventorySummary(products),
+    [products],
   )
-  const selectedStock = selectedProduct
-    ? getEffectiveStock(selectedProduct, stockOverrides)
-    : 0
+  const selectedStock = selectedProduct?.stock ?? 0
 
   const refreshInventory = async (): Promise<void> => {
-    setStockOverrides({})
     await productsQuery.refetch()
   }
 
-  const saveStockPreview = async (stock: number): Promise<void> => {
+  const saveStock = async (stock: number): Promise<void> => {
     const productId = selectedProduct?.id
     if (!selectedProduct || !productId) return
 
     const confirmed = await confirmation(
-      'Preview this stock update?',
-      `${selectedProduct.title} will show ${stock} units until this page is refreshed or closed.`,
+      'Update this product stock?',
+      `${selectedProduct.title} will have ${stock} units on hand.`,
       { confirmText: 'Update stock' },
     )
     if (!confirmed) return
 
-    setStockOverrides((currentOverrides) => ({
-      ...currentOverrides,
-      [productId]: stock,
-    }))
-    setSelectedProduct(null)
-    appToast.success({
-      title: 'Stock preview updated',
-      description: 'This temporary value has not been saved to the backend.',
-    })
+    try {
+      await appToast.loadingPromise(
+        updateProductStock.mutateAsync({ id: productId, command: { stock } }),
+        {
+          loadingTitle: 'Updating stock...',
+          successTitle: 'Stock updated',
+          successDescription: `${selectedProduct.title} now has ${stock} units on hand.`,
+          errorTitle: 'Failed to update stock',
+          errorDescription: (error) => error.message,
+        },
+      )
+      setSelectedProduct(null)
+    } catch {
+      return
+    }
   }
 
   if (productsQuery.isLoading) {
@@ -89,7 +87,6 @@ export default function InventoryPage() {
       <InventoryOverview summary={summary} />
       <InventoryTable
         products={products}
-        stockOverrides={stockOverrides}
         onAdjustStock={setSelectedProduct}
         onRefresh={refreshInventory}
         isRefreshing={productsQuery.isFetching}
@@ -99,7 +96,8 @@ export default function InventoryPage() {
         product={selectedProduct}
         currentStock={selectedStock}
         onClose={() => setSelectedProduct(null)}
-        onSave={saveStockPreview}
+        onSave={saveStock}
+        isSubmitting={updateProductStock.isPending}
       />
     </div>
   )

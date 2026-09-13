@@ -1,6 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useProductService } from '../productService.service'
-import type { CreateProductCommand, ProductImageSelection, UpdateProductCommand } from '../products.types'
+import type {
+    CreateProductCommand,
+    ProductImageSelection,
+    UpdateProductCommand,
+    UpdateProductStockCommand,
+} from '../products.types'
 import { businessKeys, useBusinessScope } from '@/lib/business-scope'
 
 export function useProducts() {
@@ -33,6 +38,17 @@ export function useProducts() {
         }
     })
 
+    const updateProductStock = useMutation({
+        mutationFn: ({ id, command }: { id: number, command: UpdateProductStockCommand }) =>
+            productService.updateStock(id, command),
+        onSuccess: async () => {
+            await Promise.all([
+                qc.invalidateQueries({ queryKey: businessKeys.products(userId) }),
+                qc.invalidateQueries({ queryKey: businessKeys.dashboardRoot(userId) }),
+            ])
+        }
+    })
+
     const deleteProduct = useMutation({
         mutationFn: (id: number) => productService.delete(id),
         onSuccess: () => {
@@ -50,6 +66,7 @@ export function useProducts() {
         productsQuery,
         createProduct,
         updateProduct,
+        updateProductStock,
         deleteProduct,
         deleteProductImage
     }

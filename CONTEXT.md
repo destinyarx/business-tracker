@@ -18,11 +18,11 @@ _Avoid_: Expense when referring to the collection
 
 ## Inventory module
 
-Inventory is a read-only projection of Product records. Each inventory row uses the product title, SKU, supplier, price, and current stock quantity. The stock-on-hand table shows Product, Supplier, Stock, Stock value, and Update columns. Stock value is the product price multiplied by its current stock.
+Inventory is a projection of Product records. Each inventory row uses the product title, SKU, supplier, price, and current stock quantity. The stock-on-hand table shows Product, Supplier, Stock, Stock value, and Update columns. Stock value is the product price multiplied by its current stock.
 
 The Inventory overview shows total stock value, out-of-stock products, low-stock products with fewer than 10 units, and total units on hand. Products with zero units are counted only as out of stock.
 
-The Update stock flow is temporarily a client-side preview because the backend does not yet expose a dedicated stock-update endpoint. A preview changes the Inventory cards and table for the current page session, but it is not persisted and resets when the page is refreshed or left. Product data from the Products query remains the server source of truth.
+The Update stock flow replaces a Product's stock-on-hand quantity with a nonnegative whole number and persists it through the Products API. Product data remains the server source of truth, and a successful update refreshes Inventory and Dashboard product data.
 
 ## Dashboard module
 

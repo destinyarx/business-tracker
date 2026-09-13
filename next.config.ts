@@ -1,4 +1,4 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 // ponytail: static defense-in-depth headers only. Full script-src CSP is
 // deferred — it needs report-only observation + Clerk/hydration nonce work
@@ -16,12 +16,19 @@ const nextConfig: NextConfig = {
     domains: [
       'foodish-api.com',
       'jsrifeeyjadnwyuiuzno.supabase.co',
-      'picsum.photos'
+      'picsum.photos',
+    ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'hlvojoftpfflptpwlfih.supabase.co',
+        pathname: '/storage/v1/object/public/product-images/**',
+      },
     ],
   },
   async headers() {
     return [{ source: '/(.*)', headers: securityHeaders }]
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig

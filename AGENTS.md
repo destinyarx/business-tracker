@@ -475,7 +475,8 @@ After making changes:
 5. Run lint, type-check, and build checks when they are applicable to the change.
 6. Run only tests related to the changed or affected behavior. Do not run unrelated test suites or add excessive tests for unaffected modules.
 7. Broaden testing only when the change affects shared infrastructure, shared components, or cross-module contracts, or when a targeted check reveals a wider regression risk.
-8. Report any checks that could not be completed.
+8. Stop every localhost server or background process the agent started for testing when the test finishes or the task is complete and the process is no longer needed. Before the final response, verify that each port opened by the agent is no longer listening. Do not stop a pre-existing process that the agent did not start.
+9. Report any checks that could not be completed.
 
 ---
 

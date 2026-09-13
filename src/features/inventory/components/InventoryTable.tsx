@@ -1,16 +1,11 @@
 import { PackageOpen, Pencil, RefreshCw } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import type { StockOverrides } from '@/features/inventory/inventory.types'
-import {
-  formatInventoryCurrency,
-  getEffectiveStock,
-} from '@/features/inventory/inventory.utils'
+import { formatInventoryCurrency } from '@/features/inventory/inventory.utils'
 import type { Product } from '@/features/products/products.types'
 
 interface InventoryTableProps {
   products: Product[]
-  stockOverrides: StockOverrides
   onAdjustStock: (product: Product) => void
   onRefresh: () => void | Promise<void>
   isRefreshing: boolean
@@ -42,7 +37,6 @@ const StockBadge = ({ stock }: { stock: number }) => {
 
 export function InventoryTable({
   products,
-  stockOverrides,
   onAdjustStock,
   onRefresh,
   isRefreshing,
@@ -88,7 +82,7 @@ export function InventoryTable({
             </thead>
             <tbody>
               {products.map((product) => {
-                const stock = getEffectiveStock(product, stockOverrides)
+                const stock = product.stock
 
                 return (
                   <tr

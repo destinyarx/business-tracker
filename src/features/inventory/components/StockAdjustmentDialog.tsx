@@ -23,6 +23,7 @@ interface StockAdjustmentDialogProps {
   currentStock: number
   onClose: () => void
   onSave: (stock: number) => void | Promise<void>
+  isSubmitting: boolean
 }
 
 export function StockAdjustmentDialog({
@@ -30,6 +31,7 @@ export function StockAdjustmentDialog({
   currentStock,
   onClose,
   onSave,
+  isSubmitting,
 }: StockAdjustmentDialogProps) {
   const form = useForm<StockAdjustmentValues>({
     resolver: zodResolver(stockAdjustmentSchema),
@@ -52,7 +54,10 @@ export function StockAdjustmentDialog({
   }
 
   return (
-    <Dialog open={Boolean(product)} onOpenChange={(open) => !open && onClose()}>
+    <Dialog
+      open={Boolean(product)}
+      onOpenChange={(open) => !open && !isSubmitting && onClose()}
+    >
       <DialogContent
         showCloseButton={false}
         className="w-[392px] max-w-[calc(100vw-2.5rem)] gap-0 overflow-hidden rounded-[20px] border-0 bg-white p-0 shadow-[0_40px_80px_-30px_rgba(12,75,71,0.55)] dark:bg-[#12201f]"
@@ -105,8 +110,8 @@ export function StockAdjustmentDialog({
               </p>
             )}
 
-            <div className="mt-4 rounded-[11px] border border-[#f1dba5] bg-[#fffaf0] px-3 py-2.5 text-[11.5px] leading-relaxed text-[#7a5a12] dark:border-[#5e4b20] dark:bg-[#332b19] dark:text-[#f4d681]">
-              Temporary preview only. This value resets when you refresh or leave the page.
+            <div className="mt-4 rounded-[11px] border border-[#bfe7df] bg-[#f0faf7] px-3 py-2.5 text-[11.5px] leading-relaxed text-[#27635e] dark:border-[#28534e] dark:bg-[#17302d] dark:text-[#9edbd4]">
+              Saving replaces the current stock-on-hand quantity for this product.
             </div>
 
             <div className="mt-5 flex gap-2.5">
@@ -114,15 +119,17 @@ export function StockAdjustmentDialog({
                 type="button"
                 variant="outline"
                 onClick={onClose}
+                disabled={isSubmitting}
                 className="h-11 flex-1 rounded-xl border-[#dce3e2] bg-white text-[13px] font-medium dark:border-[#2b4340] dark:bg-[#12201f]"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
+                disabled={isSubmitting}
                 className="h-11 flex-[1.35] rounded-xl bg-[#0c4b47] text-[13px] font-semibold text-white hover:bg-[#007f78]"
               >
-                Preview stock
+                {isSubmitting ? 'Saving...' : 'Save stock'}
               </Button>
             </div>
           </form>

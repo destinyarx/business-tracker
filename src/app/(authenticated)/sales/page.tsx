@@ -96,7 +96,7 @@ export default function SalesPage() {
       />
 
       {summary.profitInaccurate && (
-        <div className="flex items-start gap-2 rounded-xl border border-[#f2dda0] bg-[#fff7e0] px-3.5 py-2.5 text-xs text-[#8a6100] dark:border-[#5c4920] dark:bg-[#493816] dark:text-[#ffd66b]">
+        <div className="flex items-center gap-2 rounded-xl border border-[#f2dda0] bg-[#fff7e0] px-3.5 py-2.5 text-xs text-[#8a6100] dark:border-[#5c4920] dark:bg-[#493816] dark:text-[#ffd66b]">
           <TriangleAlert className="mt-0.5 size-4 shrink-0" />
           Some sales contain products without recorded profit, so their profit values may be inaccurate.
         </div>
