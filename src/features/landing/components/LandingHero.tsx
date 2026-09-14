@@ -81,7 +81,7 @@ export function LandingHero() {
             <span
               className={`${landingMono.className} ml-2 truncate text-[10px] text-[#6B7A7A]`}
             >
-              app.negosyotracker.ph/sales
+              app.negosyotracker.ph/dashboard
             </span>
           </div>
           <div className="grid min-h-[250px] min-w-0 grid-cols-[46px_minmax(0,1fr)] bg-[#F2F5F4] sm:min-h-[276px]">

@@ -66,7 +66,7 @@ export function AuthShell({
                 NegosyoTracker
               </span>
               <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#7C8E8E]">
-                Sari-sari store operations
+                Manage business with ease
               </span>
             </span>
           </Link>

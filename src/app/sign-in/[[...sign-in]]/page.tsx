@@ -7,7 +7,7 @@ export default function SignInPage() {
       heading="Welcome back"
       description="Sign in to your workspace."
       asideHeading="Everything your shop did yesterday, in one screen today."
-      asideDescription="Orders, stock, customers and expenses stay in sync. No double entry and no lost receipts."
+      asideDescription="Orders, stock, customers and expenses stay in sync. No double entry and no lost records."
     >
       <SignIn
         path="/sign-in"

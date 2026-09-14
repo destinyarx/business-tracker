@@ -35,7 +35,7 @@ export function LandingPricing() {
     <section id="pricing" className="scroll-mt-[72px] overflow-hidden bg-white px-5 py-[74px] transition-colors dark:bg-[#12201F] sm:px-8 lg:px-11">
       <div className="mx-auto max-w-[1160px]">
         <h2 className="text-[34px] font-semibold tracking-[-0.03em] text-[#16292B] dark:text-[#EAF3F1]">Pricing</h2>
-        <p className="mt-2.5 text-[15.5px] text-[#5F7273] dark:text-[#9FB3B0]">Start free. Upgrade when you want AI insights and automated receipts.</p>
+        <p className="mt-2.5 text-[15.5px] text-[#5F7273] dark:text-[#9FB3B0]">Get started for free. Upgrade as your business grows</p>
 
         <div className="mt-10 grid gap-5 lg:grid-cols-2">
           <article className="grid overflow-hidden rounded-[20px] border border-[#E3E9E8] bg-white dark:border-[#243936] dark:bg-[#16292B] sm:grid-cols-[0.75fr_1.25fr]">
@@ -59,7 +59,7 @@ export function LandingPricing() {
             <div className="flex flex-col justify-between p-6 text-white">
               <div>
                 <h3 className="text-xl font-semibold">Premium</h3>
-                <p className="mt-3 text-[11.5px] leading-[1.55] text-white/80">For businesses that want AI insights and custom PDF receipts.</p>
+                <p className="mt-3 text-[11.5px] leading-[1.55] text-white/80">For businesses that want AI insights and higher record limits.</p>
               </div>
               <div className="mt-8">
                 <p className="font-semibold">₱ ??? <span className="text-[11px] font-normal text-white/70">/month</span></p>
