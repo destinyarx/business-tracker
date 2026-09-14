@@ -5,7 +5,6 @@ import {
   ArrowLeft,
   ArrowRight,
   CalendarRange,
-  ChevronDown,
   Filter,
   ListFilter,
   PackageOpen,
@@ -16,6 +15,13 @@ import {
 import { ORDER_STATUS } from '@/constants'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   Sheet,
   SheetContent,
@@ -46,6 +52,13 @@ import { useConfirmation } from '@/app/provider/ConfirmationProvider'
 import { useToast } from '@/hooks/useToast'
 
 const ordersPerPage = 6
+
+const filterTriggerClassName =
+  "h-[38px] w-fit rounded-full border-[#e3e9e8] bg-white px-3 text-[12.5px] font-medium text-[#3f5254] shadow-none transition-colors hover:bg-white focus-visible:border-[#00beaa] focus-visible:ring-0 dark:border-[#2b4340] dark:bg-[#12201f] dark:text-[#c3d4d1] dark:hover:bg-[#12201f] [&>svg:last-child]:size-3.5 [&>svg:last-child]:opacity-100"
+const filterContentClassName =
+  "min-w-[168px] rounded-xl border-[#dce3e2] bg-white p-1.5 shadow-[0_12px_32px_-12px_rgba(22,41,43,0.28)] dark:border-[#2b4340] dark:bg-[#12201f] [&_[data-radix-select-viewport]]:h-auto [&_[data-radix-select-viewport]]:p-0"
+const filterItemClassName =
+  "min-h-10 cursor-pointer rounded-lg py-2.5 pl-3 pr-9 text-[12.5px] font-medium text-[#3f5254] focus:bg-[#edf8f6] focus:text-[#075c57] dark:text-[#c3d4d1] dark:focus:bg-[#1b3532] dark:focus:text-[#eaf3f1]"
 
 const orderDateRanges: { label: string; value: OrderDateRange }[] = [
   { label: 'All dates', value: 'all' },
@@ -361,68 +374,89 @@ export default function OrdersPage() {
             <Search className="mr-4 size-4 text-[#7c8e8e]" />
           </div>
 
-          <label className="flex h-[38px] items-center gap-2 rounded-full border border-[#e3e9e8] bg-white px-3 text-[#3f5254] transition-colors focus-within:border-[#00beaa] dark:border-[#2b4340] dark:bg-[#12201f] dark:text-[#c3d4d1]">
-            <Filter className="size-3.5 shrink-0" />
-            <select
+          <Select
+            value={statusFilter ?? 'all'}
+            onValueChange={(selectedStatus) => {
+              selectStatusFilter(
+                isOrderStatus(selectedStatus) ? selectedStatus : undefined,
+              )
+            }}
+          >
+            <SelectTrigger
               aria-label="Filter orders by status"
-              value={statusFilter ?? 'all'}
-              onChange={(event) => {
-                const selectedStatus = event.target.value
-                selectStatusFilter(
-                  isOrderStatus(selectedStatus) ? selectedStatus : undefined,
-                )
-              }}
-              className="appearance-none bg-transparent text-[12.5px] font-medium outline-none"
+              className={filterTriggerClassName}
             >
-              <option value="all">All statuses</option>
+              <Filter className="size-3.5 shrink-0" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="start" className={filterContentClassName}>
+              <SelectItem value="all" className={filterItemClassName}>
+                All statuses
+              </SelectItem>
               {ORDER_STATUS.map((statusOption) => (
-                <option key={statusOption.value} value={statusOption.value}>
+                <SelectItem
+                  key={statusOption.value}
+                  value={statusOption.value}
+                  className={filterItemClassName}
+                >
                   {statusOption.name}
-                </option>
+                </SelectItem>
               ))}
-            </select>
-            <ChevronDown className="size-3.5 shrink-0" />
-          </label>
+            </SelectContent>
+          </Select>
 
-          <label className="flex h-[38px] items-center gap-2 rounded-full border border-[#e3e9e8] bg-white px-3 text-[#3f5254] transition-colors focus-within:border-[#00beaa] dark:border-[#2b4340] dark:bg-[#12201f] dark:text-[#c3d4d1]">
-            <ListFilter className="size-3.5 shrink-0" />
-            <select
+          <Select
+            value={sort}
+            onValueChange={(selectedSort) => {
+              setCurrentPage(1)
+              setSort(selectedSort === 'asc' ? 'asc' : 'desc')
+            }}
+          >
+            <SelectTrigger
               aria-label="Sort orders by date"
-              value={sort}
-              onChange={(event) => {
-                setCurrentPage(1)
-                setSort(event.target.value === 'asc' ? 'asc' : 'desc')
-              }}
-              className="appearance-none bg-transparent text-[12.5px] font-medium outline-none"
+              className={filterTriggerClassName}
             >
-              <option value="desc">Newest first</option>
-              <option value="asc">Oldest first</option>
-            </select>
-            <ChevronDown className="size-3.5 shrink-0" />
-          </label>
+              <ListFilter className="size-3.5 shrink-0" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="start" className={filterContentClassName}>
+              <SelectItem value="desc" className={filterItemClassName}>
+                Newest first
+              </SelectItem>
+              <SelectItem value="asc" className={filterItemClassName}>
+                Oldest first
+              </SelectItem>
+            </SelectContent>
+          </Select>
 
-          <label className="flex h-[38px] items-center gap-2 rounded-full border border-[#e3e9e8] bg-white px-3 text-[#3f5254] transition-colors focus-within:border-[#00beaa] dark:border-[#2b4340] dark:bg-[#12201f] dark:text-[#c3d4d1]">
-            <CalendarRange className="size-3.5 shrink-0 text-[#007f78] dark:text-[#7fe0da]" />
-            <select
+          <Select
+            value={dateRange}
+            onValueChange={(selectedRange) => {
+              if (!isOrderDateRange(selectedRange)) return
+
+              setCurrentPage(1)
+              setDateRange(selectedRange)
+            }}
+          >
+            <SelectTrigger
               aria-label="Filter orders by order date"
-              value={dateRange}
-              onChange={(event) => {
-                const selectedRange = event.target.value
-                if (!isOrderDateRange(selectedRange)) return
-
-                setCurrentPage(1)
-                setDateRange(selectedRange)
-              }}
-              className="appearance-none bg-transparent text-[12.5px] font-medium outline-none"
+              className={filterTriggerClassName}
             >
+              <CalendarRange className="size-3.5 shrink-0 text-[#007f78] dark:text-[#7fe0da]" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="start" className={filterContentClassName}>
               {orderDateRanges.map((range) => (
-                <option key={range.value} value={range.value}>
+                <SelectItem
+                  key={range.value}
+                  value={range.value}
+                  className={filterItemClassName}
+                >
                   {range.label}
-                </option>
+                </SelectItem>
               ))}
-            </select>
-            <ChevronDown className="size-3.5 shrink-0" />
-          </label>
+            </SelectContent>
+          </Select>
         </div>
 
         <Button

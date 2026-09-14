@@ -8,7 +8,8 @@ import {
   ChartNoAxesCombined,
   ChevronLeft,
   ChevronRight,
-  PackageSearch,
+  Package,
+  Tags,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
@@ -90,8 +91,8 @@ const navigationGroups = [
     items: [
       { title: 'Orders', url: '/orders', icon: OrdersIcon },
       { title: 'Customers', url: '/customers', icon: CustomersIcon },
-      { title: 'Products', url: '/products', icon: PackageSearch },
-      { title: 'Inventory', url: '/inventory', icon: InventoryIcon },
+      { title: 'Products', url: '/products', icon: Tags },
+      { title: 'Inventory', url: '/inventory', icon: Package },
     ],
   },
   {
