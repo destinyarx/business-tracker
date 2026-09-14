@@ -39,7 +39,27 @@ export const productFormSchema = z.object({
   ),
   category: z.string().min(1, 'Category is required'),
   image: z.string().nullish(),
-  imageUrl: z.string().nullish(),
+  imageUrl: z
+    .string()
+    .trim()
+    .refine(
+      (imageUrl) => {
+        if (imageUrl === '') return true
+
+        try {
+          const parsedImageUrl = new URL(imageUrl)
+          return (
+            (parsedImageUrl.protocol === 'https:' ||
+              parsedImageUrl.protocol === 'http:') &&
+            Boolean(parsedImageUrl.hostname)
+          )
+        } catch {
+          return false
+        }
+      },
+      'Enter a valid HTTP or HTTPS image URL',
+    )
+    .nullish(),
 })
 
 export type ProductFormValues = z.infer<typeof productFormSchema>

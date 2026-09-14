@@ -97,12 +97,12 @@ export default function OrderCard({
       </div>
 
       {order.notes && (
-        <p className="line-clamp-2 text-[11.5px] leading-relaxed text-[#7c8e8e] dark:text-[#9fb3b0]">
-          {order.notes}
+        <p className="border-t border-dashed border-[#e3e9e8] dark:border-[#2b4340] line-clamp-2 text-[11.5px] leading-relaxed text-[#7c8e8e] dark:text-[#9fb3b0] pt-2">
+          Notes: {order.notes}
         </p>
       )}
 
-      <div className="flex-1 border-t border-dashed border-[#e3e9e8] pt-3 dark:border-[#2b4340]">
+      <div className="flex-1 border-t border-dashed border-[#e3e9e8] pt-2 dark:border-[#2b4340] -mt-2">
         <div className="max-h-[78px] space-y-[7px] overflow-y-auto pr-1">
           {order.items.map((orderItem, index) => (
             <div
@@ -133,30 +133,30 @@ export default function OrderCard({
           </p>
         </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          disabled={status === 'completed'}
-          onClick={() => onUpdate(order)}
-          title={status === 'completed' ? 'Move this order out of completed before editing it.' : undefined}
-          className="h-8 rounded-[10px] border-[#dce3e2] px-3 text-xs font-medium dark:border-[#2b4340] dark:bg-[#12201f]"
-        >
-          <Pencil className="size-3.5" />
-          Edit
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          disabled={!order.id || hasKnownSale}
-          onClick={() => order.id && onDelete(order.id)}
-          title={hasKnownSale ? 'Orders that have produced a Sale cannot be deleted.' : undefined}
-          className="h-8 rounded-[10px] border-[#f1cccc] px-3 text-xs font-medium text-[#b01c1c] hover:bg-[#fdecec] hover:text-[#b01c1c] dark:border-[#663535] dark:bg-[#12201f]"
-        >
-          <Trash2 className="size-3.5" />
-          Delete
-        </Button>
+        {status !== 'completed' && (
+          <>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => onUpdate(order)}
+              className="h-8 rounded-[10px] border-[#dce3e2] px-3 text-xs font-medium dark:border-[#2b4340] dark:bg-[#12201f]"
+            >
+              <Pencil className="size-3.5" />
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={!order.id || hasKnownSale}
+              onClick={() => order.id && onDelete(order.id)}
+              title={hasKnownSale ? 'Orders that have produced a Sale cannot be deleted.' : undefined}
+              className="h-8 rounded-[10px] border-[#f1cccc] px-3 text-xs font-medium text-[#b01c1c] hover:bg-[#fdecec] hover:text-[#b01c1c] dark:border-[#663535] dark:bg-[#12201f]"
+            >
+              <Trash2 className="size-3.5" />
+            </Button>
+          </>
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -164,7 +164,7 @@ export default function OrderCard({
               size="sm"
               className="h-8 rounded-[10px] bg-[#e4f7f4] px-3 text-xs font-semibold text-[#00706a] hover:bg-[#12cdbe] hover:text-white dark:bg-[#173d39] dark:text-[#55ddd0]"
             >
-              Update status
+              Update Status
               <ChevronDown className="size-3.5" />
             </Button>
           </DropdownMenuTrigger>

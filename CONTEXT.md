@@ -24,6 +24,10 @@ The Inventory overview shows total stock value, out-of-stock products, low-stock
 
 The Update stock flow replaces a Product's stock-on-hand quantity with a nonnegative whole number and persists it through the Products API. Product data remains the server source of truth, and a successful update refreshes Inventory and Dashboard product data.
 
+## Products module
+
+Product images may be uploaded or supplied through any valid HTTP or HTTPS image URL. URL images must load successfully in the browser before the product form submits. Product cards fall back to the default product image when a saved remote image can no longer load.
+
 ## Dashboard module
 
 The Dashboard presents Sales, Expenses, estimated profit, completed Orders, cashflow, expense categories, attention items, top Products, and top Customers for This month, This week, or Last week. Reporting sections use the selected period, while attention items represent the current stock, Order queue, Customer cadence, and Expense anomalies.
@@ -45,6 +49,8 @@ Order statuses are `pending`, `in_progress`, `completed`, `cancelled`, and `fail
 The backend owns stock and Sale changes during status transitions and reads stored Order items for those operations. The frontend status request sends only the target status and an optional reversal reason. Completed Orders cannot be edited. An Order that has ever produced a Sale cannot be deleted, even while its Sale is reverted.
 
 The Orders list can filter by fulfillment status and Order creation date. Date ranges are All dates, Today, Yesterday, and This week. The backend evaluates date ranges in Asia/Manila, and This week starts on Monday. Orders can be sorted newest-first or oldest-first by creation date.
+
+Order cart quantities can be changed with the stepper or by typing a whole number from 1 through the Product's available stock. Typed quantities reject zero, negative values, decimals, and leading zeroes.
 
 ## Application feedback
 

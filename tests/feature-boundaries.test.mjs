@@ -8,6 +8,7 @@ import { createCustomersApi } from '../src/features/customers/customers.api.ts'
 import { paginatedExpensesResponseSchema } from '../src/features/expenses/expenses.schema.ts'
 import { paginatedOrdersResponseSchema } from '../src/features/orders/order.schema.ts'
 import { toUpdateOrderStatusCommand } from '../src/features/orders/order.mapper.ts'
+import { parseOrderQuantity } from '../src/features/orders/order.utils.ts'
 import { createProductsApi } from '../src/features/products/products.api.ts'
 import {
   productFormSchema,
@@ -137,6 +138,24 @@ test('an API product with empty optional fields can be resubmitted for update', 
   assert.equal(result.success, true)
 })
 
+test('product image URLs accept HTTP images and reject malformed URLs', () => {
+  const product = {
+    ...validProduct,
+    category: 'food-and-beverage',
+    imageUrl: 'https://placehold.net/400x600.png',
+  }
+
+  assert.equal(productFormSchema.safeParse(product).success, true)
+  assert.equal(
+    productFormSchema.safeParse({ ...product, imageUrl: 'https://' }).success,
+    false,
+  )
+  assert.equal(
+    productFormSchema.safeParse({ ...product, imageUrl: 'ftp://example.com/image.png' }).success,
+    false,
+  )
+})
+
 test('response validation failures become safe feature errors', () => {
   const result = productsResponseSchema.safeParse({ data: [{ ...validProduct, id: '1' }] })
   assert.equal(result.success, false)
@@ -197,6 +216,16 @@ test('order response parsing accepts nested API summaries', () => {
   })
 
   assert.equal(result.success, true)
+})
+
+test('order quantities accept positive whole numbers without leading zeroes', () => {
+  assert.equal(parseOrderQuantity('56'), 56)
+  assert.equal(parseOrderQuantity('110'), 110)
+  assert.equal(parseOrderQuantity('056'), null)
+  assert.equal(parseOrderQuantity('00110'), null)
+  assert.equal(parseOrderQuantity('0'), null)
+  assert.equal(parseOrderQuantity('-1'), null)
+  assert.equal(parseOrderQuantity('1.5'), null)
 })
 
 test('order status command matches the backend update DTO', () => {

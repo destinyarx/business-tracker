@@ -10,7 +10,8 @@ interface OrderStore {
     resetCart: () => void,
     removeFromCart: (id: number | undefined) => void,
     increaseItem: (id: number | undefined) => void,
-    decreaseItem: (id: number | undefined) => void
+    decreaseItem: (id: number | undefined) => void,
+    setItemQuantity: (id: number | undefined, quantity: number) => void
 
     // form
     orderForm: OrderForm,
@@ -60,6 +61,18 @@ export const useOrderStore = create<OrderStore>((set) => ({
                     ? { ...cart, quantity: cart.quantity - 1 }
                     : cart
                 ).filter((cart) => !!cart.quantity)
+    })),
+
+    setItemQuantity: (id, quantity) =>
+        set((state) => ({
+            carts: state.carts.map((cart) =>
+                cart.id === id &&
+                Number.isSafeInteger(quantity) &&
+                quantity > 0 &&
+                quantity <= cart.stock
+                    ? { ...cart, quantity }
+                    : cart
+            )
     })),
 
     // form

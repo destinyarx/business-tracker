@@ -8,8 +8,7 @@ import { useDashboardQuery } from '@/features/dashboard/hooks/useDashboardQuery'
 import type { DashboardRange } from '@/features/dashboard/dashboard.types'
 
 export default function DashboardPage() {
-  const [selectedRange, setSelectedRange] =
-    useState<DashboardRange>('this_month')
+  const [selectedRange, setSelectedRange] = useState<DashboardRange>('this_month')
   const { dashboardQuery } = useDashboardQuery(selectedRange)
 
   if (dashboardQuery.isPending && !dashboardQuery.data) {

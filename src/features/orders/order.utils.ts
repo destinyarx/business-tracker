@@ -9,6 +9,13 @@ const philippinePesoFormatter = new Intl.NumberFormat('en-PH', {
 export const formatOrderCurrency = (amount: number): string =>
   philippinePesoFormatter.format(amount)
 
+export const parseOrderQuantity = (quantityText: string): number | null => {
+  if (!/^[1-9][0-9]*$/.test(quantityText)) return null
+
+  const quantity = Number(quantityText)
+  return Number.isSafeInteger(quantity) ? quantity : null
+}
+
 const allowedStatusTargets: Record<OrderStatus, readonly OrderStatus[]> = {
   pending: ['in_progress', 'cancelled', 'failed'],
   in_progress: ['completed', 'cancelled', 'failed'],

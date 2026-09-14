@@ -30,6 +30,7 @@ import {
   type ProductFormInput,
   type ProductFormValues,
 } from '../products.schema'
+import { isLoadableImageUrl } from '../product-image.utils'
 
 type ImageMode = 'current' | 'upload' | 'url'
 
@@ -117,6 +118,20 @@ export default function ProductForm() {
   }
 
   const onSubmit = async (productValues: ProductFormValues) => {
+    const imageUrl = productValues.imageUrl?.trim()
+
+    if (imageMode === 'url' && imageUrl) {
+      const isValidImage = await isLoadableImageUrl(imageUrl)
+
+      if (!isValidImage) {
+        form.setError('imageUrl', {
+          type: 'validate',
+          message: 'This URL does not point to a loadable image.',
+        })
+        return
+      }
+    }
+
     const updateId = productValues.id ?? product?.id
     setIsLoading(true)
 
@@ -218,12 +233,19 @@ export default function ProductForm() {
           )}
 
           {imageMode === 'url' && (
-            <Input
-              {...form.register('imageUrl')}
-              readOnly={isReadOnly}
-              placeholder="Paste image link"
-              className={fieldClassName}
-            />
+            <div>
+              <Input
+                {...form.register('imageUrl')}
+                readOnly={isReadOnly}
+                placeholder="Paste image link"
+                className={fieldClassName}
+              />
+              {form.formState.errors.imageUrl && (
+                <p className="mt-1 text-xs text-red-600">
+                  {form.formState.errors.imageUrl.message}
+                </p>
+              )}
+            </div>
           )}
 
           {imageMode === 'upload' && !isReadOnly && (

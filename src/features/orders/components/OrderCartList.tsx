@@ -1,9 +1,18 @@
 import { Minus, Plus, X } from 'lucide-react'
 import { useOrderStore } from '@/features/orders/useOrderStore'
-import { formatOrderCurrency } from '@/features/orders/order.utils'
+import {
+  formatOrderCurrency,
+  parseOrderQuantity,
+} from '@/features/orders/order.utils'
 
 export default function OrderCartList() {
-  const { carts, removeFromCart, increaseItem, decreaseItem } = useOrderStore()
+  const {
+    carts,
+    removeFromCart,
+    increaseItem,
+    decreaseItem,
+    setItemQuantity,
+  } = useOrderStore()
 
   return (
     <div className="divide-y divide-[#edf1f0] dark:divide-[#1e322f]">
@@ -36,9 +45,24 @@ export default function OrderCartList() {
                 >
                   <Minus className="size-3" />
                 </button>
-                <span className="w-8 text-center font-mono text-[12.5px]">
-                  {quantity}
-                </span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[1-9][0-9]*"
+                  value={quantity}
+                  onFocus={(event) => event.currentTarget.select()}
+                  onChange={(event) => {
+                    const nextQuantity = parseOrderQuantity(
+                      event.currentTarget.value,
+                    )
+
+                    if (nextQuantity === null) return
+
+                    setItemQuantity(cartItem.id, nextQuantity)
+                  }}
+                  aria-label={`${cartItem.title} quantity`}
+                  className="h-[27px] w-10 border-x border-[#e3e9e8] bg-white text-center font-mono text-[12.5px] text-[#16292b] outline-none focus:ring-2 focus:ring-inset focus:ring-[#12cdbe] dark:border-[#2b4340] dark:bg-[#12201f] dark:text-[#eaf3f1]"
+                />
                 <button
                   type="button"
                   onClick={() => increaseItem(cartItem.id)}

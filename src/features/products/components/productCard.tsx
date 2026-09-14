@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
 import { MoreHorizontal, Eye, Pencil, Trash2 } from 'lucide-react'
 import type { Product } from '@/features/products/products.types'
 import { useProductFormStore } from '@/features/products/store/useProductFormStore'
@@ -31,6 +32,11 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { editForm, viewForm, closeForm } = useProductFormStore()
   const confirmation = useConfirmation()
   const appToast = useToast()
+  const [hasImageError, setHasImageError] = useState(false)
+
+  useEffect(() => {
+    setHasImageError(false)
+  }, [product.imageUrl])
 
   const handleDelete = async (productId: number | undefined, imageName: string | null | undefined) => {
     if (!productId) return
@@ -70,10 +76,15 @@ export default function ProductCard({ product }: ProductCardProps) {
     <article className="flex h-full flex-col overflow-hidden rounded-[18px] border border-[#e3e9e8] bg-white transition-[border-color,box-shadow] hover:border-[#c2e7e2] hover:shadow-[0_18px_34px_-28px_rgba(12,75,71,0.5)] dark:border-[#243936] dark:bg-[#12201f] dark:hover:border-[#2f625d]">
       <div className="relative aspect-[4/3] bg-[#f2f5f4] dark:bg-[#1b2e2c]">
         <Image
-          src={product.imageUrl ?? '/default-product-image.png'}
+          src={
+            product.imageUrl && !hasImageError
+              ? product.imageUrl
+              : '/default-product-image.png'
+          }
           alt={product.title}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1440px) 33vw, 258px"
           fill
+          onError={() => setHasImageError(true)}
           className="object-cover"
         />
         <span
