@@ -57,3 +57,11 @@ Order cart quantities can be changed with the stepper or by typing a whole numbe
 Actions that need user approval use one global confirmation dialog. Standard confirmations use the teal brand treatment, while irreversible actions use the red destructive treatment. Closing the dialog, pressing Escape, or choosing Cancel resolves the pending action as cancelled.
 
 Success, error, loading, and informational notifications use the global top-right toast system. Promise-based actions keep a loading toast visible until the operation settles, then replace it with the matching success or error message.
+
+## Legal and registration
+
+Public Privacy Notice, Terms of Service, and Data Processing Addendum pages describe NegosyoTracker's current free Philippine release. Registration requires one unchecked agreement covering the Terms, acknowledgement of the Privacy Notice, and the Data Processing Addendum when a business submits personal data. Email/password and Google sign-up both pass Clerk's legal-acceptance flag, and the accepted document versions are attached to the sign-up metadata.
+
+Clerk account deletion removes the authentication identity but does not currently confirm deletion of business records or product images stored by the separate API, PostgreSQL database, caches, backups, and Supabase Storage. The Privacy Notice directs users to request confirmed cross-system deletion. Production deployment must provide `LEGAL_OPERATOR_NAME` and `LEGAL_CONTACT_EMAIL` so the legal pages identify the operator and a private contact channel.
+
+The authenticated Account Settings page embeds Clerk's account-management interface. The header user menu routes its Manage account action to this page. Clerk's Security settings remain the single account-deletion control so Clerk can perform any required identity verification and emit the signed `user.deleted` event expected by the backend account-erasure workflow. The frontend does not call a separate deletion API.

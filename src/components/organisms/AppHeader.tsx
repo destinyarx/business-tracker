@@ -19,6 +19,10 @@ const routeCopy: Record<string, { title: string; description: string }> = {
   inventory: { title: 'Inventory', description: 'See stock levels and inventory movement.' },
   expenses: { title: 'Expenses', description: 'Record business costs and monitor spending.' },
   'negosyo-ai': { title: 'NegosyoAI', description: 'Ask questions about your business data.' },
+  settings: {
+    title: 'Account settings',
+    description: 'Manage your profile, sign-in security, and account.',
+  },
 }
 
 export function AppHeader() {
@@ -39,7 +43,10 @@ export function AppHeader() {
       </div>
       <ThemeToggle className="size-[38px] rounded-full border-[#e3e9e8] dark:border-[#12cdbe]/40 dark:bg-[#16292b]" />
       <div className="flex items-center gap-2.5 rounded-full border border-[#e3e9e8] bg-white py-1 pl-1 pr-3 dark:border-[#243936] dark:bg-[#12201f]">
-        <UserButton />
+        <UserButton
+          userProfileMode="navigation"
+          userProfileUrl="/settings"
+        />
         <div className="hidden leading-tight sm:block">
           <span className="block max-w-36 truncate text-[12.5px] font-semibold text-[#16292b] dark:text-[#eaf3f1]">{displayName}</span>
           <span className="block text-[10.5px] text-[#93a5a5]">Business owner</span>

@@ -11,7 +11,7 @@ export const signUpSchema = z.object({
   emailAddress: z.email('Enter a valid email address.'),
   password: z.string().min(8, 'Use at least 8 characters.'),
   acceptsTerms: z.boolean().refine((accepted) => accepted, {
-    message: 'Accept the Terms and Privacy Policy to continue.',
+    message: 'Accept the legal agreement to continue.',
   }),
 })
 

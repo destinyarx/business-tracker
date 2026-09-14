@@ -41,6 +41,13 @@ export function CustomSignUpForm() {
     defaultValues: { code: '' },
   })
 
+  const startGoogleSignUp = async (): Promise<void> => {
+    const hasAcceptedAgreement = await signUpForm.trigger('acceptsTerms')
+    if (!hasAcceptedAgreement) return
+
+    await signUpWithGoogle(signUpForm.getValues('acceptsTerms'))
+  }
+
   if (needsEmailVerification) {
     return (
       <form
@@ -87,7 +94,7 @@ export function CustomSignUpForm() {
       <AuthSocialButtons
         disabled={!isClerkLoaded || isSubmitting}
         isGoogleLoading={isGoogleLoading}
-        onGoogleClick={() => void signUpWithGoogle()}
+        onGoogleClick={() => void startGoogleSignUp()}
       />
 
       <form noValidate onSubmit={signUpForm.handleSubmit(createAccount)} className="space-y-3.5">
@@ -116,10 +123,45 @@ export function CustomSignUpForm() {
         />
 
         <div>
-          <label className="inline-flex cursor-pointer items-start gap-2 text-[12.5px] text-[#3F5254] dark:text-[#C3D4D1]">
-            <input type="checkbox" className="mt-0.5 size-[15px] accent-[#00A899]" {...signUpForm.register('acceptsTerms')} />
-            I agree to the Terms and Privacy Policy
-          </label>
+          <div className="flex items-start gap-2 text-[12.5px] leading-5 text-[#3F5254] dark:text-[#C3D4D1]">
+            <input
+              id="acceptsTerms"
+              type="checkbox"
+              aria-invalid={Boolean(signUpForm.formState.errors.acceptsTerms)}
+              className="mt-0.5 size-[15px] shrink-0 cursor-pointer accent-[#00A899]"
+              {...signUpForm.register('acceptsTerms')}
+            />
+            <label htmlFor="acceptsTerms">
+              I agree to the{' '}
+              <Link
+                href="/terms"
+                target="_blank"
+                rel="noreferrer"
+                className="font-semibold text-[#007F78] underline underline-offset-2 hover:text-[#00A899] dark:text-[#5EEBDD]"
+              >
+                Terms of Service
+              </Link>
+              , acknowledge the{' '}
+              <Link
+                href="/privacy"
+                target="_blank"
+                rel="noreferrer"
+                className="font-semibold text-[#007F78] underline underline-offset-2 hover:text-[#00A899] dark:text-[#5EEBDD]"
+              >
+                Privacy Notice
+              </Link>
+              , and agree to the{' '}
+              <Link
+                href="/data-processing-addendum"
+                target="_blank"
+                rel="noreferrer"
+                className="font-semibold text-[#007F78] underline underline-offset-2 hover:text-[#00A899] dark:text-[#5EEBDD]"
+              >
+                Data Processing Addendum
+              </Link>
+              {' '}when I submit personal data for my business.
+            </label>
+          </div>
           {signUpForm.formState.errors.acceptsTerms && (
             <p className="mt-1.5 text-xs text-red-600" role="alert">
               {signUpForm.formState.errors.acceptsTerms.message}

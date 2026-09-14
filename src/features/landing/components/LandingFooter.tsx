@@ -6,6 +6,9 @@ const footerLinks = [
   { href: '#how', label: 'How it works' },
   { href: '#pricing', label: 'Pricing' },
   { href: '#faq', label: 'FAQ' },
+  { href: '/privacy', label: 'Privacy' },
+  { href: '/terms', label: 'Terms' },
+  { href: '/data-processing-addendum', label: 'Data processing' },
 ]
 
 export function LandingFooter() {

@@ -8,6 +8,7 @@ import type {
   EmailVerificationFields,
   SignUpFields,
 } from '../auth.schema'
+import { createLegalAcceptanceMetadata } from '@/features/legal/legal.constants'
 
 export function useCustomSignUp() {
   const router = useRouter()
@@ -29,6 +30,7 @@ export function useCustomSignUp() {
         emailAddress: fields.emailAddress,
         password: fields.password,
         legalAccepted: fields.acceptsTerms,
+        unsafeMetadata: createLegalAcceptanceMetadata(),
       })
 
       if (attempt.status === 'complete' && attempt.createdSessionId) {
@@ -98,8 +100,8 @@ export function useCustomSignUp() {
     }
   }
 
-  const signUpWithGoogle = async (): Promise<void> => {
-    if (!isLoaded) return
+  const signUpWithGoogle = async (legalAccepted: boolean): Promise<void> => {
+    if (!isLoaded || !legalAccepted) return
 
     setAuthError(null)
     setIsGoogleLoading(true)
@@ -109,6 +111,8 @@ export function useCustomSignUp() {
         strategy: 'oauth_google',
         redirectUrl: '/sso-callback',
         redirectUrlComplete: '/dashboard',
+        legalAccepted,
+        unsafeMetadata: createLegalAcceptanceMetadata(),
       })
     } catch (error) {
       if (isClerkAPIResponseError(error)) {
