@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ImageIcon, Upload } from 'lucide-react'
+import { ImageIcon, ScanBarcode, Upload } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -34,7 +34,11 @@ import { isLoadableImageUrl } from '../product-image.utils'
 
 type ImageMode = 'current' | 'upload' | 'url'
 
-export default function ProductForm() {
+type ProductFormProps = {
+  onBarcodeScan?: () => void
+}
+
+export default function ProductForm({ onBarcodeScan }: ProductFormProps) {
   const { formState, product, closeForm } = useProductFormStore()
   const { createProduct, updateProduct } = useProducts()
   const confirmation = useConfirmation()
@@ -280,7 +284,25 @@ export default function ProductForm() {
           </div>
           <div>
             <Label className={labelClassName}>Barcode</Label>
-            <Input {...form.register('barcode')} readOnly={isReadOnly} placeholder="Scan or type" className={cn(fieldClassName, 'font-mono')} />
+            <div className="relative">
+              <Input
+                {...form.register('barcode')}
+                readOnly={isReadOnly}
+                placeholder="Scan or type"
+                className={cn(fieldClassName, 'pr-11 font-mono')}
+              />
+              {!isReadOnly && (
+                <button
+                  type="button"
+                  onClick={onBarcodeScan}
+                  aria-label="Scan barcode with camera"
+                  title="Scan barcode"
+                  className="absolute right-1.5 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-[9px] text-[#007f78] transition-colors hover:bg-[#e4f7f4] hover:text-[#005f5a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#12cdbe] dark:text-[#7fe0da] dark:hover:bg-[#1b3936] dark:hover:text-[#a7eee9]"
+                >
+                  <ScanBarcode className="size-[17px]" aria-hidden="true" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
 

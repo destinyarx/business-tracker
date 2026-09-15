@@ -54,7 +54,7 @@ export default function Products() {
       <ProductTable products={productsQuery.data ?? []} />
 
       <Sheet open={showForm} onOpenChange={(open) => !open && closeForm()}>
-        <SheetContent className="w-[470px] max-w-[94vw] gap-0 border-l-0 bg-white p-0 shadow-[-30px_0_60px_-30px_rgba(11,32,33,0.5)] dark:bg-[#12201f] sm:max-w-[470px] [&>button]:hidden">
+        <SheetContent className="w-[500px] max-w-[94vw] gap-0 border-l-0 bg-white p-0 shadow-[-30px_0_60px_-30px_rgba(11,32,33,0.5)] dark:bg-[#12201f] sm:max-w-[470px] [&>button]:hidden">
           <SheetHeader className="flex-row items-start gap-3 border-b border-[#edf1f0] px-[22px] py-4 text-left dark:border-[#1e322f]">
             <span className="w-1 self-stretch shrink-0 rounded-full bg-gradient-to-b from-[#a8d97c] to-[#12cdbe]" />
             <div className="flex-1">

@@ -28,6 +28,8 @@ The Update stock flow replaces a Product's stock-on-hand quantity with a nonnega
 
 Product images may be uploaded or supplied through any valid HTTP or HTTPS image URL. URL images must load successfully in the browser before the product form submits. Product cards fall back to the default product image when a saved remote image can no longer load.
 
+The Product form's Barcode field accepts normal text entry and includes an accessible scanner action in add and edit modes. `ProductForm` exposes the optional `onBarcodeScan` callback for a future camera or hardware-scanner integration; view mode keeps the field read-only and hides the action.
+
 ## Dashboard module
 
 The Dashboard presents Sales, Expenses, estimated profit, completed Orders, cashflow, expense categories, attention items, top Products, and top Customers for This month, This week, or Last week. Reporting sections use the selected period, while attention items represent the current stock, Order queue, Customer cadence, and Expense anomalies.
