@@ -28,7 +28,7 @@ The Update stock flow replaces a Product's stock-on-hand quantity with a nonnega
 
 Product images may be uploaded or supplied through any valid HTTP or HTTPS image URL. URL images must load successfully in the browser before the product form submits. Product cards fall back to the default product image when a saved remote image can no longer load.
 
-The Product form's Barcode field accepts normal text entry and includes an accessible scanner action in add and edit modes. `ProductForm` exposes the optional `onBarcodeScan` callback for a future camera or hardware-scanner integration; view mode keeps the field read-only and hides the action.
+The Product form's Barcode field accepts normal text entry and includes an accessible scanner action in add and edit modes. The centered scanner dialog can continuously detect a barcode from the device camera or decode one from an image-only file selection. A successful scan writes the decoded text into the Barcode field and marks it dirty; an image without a detectable barcode shows an inline error. Closing the optional dialog stops its camera stream. View mode keeps the Barcode field read-only and hides the scanner action.
 
 ## Dashboard module
 

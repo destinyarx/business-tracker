@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ImageIcon, ScanBarcode, Upload } from 'lucide-react'
@@ -31,20 +31,18 @@ import {
   type ProductFormValues,
 } from '../products.schema'
 import { isLoadableImageUrl } from '../product-image.utils'
+import { BarcodeScannerDialog } from './BarcodeScannerDialog'
 
 type ImageMode = 'current' | 'upload' | 'url'
 
-type ProductFormProps = {
-  onBarcodeScan?: () => void
-}
-
-export default function ProductForm({ onBarcodeScan }: ProductFormProps) {
+export default function ProductForm() {
   const { formState, product, closeForm } = useProductFormStore()
   const { createProduct, updateProduct } = useProducts()
   const confirmation = useConfirmation()
   const appToast = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [imageMode, setImageMode] = useState<ImageMode>('upload')
+  const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false)
   const isReadOnly = formState === FormState.VIEW
 
   const form = useForm<ProductFormInput, undefined, ProductFormValues>({
@@ -197,6 +195,17 @@ export default function ProductForm({ onBarcodeScan }: ProductFormProps) {
     'h-11 rounded-xl border-[#dce3e2] px-3.5 text-[13px] shadow-none dark:border-[#2b4340]'
   const labelClassName = 'mb-1.5 text-[12.5px] font-medium'
 
+  const setScannedBarcode = useCallback(
+    (barcode: string) => {
+      form.setValue('barcode', barcode, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      })
+    },
+    [form],
+  )
+
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="flex min-h-0 flex-1 flex-col">
       <div className="flex-1 space-y-4 overflow-y-auto px-[22px] py-5">
@@ -294,7 +303,7 @@ export default function ProductForm({ onBarcodeScan }: ProductFormProps) {
               {!isReadOnly && (
                 <button
                   type="button"
-                  onClick={onBarcodeScan}
+                  onClick={() => setIsBarcodeScannerOpen(true)}
                   aria-label="Scan barcode with camera"
                   title="Scan barcode"
                   className="absolute right-1.5 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-[9px] text-[#007f78] transition-colors hover:bg-[#e4f7f4] hover:text-[#005f5a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#12cdbe] dark:text-[#7fe0da] dark:hover:bg-[#1b3936] dark:hover:text-[#a7eee9]"
@@ -381,6 +390,12 @@ export default function ProductForm({ onBarcodeScan }: ProductFormProps) {
           </Button>
         )}
       </div>
+
+      <BarcodeScannerDialog
+        open={isBarcodeScannerOpen}
+        onOpenChange={setIsBarcodeScannerOpen}
+        onDetected={setScannedBarcode}
+      />
     </form>
   )
 }
