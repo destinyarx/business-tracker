@@ -1,4 +1,4 @@
-import { Check, LockKeyhole } from 'lucide-react'
+import { Check, LockKeyhole, BadgeCheck } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
@@ -22,7 +22,8 @@ function FeatureList({ features }: { features: string[] }) {
     <ul className="mt-5 space-y-3">
       {features.map((feature) => (
         <li key={feature} className="flex gap-2.5 text-[12px] leading-5 text-[#5F7273] dark:text-[#9FB3B0]">
-          <Check className="mt-0.5 size-4 shrink-0 text-[#00A899]" strokeWidth={1.8} />
+          {/*<Check className="mt-0.5 size-4 shrink-0 text-[#00A899]" strokeWidth={1.8} />*/}
+          <BadgeCheck className="mt-0.5 size-5 shrink-0 text-[#00A899]" strokeWidth={2}/>
           {feature}
         </li>
       ))}
