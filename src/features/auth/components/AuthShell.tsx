@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import {
   CircleDollarSign,
@@ -58,9 +59,16 @@ export function AuthShell({
             href="/"
             className="inline-flex items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00BEAA] focus-visible:ring-offset-4"
           >
-            <span className="grid size-11 place-items-center rounded-[14px] bg-[linear-gradient(160deg,#A8D97C,#12CDBE_55%,#7FE0DA)] text-xl font-bold text-[#0C4B47] shadow-[0_10px_22px_-12px_rgba(0,190,170,0.8)]">
-              N
-            </span>
+            <div className="grid size-11 place-items-center rounded-[14px] bg-[linear-gradient(160deg,#A8D97C,#12CDBE_55%,#7FE0DA)] shadow-[0_10px_22px_-12px_rgba(0,190,170,0.8)]">
+              <Image
+                src="/logo-temp.png"
+                alt=""
+                aria-hidden="true"
+                width={32}
+                height={32}
+                className="size-8"
+              />
+            </div>
             <span className="flex flex-col gap-0.5">
               <span className="text-[22px] font-semibold leading-none tracking-[-0.03em] dark:text-[#EAF3F1]">
                 NegosyoTracker

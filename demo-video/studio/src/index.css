@@ -1,0 +1,18 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+}
+
+:root {
+  color-scheme: light;
+  font-family: Inter, 'Segoe UI', Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
