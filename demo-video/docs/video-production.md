@@ -20,6 +20,14 @@ Rendered delivery files:
 
 ## Technology choice
 
+### Deployment boundary
+
+The web application and video studio are separate npm and TypeScript projects. The root `tsconfig.json` excludes `demo-video` so Next.js checks only the application and its other included source files. The studio uses its own `package.json`, lockfile, and `tsconfig.json` when previewing, validating, or rendering the video.
+
+Vercel should build from the repository root using the root package install and `npm run build`. Installing the root package does not install the nested studio dependencies. Do not add Remotion packages to the root application or disable Next.js type checking to resolve video-related build errors. Keep the Remotion package dependencies in `demo-video/studio/package.json`; their classification applies to the video project, not the deployed web application.
+
+For a fresh video checkout, run `npm ci` inside `demo-video/studio` before using its commands. Run the root build independently to validate the application deployment. Avoid importing studio source files into application code because an explicit import can bring an excluded file back into the TypeScript program.
+
 Remotion 4 was selected because the product UI is already React-based and the video needs deterministic, reusable UI animation rather than a fragile screen recording. Every visual is rendered from the current frame with `useCurrentFrame`, `interpolate`, and spring-based motion. `@remotion/transitions` handles scene changes. Tailwind CSS 4 supports the mock interface styling, and Lucide supplies UI icons.
 
 No live API, Clerk session, browser automation, or production database is required to render. This makes the output repeatable and prevents customer or credential exposure.
