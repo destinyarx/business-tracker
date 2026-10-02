@@ -6,6 +6,7 @@ import { LandingHero } from '@/features/landing/components/LandingHero'
 import { LandingHowItWorks } from '@/features/landing/components/LandingHowItWorks'
 import { LandingModules } from '@/features/landing/components/LandingModules'
 import { LandingPricing } from '@/features/landing/components/LandingPricing'
+import { LandingShowcase } from '@/features/landing/components/LandingShowcase'
 import { landingSans } from '@/features/landing/landing.fonts'
 import { ThemeSync } from '@/components/molecules/ThemeSync'
 
@@ -18,6 +19,7 @@ export default function Home() {
       <LandingHeader />
       <main>
         <LandingHero />
+        <LandingShowcase />
         <LandingModules />
         <LandingHowItWorks />
         <LandingPricing />
