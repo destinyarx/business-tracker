@@ -12,6 +12,10 @@ const securityHeaders = [
 ]
 
 const nextConfig: NextConfig = {
+  // Enables forbidden()/unauthorized() and the app/forbidden.tsx + app/unauthorized.tsx pages.
+  experimental: {
+    authInterrupts: true,
+  },
   images: {
     domains: [
       'foodish-api.com',
