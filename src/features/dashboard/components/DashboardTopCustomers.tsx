@@ -13,7 +13,7 @@ export function DashboardTopCustomers({
   customers,
 }: DashboardTopCustomersProps) {
   return (
-    <section className="overflow-hidden rounded-[20px] border border-[#e3e9e8] bg-white dark:border-[#243936] dark:bg-[#12201f]" aria-labelledby="top-customers-heading">
+    <section className="xl:h-full overflow-hidden rounded-[20px] border border-[#e3e9e8] bg-white dark:border-[#243936] dark:bg-[#12201f]" aria-labelledby="top-customers-heading">
       <header className="flex items-center gap-2.5 border-b border-[#edf1f0] px-[18px] py-3.5 dark:border-[#243936]">
         <div className="min-w-0">
           <h2 id="top-customers-heading" className="text-[14.5px] font-semibold text-[#16292b] dark:text-[#eaf3f1]">Who is buying</h2>

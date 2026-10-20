@@ -116,7 +116,7 @@ export function DashboardView({
         />
       </div>
 
-      <div className="grid items-start gap-3.5 lg:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 items-start gap-3.5 xl:grid-cols-3 xl:items-stretch">
         <DashboardAttentionList attention={overview.attention} />
         <DashboardTopProducts products={overview.topProducts} />
         <DashboardTopCustomers customers={overview.topCustomers} />

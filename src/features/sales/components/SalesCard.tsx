@@ -77,8 +77,18 @@ export default function SalesCard({ open, onOpenChange, sale }: SalesCardProps) 
                 ))}
                 {!displayedSale?.orderItems.length && <p className="py-8 text-center text-xs text-[#93a5a5]">No product items are available for this sale.</p>}
               </div>
-              {displayedSale?.notes?.trim() && <div className="mt-4 rounded-xl bg-[#f8fafa] px-3 py-2.5 text-xs leading-5 text-[#5f7273] dark:bg-[#16292b] dark:text-[#9fb3b0]"><span className="font-semibold text-[#3f5254] dark:text-[#c3d4d1]">Notes: </span>{displayedSale.notes}</div>}
-              {displayedSale?.profitInaccurate && <div className="mt-3 flex items-start gap-2 rounded-xl bg-[#fff7e0] px-3 py-2.5 text-[11.5px] leading-5 text-[#8a6100] dark:bg-[#493816] dark:text-[#ffd66b]"><TriangleAlert className="mt-0.5 size-3.5 shrink-0" />Profit may be inaccurate because one or more products have no recorded profit.</div>}
+              {displayedSale?.notes?.trim() && (
+                <div className="mt-4 rounded-xl bg-[#f8fafa] px-3 py-2.5 text-xs leading-5 text-[#5f7273] dark:bg-[#16292b] dark:text-[#9fb3b0]">
+                  <span className="font-semibold text-[#3f5254] dark:text-[#c3d4d1]">
+                    Notes: </span>{displayedSale.notes}
+                </div>
+              )}
+
+              {displayedSale?.profitInaccurate &&
+                <div className="flex items-center gap-2 rounded-xl bg-[#fff7e0] px-3 py-2.5 mt-3 text-[11px] leading-5 text-[#8a6100] dark:bg-[#493816] dark:text-[#ffd66b]">
+                  <TriangleAlert className="mt-0.5 size-5.5 shrink-0"/>
+                    Profit may be inaccurate because one or more products have no recorded profit.
+                </div>}
             </section>
 
             <footer className="flex flex-wrap items-center gap-3 border-t border-[#edf1f0] px-[22px] pb-[18px] pt-3.5 dark:border-[#1e322f]">

@@ -14,7 +14,7 @@ export function DashboardAttentionList({
   attention,
 }: DashboardAttentionListProps) {
   return (
-    <section className="overflow-hidden rounded-[20px] border border-[#e3e9e8] bg-white dark:border-[#243936] dark:bg-[#12201f]" aria-labelledby="attention-heading">
+    <section className="xl:h-full overflow-hidden rounded-[20px] border border-[#e3e9e8] bg-white dark:border-[#243936] dark:bg-[#12201f]" aria-labelledby="attention-heading">
       <header className="border-b border-[#edf1f0] px-[18px] py-3.5 dark:border-[#243936]">
         <h2 id="attention-heading" className="text-[14.5px] font-semibold text-[#16292b] dark:text-[#eaf3f1]">Needs your attention</h2>
         <p className="mt-0.5 text-[11.5px] text-[#93a5a5]">
